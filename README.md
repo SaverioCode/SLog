@@ -1,5 +1,6 @@
 # Simple Logger  
 **As simple as possible**  
+![Terminal and File output](assets/terminal_output.png)
 ## Description
 Simple logger is a **singleton**, **thread safe**, **header only** C++(17+) logger that has no intet to replace complex and feature reach loggers. 
 Instead the main focus is on **simplicity**. It's simple to use and to integrate.  
@@ -16,7 +17,7 @@ Does it means that is super optimized and whatever? No, but It's definetly using
 It's possible that in future releases I'm going to support older version. At least 14 and maybe 11. Let's see
 ## Supported Platforms and Compilers
 ### Platforms
-At this stage I'm not going to provide any officially supported platforms, but for some easy test I can excpeted to work on all major linux distros and windows 10+.  
+At this stage I'm not going to provide any officially supported platforms, but for some easy test I excpet it to work on all major linux distros and windows 10+.  
 ### Compilers
 **gnu** , **clang** and unofficially **mvsc**
 ## 5 Step Guide
@@ -61,6 +62,5 @@ Not ordered
 - [ ] Implement test suites
 - [ ] Test it with _msvc_ and write examples (it should already work fine)
 - [ ] Write the _Complete Guide_
-- [ ] Add photo example of terminal output (_intro_)
 - [ ] Implement CI
 - [ ] Test it on different OS (it should already work on major linux distros and windows 10+)   
