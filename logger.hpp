@@ -19,15 +19,15 @@
 #define LOGCOUT	0b00000010
 #define LOGCOE	0b00000011
 
-#ifndef LOGNAME
-#define LOGNAME logger
+#ifndef SLOG
+#define SLOG logger
 #endif
 
 namespace sl
 {
     class Logger;
 
-    extern Logger& LOGNAME;
+    extern Logger& SLOG;
 }
 
 namespace sl
@@ -50,7 +50,7 @@ namespace sl
     class LoggerStream
     {
     public:
-        LoggerStream() = default;
+        LoggerStream() = delete;
         LoggerStream(std::string& timestamp, const char* level);
         LoggerStream(std::string& timestamp, std::string& level);
         LoggerStream(std::ostream& outstream, std::string& timestamp, const char* level);
