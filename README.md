@@ -1,10 +1,24 @@
 # Simple Logger  
 **As simple as possible**  
 ## Description
-Simple logger is an header only c++ logger that has no intet to replace complex and feature reach loggers. 
+Simple logger is a **singleton**, **thread safe**, **header only** C++(17+) logger that has no intet to replace complex and feature reach loggers. 
 Instead the main focus is on **simplicity**. It's simple to use and to integrate.  
-You should take no more then 10 minutes ([5 Step Guide](#5-step-guide)) to learn how to use it and integrate it in your own project. And if I'm wrong maybe you are a novice or just dumb!. Anyway I like you, so let me know!  
+You should take no more then 10 minutes ([5 Step Guide](#5-step-guide)) to learn how to use it and integrate it in your own project. And if I'm wrong maybe you are a too novice or just dumb!. Anyway I like you, so let me know!  
 Simple logger use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
+## Contribute
+Suggestion and contribution are welcome! Just contact me and I'll be glad to answer you
+## Requiriments
+- C++ 17+  
+
+Why from 17? To reduce boiler plate code, but manually defining everything, and trying to use new optimization offered by the lenguage.   
+Does it means that is super optimized and whatever? No, but It's definetly using some new feature offered by the lenguage. For example c++11 and previous would fail for the use of `std::make_unique`(introduced in c++14) that optimize `std::unique_ptr` allocation. Instead c++14 it's going to fail because in some situation move and copy constructor have been deleted, reling on _Copy Elipsion_ that it's guaranteed from c++17 
+
+It's possible that in future releases I'm going to support older version. At least 14 and maybe 11. Let's see
+## Supported Platforms and Compilers
+### Platforms
+At this stage I'm not going to provide any officially supported platforms, but for some easy test I can excpeted to work on all major linux distros and windows 10+.  
+### Compilers
+**gnu** , **clang** and unofficially **mvsc**
 ## 5 Step Guide
 1. #### Import the _logger.hpp_ file. 
 2. #### Include the header where you are going to use it!  
@@ -17,8 +31,12 @@ Simple logger use the **RAII** idiom, that means that you don't have to take car
     or
     ```c++
     sl::Logger& logger = sl::Logger::getInstance()
+    ```  
+    **logger** is the default value of **SLOG**! Of course you can use other names for you variable but in this case I suggest you to read the [Complete Guide](#complete-guide)  
+    If you want to log on a **file**? just pass it as argument the first time you get the instance. After it's not possible.
+    ```c++
+    sl::Logger& SLOG = sl::Logger::getInstance("file_name");
     ```
-    **logger** is the default value of **SLOG**! Of course you can use other names for you variable but in this case I suggest you to read the [Complete Guide](#complete-guide)
 4. #### Write a log
     ```c++
     SLOG.info() << "just use the stream insertion operator as you always do";
@@ -37,6 +55,12 @@ Simple logger use the **RAII** idiom, that means that you don't have to take car
 ## Complete Guide  
 
 ## Roadmap
-- [ ] Implement optional colors for the different logs levels
+Not ordered  
+- [ ] Implement optional colors for the different logs levels (terminal ouotput)
 - [ ] Implement _trace_ log level  
 - [ ] Implement test suites
+- [ ] Test it with _msvc_ and write examples (it should already work fine)
+- [ ] Write the _Complete Guide_
+- [ ] Add photo example of terminal output (_intro_)
+- [ ] Implement CI
+- [ ] Test it on different OS (it should already work on major linux distros and windows 10+)   
