@@ -1,5 +1,6 @@
 # Simple Logger  
 **As simple as possible**  
+
 ![Terminal and File output](assets/terminal_output.png)
 ## Description
 Simple logger is a **singleton**, **thread safe**, **header only** C++(17+) logger that has no intet to replace complex and feature reach loggers. 
