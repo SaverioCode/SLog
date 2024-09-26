@@ -3,8 +3,7 @@
 
 ![Terminal and File output](assets/terminal_output.png)
 ## Description
-Simple logger is a **singleton**, **thread safe**, **header only** C++(17+) logger that has no intet to replace complex and feature reach loggers. 
-Instead the main focus is on **simplicity**. It's simple to use and to integrate.  
+Simple logger is a **singleton**, **thread safe**, **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
 You should take no more then 10 minutes ([5 Step Guide](#5-step-guide)) to learn how to use it and integrate it in your own project. And if I'm wrong maybe you are too novice or just dumb! Anyway I like you, so let me know!  
 Simple logger use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
 ## Contribute
