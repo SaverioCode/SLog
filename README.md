@@ -1,20 +1,17 @@
 # Simple Logger  
 **As simple as possible**  
+
 ![Terminal and File output](assets/terminal_output.png)
 ## Description
-Simple logger is a **singleton**, **thread safe**, **header only** C++(17+) logger that has no intet to replace complex and feature reach loggers. 
-Instead the main focus is on **simplicity**. It's simple to use and to integrate.  
-You should take no more then 10 minutes ([5 Step Guide](#5-step-guide)) to learn how to use it and integrate it in your own project. And if I'm wrong maybe you are a too novice or just dumb!. Anyway I like you, so let me know!  
+Simple logger is a **singleton**, **thread safe**, **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
+You should take no more then 10 minutes ([5 Step Guide](#5-step-guide)) to learn how to use it and integrate it in your own project. And if I'm wrong maybe you are too novice or just dumb! Anyway I like you, so let me know!  
 Simple logger use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
 ## Contribute
 Suggestion and contribution are welcome! Just contact me and I'll be glad to answer you
 ## Requiriments
 - C++ 17+  
 
-Why from 17? To reduce boiler plate code, but manually defining everything, and trying to use new optimization offered by the lenguage.   
-Does it means that is super optimized and whatever? No, but It's definetly using some new feature offered by the lenguage. For example c++11 and previous would fail for the use of `std::make_unique`(introduced in c++14) that optimize `std::unique_ptr` allocation. Instead c++14 it's going to fail because in some situation move and copy constructor have been deleted, reling on _Copy Elipsion_ that it's guaranteed from c++17 
-
-It's possible that in future releases I'm going to support older version. At least 14 and maybe 11. Let's see
+It's possible that in future it's going to support older version. At least 14 and maybe 11. Let's see
 ## Supported Platforms and Compilers
 ### Platforms
 At this stage I'm not going to provide any officially supported platforms, but for some easy test I excpet it to work on all major linux distros and windows 10+.  
