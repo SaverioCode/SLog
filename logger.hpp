@@ -95,29 +95,29 @@ public:
     static Logger&	getInstance(const char* file_name = nullptr, const int options = 0);
 
 #ifdef LOGLVLI
-    LoggerStream	    info();
+    LoggerStream	    info(std::ostream* stream = &std::cout);
 #else
-    inline NullStream	info();
+    inline NullStream	info(std::ostream* stream = nullptr);
 #endif
 #ifdef LOGLVLD
-    LoggerStream	    debug();
+    LoggerStream	    debug(std::ostream* stream = &std::cout);
 #else
-    inline NullStream	debug();
+    inline NullStream	debug(std::ostream* stream = nullptr);
 #endif
 #ifdef LOGLVLW
-    LoggerStream	    warn();
+    LoggerStream	    warn(std::ostream* stream = &std::cout);
 #else
-    inline NullStream	warn();
+    inline NullStream	warn(std::ostream* stream = nullptr);
 #endif
 #ifdef LOGLVLE
-    LoggerStream	    err();
+    LoggerStream	    err(std::ostream* stream = &std::cerr);
 #else
-    inline NullStream	err();
+    inline NullStream	err(std::ostream* stream = nullptr);
 #endif
 #ifdef LOGLVLF
-    LoggerStream	    fatal();
+    LoggerStream	    fatal(std::ostream* stream = &std::cerr);
 #else
-    inline NullStream	fatal();
+    inline NullStream	fatal(std::ostream* stream = nullptr);
 #endif
 
     std::string		getFileName() const;
@@ -130,8 +130,7 @@ private:
 
     Logger	operator=(Logger& other) = delete;
 
-    LoggerStream	_print(const char* level);
-    LoggerStream	_print(std::ostream* stream, const char* level);
+    LoggerStream	_print(std::ostream* stream = nullptr, const char* level = nullptr);
     std::string		_getTimeStamp();
     void			_captureStreams(const int options);
 
@@ -227,75 +226,64 @@ Logger& Logger::getInstance(const char* file_name, const int options)
 }
 
 #ifdef LOGLVLI
-LoggerStream Logger::info()
+LoggerStream Logger::info(std::ostream* stream)
 {
-    return _print("[INFO]");
+    return _print(stream, "[INFO]");
 }
 #else
-NullStream Logger::info()
+NullStream Logger::info(std::ostream* stream)
 {
     return NullStream();
 }
 #endif
 
 #ifdef LOGLVLD
-LoggerStream Logger::debug()
+LoggerStream Logger::debug(std::ostream* stream)
 {
-    return _print("[DEBUG]");
+    return _print(stream, "[DEBUG]");
 }
 #else
-NullStream Logger::debug()
+NullStream Logger::debug(std::ostream* stream)
 {
     return NullStream();
 }
 #endif
 
 #ifdef LOGLVLW
-LoggerStream Logger::warn()
+LoggerStream Logger::warn(std::ostream* stream)
 {
-    return _print("[WARNING]");
+    return _print(stream, "[WARNING]");
 }
 #else
-NullStream Logger::warn()
+NullStream Logger::warn(std::ostream* stream)
 {
     return NullStream();
 }
 #endif
 
 #ifdef LOGLVLE
-LoggerStream Logger::err()
+LoggerStream Logger::err(std::ostream* stream)
 {
-    return _print(&std::cerr, "[ERROR]");
+    return _print(stream, "[ERROR]");
 }
 #else
-NullStream Logger::err()
+NullStream Logger::err(std::ostream* stream)
 {
     return NullStream();
 }
 #endif
 
 #ifdef LOGLVLF
-LoggerStream Logger::fatal()
+LoggerStream Logger::fatal(std::ostream* stream)
 {
-    return _print(&std::cerr, "[FATAL]");
+    return _print(stream, "[FATAL]");
 }
 #else
-NullStream Logger::fatal()
+NullStream Logger::fatal(std::ostream* stream)
 {
     return NullStream();
 }
 #endif
-
-LoggerStream Logger::_print(const char* level)
-{
-    std::string time_stamp = "[" + _getTimeStamp() + "]";
-    if (_file_is_set) {
-        return LoggerStream(_outstream, time_stamp, level);
-    }
-    else {
-        return LoggerStream(time_stamp, level);
-    }
-}
 
 LoggerStream Logger::_print(std::ostream* stream, const char* level)
 {
@@ -303,8 +291,11 @@ LoggerStream Logger::_print(std::ostream* stream, const char* level)
     if (_file_is_set) {
         return LoggerStream(_outstream, time_stamp, level);
     }
-    else {
+    else if (stream) {
         return LoggerStream(stream, time_stamp, level);
+    }
+    else {
+	    return LoggerStream(time_stamp, level);
     }
 }
 
