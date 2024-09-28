@@ -3,10 +3,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <memory>
 #include <mutex>
+#include <memory>
 #include <fstream>
 #include <iomanip>
+#include <optional>
 
 #ifdef LOGLVLA
 #define LOGLVLI
@@ -70,19 +71,17 @@ class LoggerStream
 
     private:
         LoggerStream() = delete;
-        LoggerStream(std::string& timestamp, const char* level);
-        LoggerStream(std::string& timestamp, std::string& level);
-        LoggerStream(std::ostream& outstream, std::string& timestamp, const char* level);
-        LoggerStream(std::ostream* outstream, std::string& timestamp, const char* level);
-        LoggerStream(std::ostream& outstream, std::string& timestamp, std::string& level);
+        LoggerStream(std::ostream& outstream, std::string& timestamp, const char* level, std::mutex* mutex);
+
         LoggerStream(LoggerStream&) = delete;
         LoggerStream(LoggerStream&&) = delete;
 
         LoggerStream& operator=(const LoggerStream&) = delete;
 
-        std::ostringstream	_buffer;
-        std::ostream&		_stream;
-    
+        std::ostringstream    _buffer;
+        std::ostream&         _stream;
+        std::mutex*            _mutex;
+
     friend class Logger;
 };
 
@@ -95,29 +94,29 @@ public:
     static Logger&	getInstance(const char* file_name = nullptr, const int options = 0);
 
 #ifdef LOGLVLI
-    LoggerStream	    info(std::ostream* stream = &std::cout);
+    LoggerStream	    info(std::ostream& stream = _cout);
 #else
-    inline NullStream	info(std::ostream* stream = nullptr);
+    inline NullStream	info(std::ostream& stream = _cout);
 #endif
 #ifdef LOGLVLD
-    LoggerStream	    debug(std::ostream* stream = &std::cout);
+    LoggerStream	    debug(std::ostream& stream = _cout);
 #else
-    inline NullStream	debug(std::ostream* stream = nullptr);
+    inline NullStream	debug(std::ostream& stream = _cout);
 #endif
 #ifdef LOGLVLW
-    LoggerStream	    warn(std::ostream* stream = &std::cout);
+    LoggerStream	    warn(std::ostream& stream = _cout);
 #else
-    inline NullStream	warn(std::ostream* stream = nullptr);
+    inline NullStream	warn(std::ostream& stream = _cout);
 #endif
 #ifdef LOGLVLE
-    LoggerStream	    err(std::ostream* stream = &std::cerr);
+    LoggerStream	    err(std::ostream& stream = _cerr);
 #else
-    inline NullStream	err(std::ostream* stream = nullptr);
+    inline NullStream	err(std::ostream& stream = _cerr);
 #endif
 #ifdef LOGLVLF
-    LoggerStream	    fatal(std::ostream* stream = &std::cerr);
+    LoggerStream	    fatal(std::ostream& stream = _cerr);
 #else
-    inline NullStream	fatal(std::ostream* stream = nullptr);
+    inline NullStream	fatal(std::ostream& stream = _cerr);
 #endif
 
     std::string		getFileName() const;
@@ -130,47 +129,32 @@ private:
 
     Logger	operator=(Logger& other) = delete;
 
-    LoggerStream	_print(std::ostream* stream = nullptr, const char* level = nullptr);
+    LoggerStream	_print(std::ostream& stream = _cout, const char* level = nullptr);
     std::string		_getTimeStamp();
     void			_captureStreams(const int options);
 
     static std::unique_ptr<Logger>	_instance;
-    static std::once_flag			_once_flag;
     const int		_options;
     std::string		_file_name;
-    bool			_file_is_set;
-    std::ofstream	_outstream;
+    std::optional<std::ofstream>	_outstream;
+    static std::ostream&   _cout;
+    static std::ostream&   _cerr;
+    static std::once_flag    _once_flag;
+    static std::mutex        _log_mutex;
 };
 
 /************* LOGGER STREAM *************/
 
-LoggerStream::LoggerStream(std::string& timestamp, const char* level) : _stream(std::cout)
-{
-    _buffer << timestamp << " " << level << " ";
-}
-
-LoggerStream::LoggerStream(std::string& timestamp, std::string& level) : _stream(std::cout)
-{
-    _buffer << timestamp << " " << level << " ";
-}
-
-LoggerStream::LoggerStream(std::ostream& outstream, std::string& timestamp, const char* level) : _stream(outstream)
-{
-    _buffer << timestamp << " " << level << " ";
-}
-
-LoggerStream::LoggerStream(std::ostream* outstream, std::string& timestamp, const char* level) : _stream(*outstream)
-{
-    _buffer << timestamp << " " << level << " ";
-}
-
-LoggerStream::LoggerStream(std::ostream& outstream, std::string& timestamp, std::string& level) : _stream(outstream)
+LoggerStream::LoggerStream(std::ostream& outstream, std::string& timestamp, const char* level, std::mutex* mutex) : _stream(outstream), _mutex(mutex)
 {
     _buffer << timestamp << " " << level << " ";
 }
 
 LoggerStream::~LoggerStream()
 {
+#ifdef SLOG_TSAFE
+    std::lock_guard<std::mutex> lock(*_mutex);
+#endif
     _stream << _buffer.str() << std::endl;
 }
 
@@ -182,30 +166,29 @@ std::string LoggerStream::getBuffer() const
 /************* LOGGER *************/
 
 std::unique_ptr<Logger>	Logger::_instance{ nullptr };
-std::once_flag	Logger::_once_flag{};
+std::once_flag Logger::_once_flag{};
+std::mutex Logger::_log_mutex{};
+std::ostream& Logger::_cout{std::cout};
+std::ostream& Logger::_cerr{std::cerr};
 
 Logger::Logger(std::string& file_name, const int options) : _options(options)
 {
-    _file_is_set = false;
     if (file_name.empty() == false) {
         _file_name = file_name;
         _outstream = std::ofstream(file_name);
-        if (_outstream.is_open()) {
-            _file_is_set = true;
-        }
-        else {
+        if (_outstream.has_value() == false) {
             this->err() << "Unable to open file named: " << file_name << ". Logging is going to be printed on stdout and stderr.";
         }
-    }
-    if (_file_is_set && options != 0) {
-        _captureStreams(options);
+        if (_outstream.has_value() && options != 0) {
+            _captureStreams(options);
+        }
     }
 }
 
 Logger::~Logger()
 {
-    if (_file_is_set) {
-        _outstream.close();
+    if (_outstream.has_value()) {
+        _outstream->close();
     }
 }
 
@@ -226,76 +209,79 @@ Logger& Logger::getInstance(const char* file_name, const int options)
 }
 
 #ifdef LOGLVLI
-LoggerStream Logger::info(std::ostream* stream)
+LoggerStream Logger::info(std::ostream& stream)
 {
     return _print(stream, "[INFO]");
 }
 #else
-NullStream Logger::info(std::ostream* stream)
+NullStream Logger::info(std::ostream& stream)
 {
     return NullStream();
 }
 #endif
 
 #ifdef LOGLVLD
-LoggerStream Logger::debug(std::ostream* stream)
+LoggerStream Logger::debug(std::ostream& stream)
 {
     return _print(stream, "[DEBUG]");
 }
 #else
-NullStream Logger::debug(std::ostream* stream)
+NullStream Logger::debug(std::ostream& stream)
 {
     return NullStream();
 }
 #endif
 
 #ifdef LOGLVLW
-LoggerStream Logger::warn(std::ostream* stream)
+LoggerStream Logger::warn(std::ostream& stream)
 {
     return _print(stream, "[WARNING]");
 }
 #else
-NullStream Logger::warn(std::ostream* stream)
+NullStream Logger::warn(std::ostream& stream)
 {
     return NullStream();
 }
 #endif
 
 #ifdef LOGLVLE
-LoggerStream Logger::err(std::ostream* stream)
+LoggerStream Logger::err(std::ostream& stream)
 {
     return _print(stream, "[ERROR]");
 }
 #else
-NullStream Logger::err(std::ostream* stream)
+NullStream Logger::err(std::ostream& stream)
 {
     return NullStream();
 }
 #endif
 
 #ifdef LOGLVLF
-LoggerStream Logger::fatal(std::ostream* stream)
+LoggerStream Logger::fatal(std::ostream& stream)
 {
     return _print(stream, "[FATAL]");
 }
 #else
-NullStream Logger::fatal(std::ostream* stream)
+NullStream Logger::fatal(std::ostream& stream)
 {
     return NullStream();
 }
 #endif
 
-LoggerStream Logger::_print(std::ostream* stream, const char* level)
+LoggerStream Logger::_print(std::ostream& stream, const char* level)
 {
     std::string time_stamp = "[" + _getTimeStamp() + "]";
-    if (_file_is_set) {
-        return LoggerStream(_outstream, time_stamp, level);
-    }
-    else if (stream) {
-        return LoggerStream(stream, time_stamp, level);
+    std::mutex* mutex = nullptr;
+#ifdef SLOG_TSAFE
+    std::lock_guard<std::mutex> lock(_log_mutex);
+    mutex = &_log_mutex;
+#endif
+
+    if (_outstream.has_value()) {
+        return LoggerStream(_outstream.value(), time_stamp, level, mutex);
     }
     else {
-	    return LoggerStream(time_stamp, level);
+        return LoggerStream(stream, time_stamp, level, mutex);
     }
 }
 
@@ -317,10 +303,10 @@ std::string Logger::_getTimeStamp()
 void Logger::_captureStreams(const int options)
 {
     if (options & LOGCOUT) {
-        std::cout.rdbuf(_outstream.rdbuf());
+        std::cout.rdbuf(_outstream->rdbuf());
     }
     if (options & LOGCERR) {
-        std::cerr.rdbuf(_outstream.rdbuf());
+        std::cerr.rdbuf(_outstream->rdbuf());
     }
 }
 }
