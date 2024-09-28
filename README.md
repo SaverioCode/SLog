@@ -1,37 +1,48 @@
 # Simple Logger  
 **As simple as possible**  
+- **Singleton**  
+- **Thread Safe** (instantiation and prints)  
+- **One File, Header only**  (less then 350 lines)
+- **5 different log levels**  
+- **Fast compilation**  
+- **Modern C++**
 
 ![Terminal and File output](assets/terminal_output.png)
+## Table of Contents
+[Description](#description)  
+[Contribute](#contribute)  
+[Requirements](#requirements)  
+[Supported Platform and Compilers](#supported-platforms-and-compilers)  
+[5 Step Guide](#5-step-guide)  
+[Complete Guide](#complete-guide)  
+[Roadmap](#roadmap)  
 ## Description
-Simple logger is a **singleton**, **thread safe**, **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
+Simple logger is a **singleton**, **thread safe**, **one file**, **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
 You should take no more then 10 minutes ([5 Step Guide](#5-step-guide)) to learn how to use it and integrate it in your own project. And if I'm wrong maybe you are too novice or just dumb! Anyway I like you, so let me know!  
 Simple logger use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
 ## Contribute
 Suggestion and contribution are welcome! Just contact me and I'll be glad to answer you
-## Requiriments
+## Requirements
 - C++ 17+  
-
-It's possible that in future it's going to support older version. At least 14 and maybe 11. Let's see
 ## Supported Platforms and Compilers
 ### Platforms
 At this stage I'm not going to provide any officially supported platforms, but for some easy test I excpet it to work on all major linux distros and windows 10+.  
 ### Compilers
 **gnu**, **clang** and unofficially **mvsc**
 ## 5 Step Guide
+The fastest guide you can have
 ### 1. Import the _logger.hpp_ file. 
+Copy the _logger.hpp_ file from this repository and paste it in your project
 ### 2. Include the header where you are going to use it!  
-- `#include <logger.hpp>` (good practice) in this case be sure that is in your _include_. If you don't now what I mean for _include_ path check this /* LINK */  
-- `#include "path-to-file/logger.hpp"`  
+- `#include <logger.hpp>` (good practice) be sure that is in your _include_ path  
+or  
+- `#include "path-to-file/logger.hpp"`    
 ### 3. Declare a _global variable_, maybe in your main.cpp (good practice)  
+Log on terminal:
 ```c
 sl::Logger& SLOG = sl::Logger::getInstance()
 ```
-or
-```c
-sl::Logger& logger = sl::Logger::getInstance()
-```  
-**logger** is the default value of **SLOG**! Of course you can use other names for you variable but in this case I suggest you to read the [Complete Guide](#complete-guide)  
-If you want to log on a **file**? just pass it as argument the first time you get the instance. After it's not possible.
+Log on file:
 ```c
 sl::Logger& SLOG = sl::Logger::getInstance("file_name");
 ```
@@ -41,16 +52,17 @@ SLOG.info() << "just use the stream insertion operator as you always do";
 ```
 ### 5. Compile it!
 By default all log levels are **disabled** so you need to manually activate them.  
-The **simplest** way is to activate them all:  
-**gnu**
+Activate all **log levels** defining macro **LOGLVLA**  
+Activate **thread safe prints** defining macro **SLOG_TSAFE**, if you don't need it don't do it  
+**gnu**:
 ```bash
-g++ -D LOGLVLA -o exe main.cpp -I <path-to-file>
+g++ -D LOGLVLA -D SLOG_TSAFE -o exe main.cpp
 ```
-**clang**
+**clang**:
 ```bash
-clang++ -D LOGLVLA -o exe main.cpp -I <path-to-file>
+clang++ -D LOGLVLA -D SLOG_TSAFE S-o exe main.cpp
 ```
-## Complete Guide  
+## Complete Guide
 ### Declaration
 There is a macro called `SLOG`. If not manually setted by the user, it's value is `logger`.  
 You can still use a different name and the macro usage it's not mandatory.  
@@ -92,3 +104,6 @@ Not ordered
 - [ ] Write the _Complete Guide_
 - [ ] Implement CI
 - [ ] Test it on different OS (it should already work on major linux distros and windows 10+)   
+- [ ] Implement Log Rotation  
+- [ ] Implement custom format??
+- [ ] Implement verbose??

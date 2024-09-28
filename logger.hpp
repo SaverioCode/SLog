@@ -80,7 +80,7 @@ class LoggerStream
 
         std::ostringstream    _buffer;
         std::ostream&         _stream;
-        std::mutex*            _mutex;
+        std::mutex*           _mutex;
 
     friend class Logger;
 };
