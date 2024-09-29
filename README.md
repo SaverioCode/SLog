@@ -1,25 +1,29 @@
 # Simple Logger  
 **As simple as possible**  
 - **Singleton**  
-- **Thread Safe** (instantiation and prints)  
+- **Thread Safe** (instantiation, prints and log file changes)  
 - **One File, Header only**  (less then 350 lines)
 - **5 different log levels**  
 - **Fast compilation**  
-- **Modern C++**
+- **Run-time log file change**
+- **Modern C++** (17+)  
 
 ![Terminal and File output](assets/terminal_output.png)
 ## Table of Contents
-[Description](#description)  
-[Contribute](#contribute)  
-[Requirements](#requirements)  
-[Supported Platform and Compilers](#supported-platforms-and-compilers)  
-[5 Step Guide](#5-step-guide)  
-[Complete Guide](#complete-guide)  
-[Roadmap](#roadmap)  
+- [Description](#description)  
+- [Licence](#licence)  
+- [Requirements](#requirements)  
+- [Supported Platform and Compilers](#supported-platforms-and-compilers)  
+- [5 Step Guide](#5-step-guide)  
+- [Documentation](#documentation)  
+- [Contribute](#contribute)  
+- [Roadmap](#roadmap)  
 ## Description
 Simple logger is a **singleton**, **thread safe**, **one file** **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
 Less then 5 minutes ([5 Step Guide](#5-step-guide)) to read how integrate it and do it!  
 It also use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
+## Licence
+Probabli MIT
 ## Requirements
 - C++ 17+  
 ## Supported Platforms and Compilers
@@ -30,7 +34,7 @@ At this stage I'm not going to provide any officially supported platforms, but f
 ## 5 Step Guide
 The fastest guide you can have
 ### 1. Import
-Copy the _logger.hpp_ file from this repository and paste it in your project
+Copy the _logger.hpp_ file from this repository and paste it in your project  
 // + bash and batch examples
 ### 2. Inclusion
 - `#include <logger.hpp>` (good practice) be sure that is in your _include_ path  
@@ -51,19 +55,34 @@ int main(void)
 }
 ```
 ### 5. Compilation
-By default all log levels are **disabled** so you need to manually activate them.  
-Activate all **log levels** defining macro **LOGLVLA**  
-Activate **thread safe prints** defining macro **SLOG_TSAFE**, if you don't need it don't do it  
 **gnu**:
 ```bash
-g++ -D LOGLVLA -D SLOG_TSAFE -o exe main.cpp
+g++ -o exe main.cpp
 ```
 **clang**:
 ```bash
-clang++ -D LOGLVLA -D SLOG_TSAFE S-o exe main.cpp
+clang++ -o exe main.cpp
 ```
 ## Documentation
-// link to documentation page
+// link to documentation page  
+#### Public Interface:
+```c
+// Usually you don't actually need them
+static Logger&	getInstance(std::string& file_name, const int options = 0);
+static Logger&	getInstance(const char* file_name = nullptr, const int options = 0);
+
+// It's possible to eliminate levels from compiled code through macros (No need to change your code)
+LoggerStream    info(std::ostream& stream = _cout);
+LoggerStream    debug(std::ostream& stream = _cout);
+LoggerStream    warn(std::ostream& stream = _cout);
+LoggerStream    err(std::ostream& stream = _cerr);
+LoggerStream    fatal(std::ostream& stream = _cerr);
+
+bool    updateLogFile(const char* file_name, int options = _options);
+bool    updateLogFile(std::string& file_name, int options = _options);
+void    updateLogFileOptions(int options);
+[[nodiscard]] std::string    getFileName() const;
+```
 ## Contribute
 Suggestion and contribution are welcome! Just contact me and I'll be glad to answer you
 ## Roadmap
