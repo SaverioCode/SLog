@@ -62,39 +62,8 @@ g++ -D LOGLVLA -D SLOG_TSAFE -o exe main.cpp
 ```bash
 clang++ -D LOGLVLA -D SLOG_TSAFE S-o exe main.cpp
 ```
-## Complete Guide
-### Declaration
-There is a macro called `SLOG`. If not manually setted by the user, it's value is `logger`.  
-You can still use a different name and the macro usage it's not mandatory.  
-The recommended way it's to use `SLOG` or at least the value that has been asigned to it (from you or by default).  
-Why? Because the logger it's intendeed to be declared as a _global_variable_ and to simplify the user work has already been made available with the associated macro, exactly like this:
-```c
-extern Logger& SLOG;
-```
-This means that you just have to include the header and you are ready to go. Maybe.  
-Of course there is one thing to do. **Declare it!**  
-The recommended way it's to do it in your _main_ file but do as you please.  
-```c
-sl::Logger& SLOG = sl::Logger::getInstance();
-```
-Remember this class is a **singleton**, you don't have access to the constructor and after the first `getInstance()` call, it's done. You are just going to be able to get reference on reference of the same object.  
-No init function it's needed just get the instance.
-### Log levels
-Rigth now there are 5 different log levels, **info**, **debug**, **warning**, **error** and **fatal**. Each log level is associated to a macro in order to efficiently activate and disable what you want without changes in your code.  
-`LOGLVLI` for **info**  
-`LOGLVLD` for **debug**  
-`LOGLVLW` for **warning**  
-`LOGLVLE` for **error**  
-`LOGLVLF` for **fatal**  
-`LOGLVLA` for **all levels**  
-As a default behavior **info**, **debug** and **warning** are going to write on `std::cout` instead **error** and **fatal** on `std::cerr`  
-### Log on File
-Default behavior it's to write on terminal, or at least where the buffer of `std::cout` and `std::cerr` are pointing.  
-To write logs on a file you can just pass the _file_name_ as argument to the `Logger::getInstance()` method
-```c
-sl::Logger& SLOG = sl::Logger::getInstance("<file_name>");
-```
-Once the file is setted it's not possible to revert it. At least not for now.
+## Documentation
+// link to documentation page
 ## Contribute
 Suggestion and contribution are welcome! Just contact me and I'll be glad to answer you
 ## Roadmap
