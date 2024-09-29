@@ -17,9 +17,9 @@
 [Complete Guide](#complete-guide)  
 [Roadmap](#roadmap)  
 ## Description
-Simple logger is a **singleton**, **thread safe**, **one file**, **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
-You should take no more then 10 minutes ([5 Step Guide](#5-step-guide)) to learn how to use it and integrate it in your own project. And if I'm wrong maybe you are too novice or just dumb! Anyway I like you, so let me know!  
-Simple logger use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
+Simple logger is a **singleton**, **thread safe**, **one file** **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
+Less then 5 minutes ([5 Step Guide](#5-step-guide)) to read how integrate it and do it!
+It also use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
 ## Contribute
 Suggestion and contribution are welcome! Just contact me and I'll be glad to answer you
 ## Requirements
