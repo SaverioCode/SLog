@@ -20,8 +20,6 @@
 Simple logger is a **singleton**, **thread safe**, **one file** **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
 Less then 5 minutes ([5 Step Guide](#5-step-guide)) to read how integrate it and do it!  
 It also use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
-## Contribute
-Suggestion and contribution are welcome! Just contact me and I'll be glad to answer you
 ## Requirements
 - C++ 17+  
 ## Supported Platforms and Compilers
@@ -97,6 +95,8 @@ To write logs on a file you can just pass the _file_name_ as argument to the `Lo
 sl::Logger& SLOG = sl::Logger::getInstance("<file_name>");
 ```
 Once the file is setted it's not possible to revert it. At least not for now.
+## Contribute
+Suggestion and contribution are welcome! Just contact me and I'll be glad to answer you
 ## Roadmap
 Not ordered  
 - [ ] Implement optional colors for the different logs levels (terminal ouotput)
