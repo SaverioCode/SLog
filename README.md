@@ -31,26 +31,28 @@ At this stage I'm not going to provide any officially supported platforms, but f
 **gnu**, **clang** and unofficially **mvsc**
 ## 5 Step Guide
 The fastest guide you can have
-### 1. Import the _logger.hpp_ file. 
+### 1. Import
 Copy the _logger.hpp_ file from this repository and paste it in your project
-### 2. Include the header where you are going to use it!  
+// + bash and batch examples
+### 2. Inclusion
 - `#include <logger.hpp>` (good practice) be sure that is in your _include_ path  
 or  
 - `#include "path-to-file/logger.hpp"`    
-### 3. Declare a _global variable_, maybe in your main.cpp (good practice)  
-Log on terminal:
+### 3. Usage
+**simple_logger** is a reserved word.  
+Usage example:
 ```c
-sl::Logger& SLOG = sl::Logger::getInstance()
+#include <logger.h>
+
+int main(void)
+{
+    // Logging in file  (optional line)
+    SLOG.init("file.log");
+
+    SLOG.info() << "just use the stream insertion operator as you always do";
+}
 ```
-Log on file:
-```c
-sl::Logger& SLOG = sl::Logger::getInstance("file_name");
-```
-### 4. Write a log
-```c
-SLOG.info() << "just use the stream insertion operator as you always do";
-```
-### 5. Compile it!
+### 5. Compilation
 By default all log levels are **disabled** so you need to manually activate them.  
 Activate all **log levels** defining macro **LOGLVLA**  
 Activate **thread safe prints** defining macro **SLOG_TSAFE**, if you don't need it don't do it  
