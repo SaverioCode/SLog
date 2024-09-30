@@ -57,14 +57,14 @@ int main(void)
 ### 5. Compilation
 **gnu**:
 ```bash
-g++ -o exe main.cpp
+g++ -o example main.cpp
 ```
 **clang**:
 ```bash
-clang++ -o exe main.cpp
+clang++ -o example main.cpp
 ```
 ## Documentation
-// link to documentation page  
+// link-to-documentation (work in progress)  
 #### Public Interface:
 ```c
 // Usually you don't actually need them
