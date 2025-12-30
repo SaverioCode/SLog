@@ -1,28 +1,34 @@
-#pragma once
+#ifndef SIMPLE_LOGGER_HPP
+#define SIMPLE_LOGGER_HPP
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <mutex>
-#include <memory>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <mutex>
+#include <memory>
 #include <optional>
+#include <sstream>
+#include <string>
 
-#ifndef SLOG_LVLA
-#define SLOG_LVLA 1
-#endif
-
+// Todo: remove? or not remove?
 #ifndef SLOG_TSAFE
-#define SLOG_TSAFE 1
+#define SLOG_TSAFE
 #endif
 
-#if defined(SLOG_LVLA) && SLOG_LVLA == 1
-#define SLOG_LVLI 1
-#define SLOG_LVLD 1
-#define SLOG_LVLW 1
-#define SLOG_LVLE 1
-#define SLOG_LVLF 1
+#if defined(SLOG_LVLT)
+#define SLOG_LVLD
+#endif
+#if defined(SLOG_LVLD)
+#define SLOG_LVLI
+#endif
+#if defined(SLOG_LVLI)
+#define SLOG_LVLW
+#endif
+#if defined(SLOG_LVLW)
+#define SLOG_LVLE
+#endif
+#if defined(SLOG_LVLE)
+#define SLOG_LVLF
 #endif
 
 #define SLOG_CERR	0b00000001
@@ -30,7 +36,7 @@
 #define SLOG_COE	0b00000011
 
 #ifndef SLOG
-#define SLOG simple_logger
+#define SLOG slogger
 #endif
 
 namespace sl
@@ -79,7 +85,7 @@ class LoggerStream
 
         LoggerStream& operator=(const LoggerStream&) = delete;
 
-        std::ostringstream    _buffer;
+        std::ostringstream    _buffer{};
         std::ostream&         _stream;
         std::mutex*           _mutex;
 
@@ -93,31 +99,36 @@ public:
 
     static Logger&	getInstance(std::string& file_name, const int options = 0);
     static Logger&	getInstance(const char* file_name = nullptr, const int options = 0);
-
-#if defined(SLOG_LVLI) && SLOG_LVLI == 1
-    LoggerStream	    info(std::ostream& stream = _cout);
+    
+#if defined(SLOG_LVLF)
+    LoggerStream	    fatal(std::ostream& stream = _cerr);
 #else
-    inline NullStream	info(std::ostream& stream = _cout);
+    inline NullStream	fatal(std::ostream& stream = _cerr);
 #endif
-#if defined(SLOG_LVLD) && SLOG_LVLD == 1
-    LoggerStream	    debug(std::ostream& stream = _cout);
-#else
-    inline NullStream	debug(std::ostream& stream = _cout);
-#endif
-#if defined(SLOG_LVLW) && SLOG_LVLW == 1
-    LoggerStream	    warn(std::ostream& stream = _cout);
-#else
-    inline NullStream	warn(std::ostream& stream = _cout);
-#endif
-#if defined(SLOG_LVLE) && SLOG_LVLE == 1
+#if defined(SLOG_LVLE)
     LoggerStream	    err(std::ostream& stream = _cerr);
 #else
     inline NullStream	err(std::ostream& stream = _cerr);
 #endif
-#if defined(SLOG_LVLF) && SLOG_LVLF == 1
-    LoggerStream	    fatal(std::ostream& stream = _cerr);
+#if defined(SLOG_LVLW)
+    LoggerStream	    warn(std::ostream& stream = _cout);
 #else
-    inline NullStream	fatal(std::ostream& stream = _cerr);
+    inline NullStream	warn(std::ostream& stream = _cout);
+#endif
+#if defined(SLOG_LVLI)
+LoggerStream	    info(std::ostream& stream = _cout);
+#else
+inline NullStream	info(std::ostream& stream = _cout);
+#endif
+#if defined(SLOG_LVLD)
+    LoggerStream	    debug(std::ostream& stream = _cout);
+#else
+    inline NullStream	debug(std::ostream& stream = _cout);
+#endif
+#if defined(SLOG_LVLT)
+    LoggerStream	    trace(std::ostream& stream = _cout);
+#else
+    inline NullStream	trace(std::ostream& stream = _cout);
 #endif
 
 bool		updateLogFile(const char* file_name, int options = _options);
@@ -160,6 +171,7 @@ LoggerStream::LoggerStream(std::ostream& outstream, std::string& timestamp, cons
 {
     _buffer << timestamp << " " << level << " ";
 }
+
 
 LoggerStream::~LoggerStream()
 {
@@ -209,7 +221,7 @@ bool	Logger::updateLogFile(const char* file_name, int options)
 
 bool	Logger::updateLogFile(std::string& file_name, int options)
 {
-#if defined(SLOG_TSAFE) && SLOG_TSAFE == 1
+#if defined(SLOG_TSAFE)
 	std::lock_guard<std::mutex> lock(_log_mutex);
 #endif
   	bool status = true;
@@ -225,10 +237,10 @@ bool	Logger::updateLogFile(std::string& file_name, int options)
             _ostream.reset();
         }
     	if (_ostream.has_value() && _ostream->is_open() == false) {
-#if defined(SLOG_TSAFE) && SLOG_TSAFE == 1
-			std::cerr << "[" + _getTimeStamp() + "]" << " [ERROR] " << "Failed to open file " << file_name << ": Logging is going to be printed on stdout and stderr";
+#if defined(SLOG_TSAFE)
+			std::cerr << "[" + _getTimeStamp() + "]" << " [ERROR] " << "Failed to open file " << file_name << ": Logging is going to be printed on console only";
 #else
-        	this->err() << "Unable to open file named: " << file_name << ": Logging is going to be printed on stdout and stderr";
+        	this->err() << "Unable to open file named: " << file_name << ": Logging is going to be printed on console only";
 #endif
             status = false;
     	}
@@ -240,49 +252,25 @@ bool	Logger::updateLogFile(std::string& file_name, int options)
 void	Logger::updateLogFileOptions(int options)
 {
 	_options = options;
-    auto buffer = _options & SLOG_COUT && _ostream.has_value() && _ostream->is_open() ? _ostream->rdbuf() : std::cout.rdbuf();
+    auto buffer = _options && SLOG_COUT && _ostream.has_value() && _ostream->is_open() ? _ostream->rdbuf() : std::cout.rdbuf();
     _cout.rdbuf(std::move(buffer));
-    buffer = _options & SLOG_CERR && _ostream.has_value() && _ostream->is_open() ? _ostream->rdbuf() : std::cerr.rdbuf();
+    buffer = _options && SLOG_CERR && _ostream.has_value() && _ostream->is_open() ? _ostream->rdbuf() : std::cerr.rdbuf();
     _cerr.rdbuf(std::move(buffer));
 }
 
-#if defined(SLOG_LVLI) && SLOG_LVLI == 1
-LoggerStream Logger::info(std::ostream& stream)
+#if defined(SLOG_LVLF)
+LoggerStream Logger::fatal(std::ostream& stream)
 {
-    return _print(stream, "[INFO]");
+    return _print(stream, "[FATAL]");
 }
 #else
-NullStream Logger::info(std::ostream& stream)
+NullStream Logger::fatal(std::ostream& stream)
 {
     return NullStream();
 }
 #endif
 
-#if defined(SLOG_LVLD) && SLOG_LVLD == 1
-LoggerStream Logger::debug(std::ostream& stream)
-{
-    return _print(stream, "[DEBUG]");
-}
-#else
-NullStream Logger::debug(std::ostream& stream)
-{
-    return NullStream();
-}
-#endif
-
-#if defined(SLOG_LVLW) && SLOG_LVLW == 1
-LoggerStream Logger::warn(std::ostream& stream)
-{
-    return _print(stream, "[WARNING]");
-}
-#else
-NullStream Logger::warn(std::ostream& stream)
-{
-    return NullStream();
-}
-#endif
-
-#if defined(SLOG_LVLE) && SLOG_LVLE == 1
+#if defined(SLOG_LVLE)
 LoggerStream Logger::err(std::ostream& stream)
 {
     return _print(stream, "[ERROR]");
@@ -294,17 +282,54 @@ NullStream Logger::err(std::ostream& stream)
 }
 #endif
 
-#if defined(SLOG_LVLF) && SLOG_LVLF == 1
-LoggerStream Logger::fatal(std::ostream& stream)
+#if defined(SLOG_LVLW)
+LoggerStream Logger::warn(std::ostream& stream)
 {
-    return _print(stream, "[FATAL]");
+    return _print(stream, "[WARNING]");
 }
 #else
-NullStream Logger::fatal(std::ostream& stream)
+NullStream Logger::warn(std::ostream& stream)
 {
     return NullStream();
 }
 #endif
+
+#if defined(SLOG_LVLI)
+LoggerStream Logger::info(std::ostream& stream)
+{
+    return _print(stream, "[INFO]");
+}
+#else
+NullStream Logger::info(std::ostream& stream)
+{
+    return NullStream();
+}
+#endif
+
+#if defined(SLOG_LVLD)
+LoggerStream Logger::debug(std::ostream& stream)
+{
+    return _print(stream, "[DEBUG]");
+}
+#else
+NullStream Logger::debug(std::ostream& stream)
+{
+    return NullStream();
+}
+#endif
+
+#if defined(SLOG_LVLT)
+LoggerStream Logger::trace(std::ostream& stream)
+{
+    return _print(stream, "[TRACE]");
+}
+#else
+NullStream Logger::trace(std::ostream& stream)
+{
+    return NullStream();
+}
+#endif
+
 
 LoggerStream Logger::_print(std::ostream& stream, const char* level)
 {
@@ -344,3 +369,5 @@ void Logger::_captureStreams(const int options)
     }
 }
 }
+
+#endif // SIMPLE_LOGGER_HPP
