@@ -2,7 +2,7 @@
 **As simple as possible**  
 - **Singleton**  
 - **Thread Safe** (instantiation, prints and log file changes)  
-- **One File, Header only**  (less then 350 lines)
+- **One File, Header only**  (less then 1000 lines)
 - **5 different log levels**  
 - **Fast compilation**  
 - **Run-time log file change**
@@ -34,24 +34,23 @@ At this stage I'm not going to provide any officially supported platforms, but f
 ## 5 Step Guide
 The fastest guide you can have
 ### 1. Import
-Copy the _logger.hpp_ file from this repository and paste it in your project  
-// + bash and batch examples
+Copy the _slogger.hpp_ file from the _include_ folder of this respository and paste it in your project  
 ### 2. Inclusion
-- `#include <logger.hpp>` (good practice) be sure that is in your _include_ path  
+- `#include <slogger.hpp>` (good practice) be sure that is in your _include_ path  
 or  
-- `#include "path-to-file/logger.hpp"`    
+- `#include "path-to-file/slogger.hpp"`    
 ### 3. Usage
-**simple_logger** is a reserved word.  
+**slogger** is a reserved word.  
 Usage example:
 ```c
-#include <logger.h>
+#include <slogger.h>
 
 int main(void)
 {
     // Logging in file  (optional line)
     SLOG.init("file.log");
 
-    SLOG.info() << "just use the stream insertion operator as you always do";
+    SLOG.info() << "just use the stream" << "insertion operator as you always do";
 }
 ```
 ### 5. Compilation
@@ -88,12 +87,11 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 ## Roadmap
 Not ordered  
 - [ ] Implement optional colors for the different logs levels (terminal ouotput)
-- [ ] Implement _trace_ log level  
+- [ ] Implement config file
 - [ ] Implement test suites
 - [ ] Test it with _msvc_ and write examples (it should already work fine)
 - [ ] Write the _Complete Guide_
 - [ ] Implement CI
 - [ ] Test it on different OS (it should already work on major linux distros and windows 10+)   
 - [ ] Implement Log Rotation  
-- [ ] Implement custom format??
-- [ ] Implement verbose??
+- [ ] Implement custom format
