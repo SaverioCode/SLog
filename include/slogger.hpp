@@ -15,6 +15,10 @@
 #define SLOG_TSAFE
 #endif
 
+#ifndef SLOG_MAX_LOG_LEVEL
+#define SLOG_MAX_LOG_LEVEL 6
+#endif
+
 #define SLOG_CERR	0b00000001
 #define SLOG_COUT	0b00000010
 #define SLOG_COE	0b00000011
@@ -94,12 +98,12 @@ public:
     static Logger&	getInstance(std::string& file_name, const int options = 0);
     static Logger&	getInstance(const char* file_name = nullptr, const int options = 0);
 
-    void    fatal() { _log(_cout, LogLevel::FATAL); };
-    void    err() { _log(_cout, LogLevel::ERROR); };
-    void    warn() { _log(_cout, LogLevel::WARNING); };
-    void    info() { _log(_cout, LogLevel::INFO); };
-    void    debug() { _log(_cout, LogLevel::DEBUG); };
-    void    trace() { _log(_cout, LogLevel::TRACE); };
+    void    fatal() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::FATAL)) _log(_cout, LogLevel::FATAL); };
+    void    err() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::ERROR)) _log(_cout, LogLevel::ERROR); };
+    void    warn() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::WARNING)) _log(_cout, LogLevel::WARNING); };
+    void    info() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::INFO)) _log(_cout, LogLevel::INFO); };
+    void    debug() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::DEBUG)) _log(_cout, LogLevel::DEBUG); };
+    void    trace() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::TRACE)) _log(_cout, LogLevel::TRACE); };
 
 bool		updateLogFile(const char* file_name, int options = _options);
 bool		updateLogFile(std::string& file_name, int options = _options);
@@ -114,7 +118,7 @@ private:
 
     Logger	operator=(Logger& other) = delete;
 
-    void            _log(std::ostream& stream = _cout, LogLevel level = LogLevel::INFO);
+    void            _log(std::ostream& stream = _cout, const LogLevel level = LogLevel::INFO);
     LoggerStream	_print(std::ostream& stream = _cout, std::string_view level = "INFO");
     std::string		_getTimeStamp();
     void			_captureStreams(const int options);
@@ -157,7 +161,6 @@ LoggerStream::LoggerStream(std::ostream& outstream, std::string& timestamp, cons
 {
     _buffer << timestamp << " " << level << " ";
 }
-
 
 LoggerStream::~LoggerStream()
 {
@@ -244,11 +247,14 @@ void	Logger::updateLogFileOptions(int options)
     _cerr.rdbuf(std::move(buffer));
 }
 
-void    Logger::_log(std::ostream& stream, LogLevel level)
+void    Logger::_log(std::ostream& stream, const LogLevel level)
 {
-    if constexpr (SLOG_MAX_LOG_LEVEL < level)
+    // Todo: needs to use an internal log level variable,
+    // that the user can set
+    // instead of the macro used for code stripping
+    if (SLOG_MAX_LOG_LEVEL < static_cast<uint8_t>(level))
         return;
-    _print(stream, ("[" + std::string(to_string(level)) + "]").c_str());
+    _print(stream, to_string(level));
 }
 
 LoggerStream Logger::_print(std::ostream& stream, std::string_view level)
