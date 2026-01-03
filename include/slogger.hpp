@@ -92,6 +92,16 @@ class LoggerStream
     friend class Logger;
 };
 
+enum class LogLevel : uint8_t
+{
+    FATAL = 1,
+    ERROR = 2,
+    WARNING = 3,
+    INFO = 4,
+    DEBUG = 5,
+    TRACE = 6
+};
+
 class Logger
 {
 public:
@@ -165,6 +175,21 @@ extern sl::Logger& SLOG;
 
 namespace sl
 {
+/************* HELPER FUNCTIONS *************/
+
+constexpr std::string_view to_string(LogLevel level)
+{
+    switch (level) {
+        case LogLevel::FATAL:  return "FATAL";
+        case LogLevel::ERROR:  return "ERROR";
+        case LogLevel::WARNING:return "WARNING";
+        case LogLevel::INFO:   return "INFO";
+        case LogLevel::DEBUG:  return "DEBUG";
+        case LogLevel::TRACE:  return "TRACE";
+        default:               return "UNKNOWN";
+    }
+}
+
 /************* LOGGER STREAM *************/
 
 LoggerStream::LoggerStream(std::ostream& outstream, std::string& timestamp, const char* level, std::mutex* mutex) : _stream(outstream), _mutex(mutex)
