@@ -1,6 +1,9 @@
 #ifndef SLOGGER_HPP
 #define SLOGGER_HPP
 
+#include <cstdio>
+#include <exception>
+#include <format>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -8,77 +11,47 @@
 #include <memory>
 #include <optional>
 #include <sstream>
+#include <source_location>
 #include <string>
+#include <thread>
+#include <unordered_map>
 
-// Todo: remove? or not remove?
-#ifndef SLOG_TSAFE
-#define SLOG_TSAFE
+#if defined(_MSC_VER)
+    #define SLOG_FORCE_INLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+    #define SLOG_FORCE_INLINE inline __attribute__((always_inline))
+#else
+    #define SLOG_FORCE_INLINE inline
+#endif
+
+#if defined(SLOG_TSAFE)
+    #define SLOG_MUTEX_MEMBER(name) std::mutex name
+    #define SLOG_LOCK(name) std::lock_guard<std::mutex> lock(name)
+#else
+    #define SLOG_MUTEX_MEMBER(name)
+    #define SLOG_LOCK(name)
 #endif
 
 #ifndef SLOG_MAX_LOG_LEVEL
 #define SLOG_MAX_LOG_LEVEL 6
 #endif
 
-#define SLOG_CERR	0b00000001
-#define SLOG_COUT	0b00000010
-#define SLOG_COE	0b00000011
+#define SLOG_FATAL SLOG(sl::LogLevel::FATAL)
+#define SLOG_ERROR SLOG(sl::LogLevel::ERROR)
+#define SLOG_WARN SLOG(sl::LogLevel::WARNING)
+#define SLOG_INFO SLOG(sl::LogLevel::INFO)
+#define SLOG_DEBUG SLOG(sl::LogLevel::DEBUG)
+#define SLOG_TRACE SLOG(sl::LogLevel::TRACE)
 
-#ifndef SLOG
-#define SLOG slogger
-#endif
+#define SLOG(lvl) \
+    ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) && SLOG_IS_ON(lvl)) ? \
+        (void)0 : sl::VodifyLogProxy() & sl::LogProxy(sl::Logger::getInstance(), lvl)
+
+#define SLOG_IS_ON(lvl) \
+    (sl::Logger::getInstance().getGlobalLevel() < lvl)
 
 namespace sl
 {
-class NullStream
-{
-    public:
-        ~NullStream() = default;
-        
-        template<typename T>
-        NullStream& operator<<(const T&)
-        {
-            return *this;
-        }
-
-    private:
-        NullStream() = default;
-        NullStream(NullStream&) = delete;
-        NullStream(NullStream&&) = delete;
-
-        NullStream& operator=(const NullStream&) = delete;
-
-    friend class Logger;
-};
-
-class LoggerStream
-{
-    public:
-        ~LoggerStream();
-
-        template<typename T>
-        LoggerStream& operator<<(const T& msg)
-        {
-            _buffer << msg;
-            return *this;
-        }
-
-        std::string getBuffer() const;
-
-    private:
-        LoggerStream() = delete;
-        LoggerStream(std::ostream& outstream, std::string& timestamp, const char* level, std::mutex* mutex);
-
-        LoggerStream(LoggerStream&) = delete;
-        LoggerStream(LoggerStream&&) = delete;
-
-        LoggerStream& operator=(const LoggerStream&) = delete;
-
-        std::ostringstream    _buffer{};
-        std::ostream&         _stream;
-        std::mutex*           _mutex;
-
-    friend class Logger;
-};
 
 enum class LogLevel : uint8_t
 {
@@ -90,59 +63,7 @@ enum class LogLevel : uint8_t
     TRACE = 6
 };
 
-class Logger
-{
-public:
-    ~Logger();
-
-    static Logger&	getInstance(std::string& file_name, const int options = 0);
-    static Logger&	getInstance(const char* file_name = nullptr, const int options = 0);
-
-    void    fatal() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::FATAL)) _log(_cout, LogLevel::FATAL); };
-    void    err() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::ERROR)) _log(_cout, LogLevel::ERROR); };
-    void    warn() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::WARNING)) _log(_cout, LogLevel::WARNING); };
-    void    info() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::INFO)) _log(_cout, LogLevel::INFO); };
-    void    debug() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::DEBUG)) _log(_cout, LogLevel::DEBUG); };
-    void    trace() { if constexpr (SLOG_MAX_LOG_LEVEL >= static_cast<uint8_t>(LogLevel::TRACE)) _log(_cout, LogLevel::TRACE); };
-
-bool		updateLogFile(const char* file_name, int options = _options);
-bool		updateLogFile(std::string& file_name, int options = _options);
-void	    updateLogFileOptions(int options);
-[[nodiscard("WHAT IS THE POINT?")]] inline std::string		getFileName() const;
-
-private:
-    Logger() = delete;
-    Logger(std::string& file_name, const int options);
-    Logger(Logger&) = delete;
-    Logger(Logger&&) = delete;
-
-    Logger	operator=(Logger& other) = delete;
-
-    void            _log(std::ostream& stream = _cout, const LogLevel level = LogLevel::INFO);
-    LoggerStream	_print(std::ostream& stream = _cout, std::string_view level = "INFO");
-    std::string		_getTimeStamp();
-    void			_captureStreams(const int options);
-
-    inline static std::unique_ptr<Logger> _instance{nullptr};
-    inline static std::ostream&           _cout{std::cout};
-    inline static std::ostream&           _cerr{std::cerr};
-    inline static std::once_flag    	  _once_flag{};
-    inline static std::mutex	          _log_mutex{};
-    inline static int			          _options = 0;
-    std::string		                      _file_name;
-    std::optional<std::ofstream>    	  _ostream;
-};
-}
-
-/************* GLOBAL DECLARATION **************/
-sl::Logger& SLOG = sl::Logger::getInstance();
-extern sl::Logger& SLOG;
-
-namespace sl
-{
-/************* HELPER FUNCTIONS *************/
-
-constexpr std::string_view to_string(LogLevel level)
+constexpr std::string_view to_string(LogLevel level) noexcept
 {
     switch (level) {
         case LogLevel::FATAL:  return "FATAL";
@@ -155,146 +76,362 @@ constexpr std::string_view to_string(LogLevel level)
     }
 }
 
-/************* LOGGER STREAM *************/
-
-LoggerStream::LoggerStream(std::ostream& outstream, std::string& timestamp, const char* level, std::mutex* mutex) : _stream(outstream), _mutex(mutex)
+struct LogRecord
 {
-    _buffer << timestamp << " " << level << " ";
-}
+    LogLevel                                level;
+    std::string                             message;
+    std::source_location                    location;
+    std::chrono::system_clock::time_point   timestamp;
+    std::thread::id                         thread_id;
 
-LoggerStream::~LoggerStream()
+    LogRecord(LogLevel lvl, std::string&& msg, std::source_location loc) :
+        level(lvl), message(std::move(msg)), location(loc),
+        timestamp(std::chrono::system_clock::now()), thread_id(std::this_thread::get_id()) {}
+};
+
+class ISink
 {
-#ifdef SLOG_TSAFE
-    std::lock_guard<std::mutex> lock(*_mutex);
-#endif
-    _stream << _buffer.str() << std::endl;
-}
-
-std::string LoggerStream::getBuffer() const
-{
-    return _buffer.str();
-}
-
-/************* LOGGER *************/
-
-Logger::Logger(std::string& file_name, const int options)
-{
-    updateLogFile(file_name, options);
-}
-
-Logger::~Logger()
-{
-    if (_ostream.has_value()) {
-        _ostream->close();
-    }
-}
-
-Logger& Logger::getInstance(std::string& file_name, const int options)
-{
-    struct Temp : public Logger { Temp(std::string& tpm_file_name, const int tmp_options) : Logger(tpm_file_name, tmp_options) {} };
-    std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(file_name, options); });
-    return *_instance;
-}
-
-Logger& Logger::getInstance(const char* file_name, const int options)
-{
-    std::string name = file_name ? file_name : "";
-    return Logger::getInstance(name, options);
-}
-
-bool	Logger::updateLogFile(const char* file_name, int options)
-{
-    std::string name = file_name ? file_name : "";
-    return updateLogFile(name, options);
-}
-
-bool	Logger::updateLogFile(std::string& file_name, int options)
-{
-#if defined(SLOG_TSAFE)
-    std::lock_guard<std::mutex> lock(_log_mutex);
-#endif
-    bool status = true;
-    if (file_name.compare(_file_name) != 0) {
-        if (_ostream.has_value()) {
-            _ostream->close();
+    public:
+        ISink(const std::string& name) : _name(name) {}
+        virtual ~ISink() = default;
+    
+        virtual void    flush() = 0;
+        [[nodiscard]] LogLevel        getLevel() const noexcept
+        {
+            return _level;
         }
-        _file_name = file_name;
-        if (file_name.empty() == false) {
-            _ostream = std::ofstream(file_name);
+        [[nodiscard]] std::string     getName() const
+        {
+            return _name;
+        }
+        virtual void    log(const LogRecord& record) = 0;
+        void            setLevel(const LogLevel level) noexcept
+        {
+            _level = level;
+        }
+    
+    private:
+        std::string     _name;
+        LogLevel        _level{LogLevel::TRACE};
+};
+
+class StreamSink : public ISink
+{
+    public:
+        StreamSink(const std::string& sink_name, std::ostream& ostream) : ISink(sink_name), _ostream(ostream)
+        {
+        }
+        ~StreamSink() override
+        {
+            _ostream.flush();
+        }
+
+        void    flush() override
+        {
+            _ostream.flush();
+        }
+        void    log(const LogRecord& record) override
+        {
+            _ostream << record.message << '\n';
+        }
+
+    private:
+        std::ostream&   _ostream;
+};
+
+class FileSink : public ISink
+{
+    public:
+        FileSink(const std::string& sink_name, const std::string& file_name, const std::string& mode = "w") : ISink(sink_name)
+        {
+            _file_name = file_name;
+
+            _fd = std::fopen(file_name.c_str(), mode.c_str());
+            if (!_fd) {
+                throw std::runtime_error("Failed to open log file.");
+            }
+        }
+        FileSink(const FileSink&) = delete;
+        FileSink(FileSink&&) = delete;
+        ~FileSink() override
+        {
+            if (_fd) {
+                this->flush();
+                std::fclose(_fd);
+            }
+        };
+
+        FileSink& operator=(const FileSink&) = delete;
+
+        void        flush() override
+        {
+            std::fflush(_fd);
+        }
+        [[nodiscard]] std::string getFileName() const
+        {
+            return _file_name;
+        }
+        void        log(const LogRecord& record) override
+        {
+            std::fwrite(record.message.data(), sizeof(char), record.message.size(), _fd);
+        }
+
+    private:
+        std::FILE*  _fd{nullptr};
+        std::string _file_name;
+};
+
+class SinkManager
+{
+    public:
+        bool                    addSink(std::shared_ptr<ISink> sink)
+        {
+            SLOG_LOCK(_sink_manager_mutex);
+            std::string name = sink->getName();
+            auto        it = _sinks.find(name);
+
+            if (it == _sinks.end()) {
+                _sinks[name] = sink;
+                return true;
+            }
+            return false;
+        }
+        void                    dispatch(const LogRecord& record)
+        {
+            for (auto& [name, sink] : _sinks) {
+                if (record.level <= sink->getLevel()) {
+                    sink->log(record);
+                }
+            }
+        }
+        [[nodiscard]] std::shared_ptr<ISink>  getSink(const std::string& name)
+        {
+            SLOG_LOCK(_sink_manager_mutex);
+            auto it = _sinks.find(name);
+
+            if (it != _sinks.end()) {
+                return it->second;
+            }
+            return nullptr;
+        }
+        void                    removeSink(const std::string& name) noexcept
+        {
+            SLOG_LOCK(_sink_manager_mutex);
+            _sinks.erase(name);
+        }
+
+    private:
+        std::unordered_map<std::string, std::shared_ptr<ISink>> _sinks;
+        SLOG_MUTEX_MEMBER(_sink_manager_mutex);
+};
+
+struct NullProxy
+{
+    template<typename T>
+    constexpr NullProxy& operator<<(const T&) noexcept { return *this; }
+
+    template<typename... Args>
+    constexpr void operator()(std::string_view, Args&&...) noexcept {}
+};
+
+class Logger;
+class LogProxy
+{
+public:
+    SLOG_FORCE_INLINE LogProxy(Logger& logger, LogLevel level,
+        bool is_active = true, std::source_location loc = std::source_location::current()) :
+        _logger(logger), _level(level), _is_active(is_active), _location(loc) {}
+
+    LogProxy(const LogProxy&) = delete;
+    LogProxy(LogProxy&&) = delete;
+    ~LogProxy(); // Defined below due to circular dependency with Logger class
+
+    LogProxy& operator=(const LogProxy&) = delete;
+    LogProxy& operator=(LogProxy&&) = delete;
+
+    template<typename T>
+    LogProxy& operator<<(const T& msg) { return _stream_write(msg); }
+    LogProxy& operator<<(std::ostream& (*manip)(std::ostream&)) { return _stream_write(manip); }
+    LogProxy& operator<<(std::ios_base& (*manip)(std::ios_base&)) { return _stream_write(manip); }
+
+    template<typename... Args>
+    LogProxy& operator()(std::format_string<Args...> fmt, Args&&... args)
+    {
+        std::format_to(std::back_inserter(_string_buffer), fmt, std::forward<Args>(args)...);
+        return *this;
+    }
+
+private:
+    friend class Logger;
+
+    SLOG_FORCE_INLINE void _ensure_stream()
+    {
+        if (!_stream_buffer) [[unlikely]] {
+            _stream_buffer = std::make_unique<std::ostringstream>();
+        }
+    }
+    template<typename V>
+    LogProxy& _stream_write(V&& val)
+    {
+        _ensure_stream();
+        (*_stream_buffer) << std::forward<V>(val);
+        return *this;
+    }
+
+    Logger&                             _logger;
+    LogLevel                            _level;
+    bool                                _is_active;
+    std::source_location                _location;
+    std::string                         _string_buffer; 
+    std::unique_ptr<std::ostringstream> _stream_buffer; 
+};
+
+struct VodifyLogProxy
+{
+    void operator&(const LogProxy&) {}
+};
+
+class Logger
+{
+public:
+    ~Logger() = default;
+
+    SLOG_FORCE_INLINE static Logger&	getInstance(const int options = 0)
+    {
+        struct Temp : public Logger { Temp(const int tmp_options) : Logger(tmp_options) {} };
+        std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(options); });
+        return *_instance;
+    }
+
+    template<LogLevel level>
+    SLOG_FORCE_INLINE auto log()
+    {
+        if constexpr (static_cast<uint8_t>(level) > SLOG_MAX_LOG_LEVEL) {
+            return NullProxy{};
+        }
+        return LogProxy(*this, level, level <= _global_log_level); 
+    }
+    template<LogLevel level, typename... Args>
+    void log(std::format_string<Args...> fmt, Args&&... args)
+    {
+        std::string string_buffer;
+
+        if constexpr (static_cast<uint8_t>(level) > SLOG_MAX_LOG_LEVEL) {
+            return;
+        }
+        std::format_to(std::back_inserter(string_buffer), fmt, std::forward<Args>(args)...);
+        _submit(level, std::move(string_buffer), std::source_location::current());
+    }
+
+    SLOG_FORCE_INLINE auto fatal() { return log<LogLevel::FATAL>(); }
+    template<typename... Args>
+    SLOG_FORCE_INLINE auto fatal(std::format_string<Args...> fmt, Args&&... args)
+    {
+        return log<LogLevel::FATAL>(fmt, std::forward<Args>(args)...);
+    }
+    SLOG_FORCE_INLINE auto error() { return log<LogLevel::ERROR>(); }
+    template<typename... Args>
+    SLOG_FORCE_INLINE auto error(std::format_string<Args...> fmt, Args&&... args)
+    {
+        return log<LogLevel::ERROR>(fmt, std::forward<Args>(args)...);
+    }
+    SLOG_FORCE_INLINE auto warn()  { return log<LogLevel::WARNING>(); }
+    template<typename... Args>
+    SLOG_FORCE_INLINE auto warn(std::format_string<Args...> fmt, Args&&... args)
+    {
+        return log<LogLevel::WARNING>(fmt, std::forward<Args>(args)...);
+    }
+    SLOG_FORCE_INLINE auto info()  { return log<LogLevel::INFO>(); }
+    template<typename... Args>
+    SLOG_FORCE_INLINE auto info(std::format_string<Args...> fmt, Args&&... args)
+    {
+        return log<LogLevel::INFO>(fmt, std::forward<Args>(args)...);
+    }
+    SLOG_FORCE_INLINE auto debug() { return log<LogLevel::DEBUG>(); }
+    template<typename... Args>
+    SLOG_FORCE_INLINE auto debug(std::format_string<Args...> fmt, Args&&... args)
+    {
+        return log<LogLevel::DEBUG>(fmt, std::forward<Args>(args)...);
+    }
+    SLOG_FORCE_INLINE auto trace() { return log<LogLevel::TRACE>(); }
+    template<typename... Args>
+    SLOG_FORCE_INLINE auto trace(std::format_string<Args...> fmt, Args&&... args)
+    {
+        return log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
+    }
+
+    SLOG_FORCE_INLINE void    addSink(std::shared_ptr<ISink> sink)
+    {
+        _sink_manager.addSink(sink);
+    }
+    SLOG_FORCE_INLINE void    removeSink(const std::string& name) noexcept
+    {
+        _sink_manager.removeSink(name);
+    }
+
+    [[nodiscard]] SLOG_FORCE_INLINE LogLevel    getGlobalLevel() const noexcept
+    {
+        return _global_log_level;
+    }
+    SLOG_FORCE_INLINE void                      setGlobalLevel(const LogLevel level) noexcept
+    {
+        _global_log_level = level;
+    }
+
+private:
+    friend struct LogProxy;
+
+    Logger() = delete;
+    Logger(const int options) {} // Todo: option for having an outof the box std::cout sink?
+    Logger(Logger&) = delete;
+    Logger(Logger&&) = delete;
+
+    Logger	operator=(Logger& other) = delete;
+    Logger  operator=(Logger&& other) = delete;
+
+
+    void            _submit(const LogLevel level, std::string&& message, std::source_location loc)
+    {
+        LogRecord record{level, std::move(message), loc};
+
+        _sink_manager.dispatch(record);
+    }
+    [[nodiscard]] std::string		_getTimeStamp()
+    {
+        char formatted[20];
+
+        std::time_t timestamp = std::time(nullptr);
+        std::tm* datetime = std::localtime(&timestamp);
+        std::strftime(formatted, sizeof(formatted), "%Y-%m-%d %H:%M:%S", datetime);
+        return std::string(formatted);
+    }
+
+    inline static std::unique_ptr<Logger>   _instance{nullptr};
+    inline static SinkManager               _sink_manager{};
+    inline static std::once_flag    	    _once_flag{};
+    inline static std::mutex	            _log_mutex{};
+    LogLevel                                _global_log_level{LogLevel::TRACE};
+};
+}
+
+sl::LogProxy::~LogProxy()
+{
+    // Log level behaviour safeguard when logging is done calling methods instead of using MACROS
+    if (!_is_active) [[unlikely]] {
+        return;
+    }
+    // Format strings are preferred for performance
+    if (_stream_buffer) [[unlikely]] {
+        // The else is to prevent unintended usage from user
+        // who might use both streams and format strings for one log line
+        if (_string_buffer.empty()) [[likely]] {
+            _string_buffer = std::move(*_stream_buffer).str();
         }
         else {
-            _ostream.reset();
-        }
-        if (_ostream.has_value() && _ostream->is_open() == false) {
-#if defined(SLOG_TSAFE)
-            std::cerr << "[" + _getTimeStamp() + "]" << " [ERROR] " << "Failed to open file " << file_name << ": Logging is going to be printed on console only";
-#else
-            this->err() << "Unable to open file named: " << file_name << ": Logging is going to be printed on console only";
-#endif
-            status = false;
+            _string_buffer.append(std::move(*_stream_buffer).str());
         }
     }
-    updateLogFileOptions(options);
-    return status;
-}
-
-void	Logger::updateLogFileOptions(int options)
-{
-    _options = options;
-    auto buffer = _options & SLOG_COUT && _ostream.has_value() && _ostream->is_open() ? _ostream->rdbuf() : std::cout.rdbuf();
-    _cout.rdbuf(std::move(buffer));
-    buffer = _options & SLOG_CERR && _ostream.has_value() && _ostream->is_open() ? _ostream->rdbuf() : std::cerr.rdbuf();
-    _cerr.rdbuf(std::move(buffer));
-}
-
-void    Logger::_log(std::ostream& stream, const LogLevel level)
-{
-    // Todo: needs to use an internal log level variable,
-    // that the user can set
-    // instead of the macro used for code stripping
-    if (SLOG_MAX_LOG_LEVEL < static_cast<uint8_t>(level))
-        return;
-    _print(stream, to_string(level));
-}
-
-LoggerStream Logger::_print(std::ostream& stream, std::string_view level)
-{
-    std::string time_stamp = "[" + _getTimeStamp() + "]";
-    std::string level_str = "[" + std::string(level) + "]";
-    std::ostream& outstream = _ostream.has_value() ? _ostream.value() : stream;
-    std::mutex* mutex = nullptr;
-#ifdef SLOG_TSAFE
-    std::lock_guard<std::mutex> lock(_log_mutex);
-    mutex = &_log_mutex;
-#endif
-
-    return LoggerStream(outstream, time_stamp, level_str.c_str(), mutex);
-}
-
-std::string Logger::getFileName() const
-{
-    return _file_name;
-}
-
-std::string Logger::_getTimeStamp()
-{
-    char formatted[20];
-
-    std::time_t timestamp = std::time(nullptr);
-    std::tm* datetime = std::localtime(&timestamp);
-    std::strftime(formatted, sizeof(formatted), "%Y-%m-%d %H:%M:%S", datetime);
-    return std::string(formatted);
-}
-
-void Logger::_captureStreams(const int options)
-{
-    if (options & SLOG_COUT) {
-        std::cout.rdbuf(_ostream->rdbuf());
-    }
-    if (options & SLOG_CERR) {
-        std::cerr.rdbuf(_ostream->rdbuf());
-    }
-}
+    _logger._submit(_level, std::move(_string_buffer), _location);
 }
 
 #endif // SLOGGER_HPP

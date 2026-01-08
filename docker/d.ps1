@@ -9,4 +9,5 @@ $ParentDir = (Get-Item $BaseDir).Parent.FullName
 docker run -it --rm `
     -v "${ParentDir}/include:/home/dev/slogger/include" `
     -v "${ParentDir}/tests:/home/dev/slogger/tests" `
+    -v "${ParentDir}/example:/home/dev/slogger/example" `
     "slogger:${Tag}" bash
