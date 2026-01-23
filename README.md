@@ -123,13 +123,16 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 
 ## Roadmap
 
+- [ ] Implement ConsoleSink
 - [ ] Implement the possiblity to give a name to the Logger. Like this multiple modules
-- [ ] Implement a register class that hold multiple logger, creating a default one
+- [ ] Implement a register class that hold multiple logger, with a default logger that olds a ConsoleSink
 - [ ] Implement optional colors for the different logs levels (console ouotput)
+- [ ] Implement Log Rotation  
+- [ ] Implement custom format
 - [ ] Implement test suites
 - [ ] Test it with _msvc_ and write examples (it should already work fine)
 - [ ] Write Wiki
 - [ ] Implement CI
 - [ ] Test it on different OS (it should already work on major linux distros and windows 10+)
-- [ ] Implement Log Rotation  
-- [ ] Implement custom format
+- [ ] LogProxy pool?
+- [ ] LogRecord pool?
