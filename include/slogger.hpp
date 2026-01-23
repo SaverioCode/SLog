@@ -30,6 +30,14 @@
     #define SLOG_LOCK(name)
 #endif
 
+#if defined(SLOG_ASYNC_MODE)
+    #define SLOG_SINK_MUTEX_MEMBER(name)
+    #define SLOG_SINK_LOCK(name)
+#else
+    #define SLOG_SINK_MUTEX_MEMBER(name) SLOG_MUTEX_MEMBER(name)
+    #define SLOG_SINK_LOCK(name)         SLOG_LOCK(name)
+#endif
+
 #ifndef SLOG_MAX_LOG_LEVEL
 #define SLOG_MAX_LOG_LEVEL 6
 #endif
