@@ -9,12 +9,10 @@
 #include <iostream>
 #include <mutex>
 #include <memory>
-#include <optional>
 #include <sstream>
 #include <source_location>
 #include <string>
 #include <thread>
-#include <unordered_map>
 
 #if defined(_MSC_VER)
     #define SLOG_FORCE_INLINE __forceinline
@@ -25,8 +23,8 @@
 #endif
 
 #if defined(SLOG_TSAFE)
-    #define SLOG_MUTEX_MEMBER(name) std::mutex name
-    #define SLOG_LOCK(name) std::lock_guard<std::mutex> lock(name)
+    #define SLOG_MUTEX_MEMBER(name) std::mutex name;
+    #define SLOG_LOCK(name) std::lock_guard<std::mutex> lock(name);
 #else
     #define SLOG_MUTEX_MEMBER(name)
     #define SLOG_LOCK(name)
@@ -96,16 +94,16 @@ class ISink
         virtual ~ISink() = default;
     
         virtual void    flush() = 0;
-        [[nodiscard]] LogLevel        getLevel() const noexcept
+        [[nodiscard]] SLOG_FORCE_INLINE LogLevel        getLevel() const noexcept
         {
             return _level;
         }
-        [[nodiscard]] std::string     getName() const
+        [[nodiscard]] SLOG_FORCE_INLINE std::string     getName() const noexcept
         {
             return _name;
         }
         virtual void    log(const LogRecord& record) = 0;
-        void            setLevel(const LogLevel level) noexcept
+        SLOG_FORCE_INLINE void            setLevel(const LogLevel level) noexcept
         {
             _level = level;
         }
@@ -126,7 +124,7 @@ class StreamSink : public ISink
             _ostream.flush();
         }
 
-        void    flush() override
+        SLOG_FORCE_INLINE void    flush() override
         {
             _ostream.flush();
         }
@@ -163,7 +161,7 @@ class FileSink : public ISink
 
         FileSink& operator=(const FileSink&) = delete;
 
-        void        flush() override
+        SLOG_FORCE_INLINE void        flush() override
         {
             std::fflush(_fd);
         }
@@ -186,15 +184,16 @@ class SinkManager
     public:
         bool                    addSink(std::shared_ptr<ISink> sink)
         {
-            SLOG_LOCK(_sink_manager_mutex);
-            std::string name = sink->getName();
-            auto        it = _sinks.find(name);
+            SLOG_LOCK(_sink_manager_mutex)
+            std::string& name = sink->getName();
 
-            if (it == _sinks.end()) {
-                _sinks[name] = sink;
-                return true;
+            for (const auto& existing_sink : _sinks) {
+                if (existing_sink->getName() == name) {
+                    return false;
+                }
             }
-            return false;
+            _sinks.push_back(sink);
+            return true;
         }
         void                    dispatch(const LogRecord& record)
         {
@@ -206,23 +205,30 @@ class SinkManager
         }
         [[nodiscard]] std::shared_ptr<ISink>  getSink(const std::string& name)
         {
-            SLOG_LOCK(_sink_manager_mutex);
-            auto it = _sinks.find(name);
+            SLOG_LOCK(_sink_manager_mutex)
 
-            if (it != _sinks.end()) {
-                return it->second;
+            for (const auto& sink : _sinks) {
+                if (sink->getName() == name) {
+                    return sink;
+                }
             }
             return nullptr;
         }
         void                    removeSink(const std::string& name) noexcept
         {
-            SLOG_LOCK(_sink_manager_mutex);
-            _sinks.erase(name);
+            SLOG_LOCK(_sink_manager_mutex)
+
+            for (auto& it = _sinks.begin(); it != _sinks.end(); it++) {
+                if ((*it)->getName() == name) {
+                    _sinks.erase(it);
+                    return;
+                }
+            }
         }
 
     private:
-        std::unordered_map<std::string, std::shared_ptr<ISink>> _sinks;
-        SLOG_MUTEX_MEMBER(_sink_manager_mutex);
+        std::vector<std::shared_ptr<ISink>> _sinks;
+        SLOG_MUTEX_MEMBER(_sink_manager_mutex)
 };
 
 struct NullProxy
