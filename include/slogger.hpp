@@ -110,15 +110,23 @@ class ISink
         {
             return _name;
         }
-        virtual void    log(const LogRecord& record) = 0;
+        SLOG_FORCE_INLINE void    log(const LogRecord& record)
+        {
+            SLOG_SINK_LOCK(_sink_mutex)
+            _write(record);
+        }
         SLOG_FORCE_INLINE void            setLevel(const LogLevel level) noexcept
         {
             _level = level;
         }
     
+    protected:
+        virtual void    _write(const LogRecord& record) = 0;
+
     private:
         std::string     _name;
         LogLevel        _level{LogLevel::TRACE};
+        SLOG_SINK_MUTEX_MEMBER(_sink_mutex)
 };
 
 class StreamSink : public ISink
@@ -136,12 +144,13 @@ class StreamSink : public ISink
         {
             _ostream.flush();
         }
-        void    log(const LogRecord& record) override
+
+    private:
+        void    _write(const LogRecord& record) override
         {
             _ostream << record.message << '\n';
         }
 
-    private:
         std::ostream&   _ostream;
 };
 
@@ -177,12 +186,13 @@ class FileSink : public ISink
         {
             return _file_name;
         }
-        void        log(const LogRecord& record) override
+
+    private:
+        void    _write(const LogRecord& record) override
         {
             std::fwrite(record.message.data(), sizeof(char), record.message.size(), _fd);
         }
 
-    private:
         std::FILE*  _fd{nullptr};
         std::string _file_name;
 };
