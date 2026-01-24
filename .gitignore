@@ -3,9 +3,6 @@
 
 build/
 
-*.cpp
-*.c
-
 *.o
 
 exe
