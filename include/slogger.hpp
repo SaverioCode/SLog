@@ -134,9 +134,11 @@ struct BlockOnFull
     }
 };
 
-template<typename T, typename Policy = DiscardOnFull>
+template<typename T, size_t Size, typename Policy = DiscardOnFull>
 class MPSCQueue
 {
+    static_assert((Size != 0) && ((Size & (Size - 1)) == 0), "MPSCQueue::Size must be a power of 2");
+
     struct Node
     {
         alignas(64) std::atomic<size_t> seq;
@@ -144,7 +146,7 @@ class MPSCQueue
     };
 
     public:
-        MPSCQueue(size_t size) : _size(size), _mask(size - 1), _buffer(new Node[size])
+        MPSCQueue() : _size(Size), _mask(Size - 1), _buffer(new Node[Size])
         {
             for (size_t i = 0; i < _size; i++) {
                 _buffer[i].seq.store(i, std::memory_order_relaxed);
@@ -576,7 +578,7 @@ private:
 };
 }
 
-sl::LogProxy::~LogProxy()
+inline sl::LogProxy::~LogProxy()
 {
     // Log level behaviour safeguard when logging is done calling methods instead of using MACROS
     if (!_is_active) [[unlikely]] {
