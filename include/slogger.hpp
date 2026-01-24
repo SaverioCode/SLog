@@ -92,9 +92,126 @@ struct LogRecord
     std::chrono::system_clock::time_point   timestamp;
     std::thread::id                         thread_id;
 
+    LogRecord() : level(LogLevel::INFO) {}
     LogRecord(LogLevel lvl, std::string&& msg, std::source_location loc) :
         level(lvl), message(std::move(msg)), location(loc),
         timestamp(std::chrono::system_clock::now()), thread_id(std::this_thread::get_id()) {}
+    LogRecord(LogRecord&&) noexcept = default;
+    LogRecord& operator=(LogRecord&&) noexcept = default;
+    LogRecord(const LogRecord&) = default;
+    LogRecord& operator=(const LogRecord&) = default;
+};
+
+struct Reservation
+{
+    size_t index;
+};
+
+struct DiscardOnFull
+{
+    template<typename T, typename Queue>
+    static bool push(Queue& q, T&& item)
+    {
+        Reservation r;
+
+        if (q.tryReserve(r)) {
+            q.commit(r, std::move(item));
+            return true;
+        }
+        return false;
+    }
+};
+
+struct BlockOnFull
+{
+    template<typename T, typename Queue>
+    static bool push(Queue& q, T&& item)
+    {
+        Reservation r = q.reserve();
+
+        q.commit(r, std::move(item));
+        return true;
+    }
+};
+
+template<typename T, typename Policy = DiscardOnFull>
+class MPSCQueue
+{
+    struct Node
+    {
+        alignas(64) std::atomic<size_t> seq;
+        T                               data;
+    };
+
+    public:
+        MPSCQueue(size_t size) : _size(size), _mask(size - 1), _buffer(new Node[size])
+        {
+            for (size_t i = 0; i < _size; i++) {
+                _buffer[i].seq.store(i, std::memory_order_relaxed);
+            }
+        }
+        ~MPSCQueue() { delete[] _buffer; }
+
+        MPSCQueue(const MPSCQueue&) = delete;
+        MPSCQueue& operator=(const MPSCQueue&) = delete;
+
+        SLOG_FORCE_INLINE bool  push(T&& item)
+        {
+            return Policy::push(*this, std::move(item));
+        }
+        bool                    pop(T& item)
+        {
+            size_t tail = _tail.load(std::memory_order_relaxed);
+            Node& node = _buffer[tail & _mask];
+
+            if (node.seq.load(std::memory_order_acquire) != tail + 1) {
+                return false;
+            }
+
+            item = std::move(node.data);
+            node.seq.store(tail + _size, std::memory_order_release);
+            // _tail is relaxed, seq's acquire/release enforces visibility
+            _tail.store(tail + 1, std::memory_order_relaxed);
+            return true;
+        }
+        [[nodiscard]] bool      tryReserve(Reservation& r)
+        {
+            size_t head = _head.load(std::memory_order_relaxed);
+
+            while (true) {
+                if (head - _tail.load(std::memory_order_acquire) >= _size) {
+                    return false;
+                }
+                if (_head.compare_exchange_weak(head, head + 1, std::memory_order_relaxed)) {
+                    r.index = head;
+                    return true;
+                }
+            }
+        }
+        [[nodiscard]] Reservation reserve()
+        {
+            Reservation r;
+            r.index = _head.fetch_add(1, std::memory_order_relaxed);
+            return r;
+        }
+        void                    commit(const Reservation& r, T&& item)
+        {
+            Node& node = _buffer[r.index & _mask];
+
+            while (node.seq.load(std::memory_order_acquire) != r.index) {
+                std::this_thread::yield();
+            }
+
+            node.data = std::move(item);
+            node.seq.store(r.index + 1, std::memory_order_release);
+        }
+
+    private:
+        size_t                          _size;
+        size_t                          _mask;
+        Node*                           _buffer;
+        alignas(64) std::atomic<size_t> _head{0};
+        alignas(64) std::atomic<size_t> _tail{0};
 };
 
 class ISink
@@ -108,7 +225,7 @@ class ISink
         {
             return _level;
         }
-        [[nodiscard]] SLOG_FORCE_INLINE std::string     getName() const noexcept
+        [[nodiscard]] SLOG_FORCE_INLINE const std::string& getName() const noexcept
         {
             return _name;
         }
