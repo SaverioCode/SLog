@@ -46,9 +46,9 @@ It also use the **RAII** idiom, that means that you don't have to take care abou
 // Todo: Windows (specify which?)  
 // Todo: MacOS (specify which?)
 
-### Compilers
+### Compilers (implementation)
 
-// Todo: gnu (specify which)
+- gcc (13+)  
 // Todo: clang (specify which)
 // Todo: mvsc (specify which)
 
