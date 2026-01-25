@@ -10,4 +10,5 @@ docker run -it --rm `
     -v "${ParentDir}/include:/home/dev/slogger/include" `
     -v "${ParentDir}/tests:/home/dev/slogger/tests" `
     -v "${ParentDir}/example:/home/dev/slogger/example" `
+    -v "${ParentDir}/CMakeLists.txt:/home/dev/slogger/CMakeLists.txt" `
     "slogger:${Tag}" bash

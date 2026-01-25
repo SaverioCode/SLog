@@ -13,7 +13,9 @@ jobs:
       WORK_DIR: .
       BUILD_DIR: build
       CONAN_DIR: conan
-      CONAN_TOOLCHAIN: conan/build/Release/generators/conan_toolchain.cmake
+      CONAN_TOOLCHAIN: build/Release/generators/conan_toolchain.cmake
+      CC: gcc-13
+      CXX: g++-13
     name: Debian Bookworm
     runs-on: ubuntu-latest
     container: debian:bookworm
@@ -26,7 +28,7 @@ jobs:
         apt-get update
         apt-get install -y \
           cmake \
-          g++ \
+          g++-13 \
           git \
           python3-pip \
           python3-venv
