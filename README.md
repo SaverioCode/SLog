@@ -1,6 +1,6 @@
-# Simple Logger
+# SLog
 
-**As simple as possible**  
+**Designed for Simplicity. Built for Power**.
 
 - **Singleton**  
 - **Thread Safe** (instantiation, prints and log file changes)  
@@ -31,23 +31,30 @@ It also use the **RAII** idiom, that means that you don't have to take care abou
 
 ## Licence
 
-Probabli MIT
+// Todo: Probably MIT
 
 ## Requirements
 
-- C++ 20+  
+- C++ 20+ (implementation)  
+// Todo: - C++ 11+ (interface)
 
 ## Supported Platforms and Compilers
 
 ### Platforms
 
-At this stage I'm not going to provide any officially supported platforms, but for some easy test I excpet it to work on all major linux distros and windows 10+.  
+// Todo: Linux (specify which?)  
+// Todo: Windows (specify which?)  
+// Todo: MacOS (specify which?)
 
 ### Compilers
 
-**gnu**, **clang** and unofficially **mvsc**
+// Todo: gnu (specify which)
+// Todo: clang (specify which)
+// Todo: mvsc (specify which)
 
 ## 5 Step Guide
+
+// Todo: revision it
 
 The fastest guide you can have
 
@@ -68,18 +75,12 @@ or
 Usage example:
 
 ```c
-#include <slogger.h>
-
-int main(void)
-{
-    // Logging in file  (optional line)
-    SLOG.init("file.log");
-
-    SLOG.info() << "just use the stream" << "insertion operator as you always do";
-}
+// Todo: revision it
 ```
 
 ### 5. Compilation
+
+// Todo: revision it
 
 **gnu**:
 
@@ -93,28 +94,15 @@ g++ -o example main.cpp
 clang++ -o example main.cpp
 ```
 
-## Documentation
+## Wiki
 
-// link-to-documentation (work in progress)  
+// Todo
 
 ### Public Interface
 
+// Todo
+
 ```c
-// Usually you don't actually need them
-static Logger&	getInstance(std::string& file_name, const int options = 0);
-static Logger&	getInstance(const char* file_name = nullptr, const int options = 0);
-
-// It's possible to eliminate levels from compiled code through macros (No need to change your code)
-LoggerStream    info(std::ostream& stream = _cout);
-LoggerStream    debug(std::ostream& stream = _cout);
-LoggerStream    warn(std::ostream& stream = _cout);
-LoggerStream    err(std::ostream& stream = _cerr);
-LoggerStream    fatal(std::ostream& stream = _cerr);
-
-bool    updateLogFile(const char* file_name, int options = _options);
-bool    updateLogFile(std::string& file_name, int options = _options);
-void    updateLogFileOptions(int options);
-[[nodiscard]] std::string    getFileName() const;
 ```
 
 ## Contribute
@@ -123,16 +111,30 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 
 ## Roadmap
 
+- [x] Implement MPSCQueue tests
+- [ ] Implement CI/CD, debian, for tests
+- [ ] Implement Worker (BackgroundWorker)
+- [ ] Integrate Worker in Logger
+- [ ] Implement naming for Logger
+- [ ] Implement LoggerRegistry
+- [ ] Update Logging Macros to use LoggerRegistry keeping a default case
+- [ ] Implement SinkRegistry
+- [ ] Optimize compilation. Separating Definitio from declaration inside the same file. Definition with forward declaration when possible. Wrap the definition with a Macro to easly inject in in one file and use it as a .cpp file for compilation, without effecting other unit compile time
+- [ ] Implement Formatting
+- [ ] Implement SAST tests
+- [ ] Update CI/CD for SAST tests
 - [ ] Implement ConsoleSink
-- [ ] Implement the possiblity to give a name to the Logger. Like this multiple modules
-- [ ] Implement a register class that hold multiple logger, with a default logger that olds a ConsoleSink
 - [ ] Implement optional colors for the different logs levels (console ouotput)
-- [ ] Implement Log Rotation  
-- [ ] Implement custom format
-- [ ] Implement test suites
-- [ ] Test it with _msvc_ and write examples (it should already work fine)
+- [ ] Implement Log Rotation
+- [ ] Implement fuzzing test
+- [ ] Update CI/CD for fuzzing test
+- [ ] Improve test suites
+- [ ] Update CI/CD for windows
+- [ ] Implement Benchmark
+- [ ] Improve performance
+- [ ] Update CI/CD for MacOS ?
 - [ ] Write Wiki
-- [ ] Implement CI
-- [ ] Test it on different OS (it should already work on major linux distros and windows 10+)
-- [ ] LogProxy pool?
-- [ ] LogRecord pool?
+- [ ] Implement conan package
+- [ ] Implement TCP Sink
+- [ ] Implement UDP Sink
+- [ ] REENTRANCY
