@@ -1,6 +1,6 @@
 # SLog
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/linux.yml?branch=dev&label=Linux&logo=linux&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/linux.yml)
 [![Windows](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/windows.yml?branch=dev&label=Windows&logo=windows&logoColor=blue&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/windows.yml)
 
@@ -41,8 +41,8 @@ It also use the **RAII** idiom, that means that you don't have to take care abou
 
 ### Platforms
 
-// Todo: Linux (specify which?)  
-// Todo: Windows (specify which?)  
+- Linux
+- Windows  
 // Todo: MacOS (specify which?)
 
 ### Compilers (implementation)
@@ -53,7 +53,7 @@ It also use the **RAII** idiom, that means that you don't have to take care abou
 
 ## 3 Step Guide
 
-// Todo: revision it
+// Todo: revision it (I think this guide it's not that usefull like this. I could either remove it and opt for an example that show the fastest way to use it inside the code, assuming that the user is already familiar with the basic of C++)
 
 The fastest guide you can have
 
@@ -65,7 +65,7 @@ Copy the _slogger.hpp_ file from the _include_ folder of this respository and pa
 
 Depending on your project configuration:
 
-- `#include <slogger.hpp>` or `#include "slogger.hpp"`
+- `#include <slog.hpp>` or `#include "slog.hpp"`
 
 ### 3. Usage
 
@@ -94,6 +94,8 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 
 - [x] Implement MPSCQueue tests
 - [x] Implement CI/CD, debian, for tests
+- [x] Update CI/CD for windows
+- [ ] Define desing/architecture and Implement Design/architecture professional documentation
 - [ ] Implement Worker (BackgroundWorker)
 - [ ] Integrate Worker in Logger
 - [ ] Implement naming for Logger
@@ -111,7 +113,6 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 - [ ] Implement fuzzing test
 - [ ] Update CI/CD for fuzzing test
 - [ ] Improve test suites
-- [ ] Update CI/CD for windows
 - [ ] Implement Benchmark
 - [ ] Improve performance
 - [ ] Update CI/CD for MacOS ?

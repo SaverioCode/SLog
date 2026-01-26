@@ -9,9 +9,11 @@ if [ -z "$TAG" ]; then
     exit 1
 fi
 
+DOCKER_SLOG_DIR=/home/dev/slog
+
 docker run -it --rm \
-    -v ${PARENT_DIR}/include:/home/dev/slogger/include \
-    -v ${PARENT_DIR}/tests:/home/dev/slogger/tests \
-    -v ${PARENT_DIR}/example:/home/dev/slogger/example \
-    -v "${ParentDir}/CMakeLists.txt:/home/dev/slogger/CMakeLists.txt" \ 
-    slogger:${TAG} bash
+    -v ${PARENT_DIR}/include:${DOCKER_SLOG_DIR}/include \
+    -v ${PARENT_DIR}/tests:${DOCKER_SLOG_DIR}/tests \
+    -v ${PARENT_DIR}/example:${DOCKER_SLOG_DIR}/example \
+    -v ${PARENT_DIR}/CMakeLists.txt:${DOCKER_SLOG_DIR}/CMakeLists.txt \ 
+    slog:${TAG} bash

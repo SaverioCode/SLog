@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <slogger.hpp>
+#include <slog/slog.hpp>
 
 #include "common.hpp"
 

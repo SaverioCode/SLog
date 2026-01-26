@@ -1,5 +1,5 @@
-#ifndef SLOGGER_HPP
-#define SLOGGER_HPP
+#ifndef SLOG_HPP
+#define SLOG_HPP
 
 #include <atomic>
 #include <cstdio>
@@ -45,21 +45,21 @@
 #define SLOG_MAX_LOG_LEVEL 6
 #endif
 
-#define SLOG_FATAL SLOG(sl::LogLevel::FATAL)
-#define SLOG_ERROR SLOG(sl::LogLevel::ERROR)
-#define SLOG_WARN SLOG(sl::LogLevel::WARNING)
-#define SLOG_INFO SLOG(sl::LogLevel::INFO)
-#define SLOG_DEBUG SLOG(sl::LogLevel::DEBUG)
-#define SLOG_TRACE SLOG(sl::LogLevel::TRACE)
+#define SLOG_FATAL SLOG(slog::LogLevel::FATAL)
+#define SLOG_ERROR SLOG(slog::LogLevel::ERROR)
+#define SLOG_WARN SLOG(slog::LogLevel::WARNING)
+#define SLOG_INFO SLOG(slog::LogLevel::INFO)
+#define SLOG_DEBUG SLOG(slog::LogLevel::DEBUG)
+#define SLOG_TRACE SLOG(slog::LogLevel::TRACE)
 
 #define SLOG(lvl) \
     ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) && SLOG_IS_ON(lvl)) ? \
-        (void)0 : sl::VodifyLogProxy() & sl::LogProxy(sl::Logger::getInstance(), lvl)
+        (void)0 : slog::VodifyLogProxy() & slog::LogProxy(slog::Logger::getInstance(), lvl)
 
 #define SLOG_IS_ON(lvl) \
-    (sl::Logger::getInstance().getGlobalLevel() < lvl)
+    (slog::Logger::getInstance().getGlobalLevel() < lvl)
 
-namespace sl
+namespace slog
 {
 
 enum class LogLevel : uint8_t
@@ -579,7 +579,7 @@ private:
 };
 }
 
-inline sl::LogProxy::~LogProxy()
+inline slog::LogProxy::~LogProxy()
 {
     // Log level behaviour safeguard when logging is done calling methods instead of using MACROS
     if (!_is_active) [[unlikely]] {

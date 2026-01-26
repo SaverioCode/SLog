@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
-project(SimpleLogger LANGUAGES CXX)
+project(SLog LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(slogger INTERFACE)
-target_include_directories(slogger INTERFACE include)
+add_library(slog INTERFACE)
+target_include_directories(slog INTERFACE include)
 
 enable_testing()
 

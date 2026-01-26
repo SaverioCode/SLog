@@ -1,6 +1,6 @@
 # Tests
 
-**slogger** tests
+**slog** tests
 
 ## What is tested
 
@@ -23,5 +23,5 @@ cmake --build build
 3. Execute
 
 ``` bash
-./build/slogger_tests
+./build/slog_tests
 ```

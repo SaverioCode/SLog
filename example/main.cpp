@@ -1,10 +1,10 @@
-#include <slogger.hpp>
+#include <slog/slog.hpp>
 
 int main(void)
 {
-    sl::Logger& logger = sl::Logger::getInstance();
+    slog::Logger& logger = slog::Logger::getInstance();
 
-    std::shared_ptr<sl::ISink> console_sink = std::make_shared<sl::StreamSink>("console", std::cout);
+    std::shared_ptr<slog::ISink> console_sink = std::make_shared<slog::StreamSink>("console", std::cout);
     logger.addSink(console_sink);
 
     SLOG_INFO("Simple-Logger C++17 example started.");

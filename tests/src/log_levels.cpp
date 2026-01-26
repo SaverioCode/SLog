@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <slogger.hpp>
+#include <slog/slog.hpp>
 
 TEST(MyTestSuite, MyTestCase)
 {
