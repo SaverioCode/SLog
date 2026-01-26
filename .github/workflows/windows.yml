@@ -46,7 +46,8 @@ jobs:
       working-directory: ${{ env.WORK_DIR }}
       run: |
         conan install tests/ --build=missing -s build_type=Release `
-            --output-folder=${{ env.CONAN_DIR }}
+            --output-folder=${{ env.CONAN_DIR }} `
+            -s compiler.cppstd=20
 
     - name: Configure CMake
       working-directory: ${{ env.WORK_DIR }}
