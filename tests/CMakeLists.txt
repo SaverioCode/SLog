@@ -1,19 +1,14 @@
 cmake_minimum_required(VERSION 3.15)
-project(LoggerTests LANGUAGES CXX)
+project(SLogTests LANGUAGES CXX)
 
 enable_testing()
 
-set(EXE_NAME slogger_tests)
+set(EXE_NAME slog_tests)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENABLE_ASAN "Enable Address Sanitizer" ON)
-
-if(ENABLE_ASAN)
-    add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
-    add_link_options(-fsanitize=address)
-endif()
 
 find_package(GTest REQUIRED)
 
@@ -23,6 +18,16 @@ add_executable(${EXE_NAME}
     src/mpsc_queue/multi_thread_tests.cpp
     src/test_main.cpp
 )
+
+if (ENABLE_ASAN)
+    if(MSVC)
+        target_compile_options(${EXE_NAME} PRIVATE /fsanitize=address /Zi)
+        target_link_options(${EXE_NAME} PRIVATE /fsanitize=address /INCREMENTAL:NO)
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(${EXE_NAME} PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+        target_link_options(${EXE_NAME} PRIVATE -fsanitize=address)
+    endif()
+endif()
 
 target_link_libraries(${EXE_NAME} PRIVATE gtest::gtest slogger)
 
