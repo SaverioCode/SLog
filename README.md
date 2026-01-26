@@ -1,5 +1,9 @@
 # SLog
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+[![Linux](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/linux.yml?label=Linux&logo=linux&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/linux.yml)
+[![Windows](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/windows.yml?label=Windows&logo=windows&logoColor=blue&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/windows.yml)
+
 **Designed for Simplicity. Built for Power**.
 
 - **Singleton**  
@@ -15,7 +19,6 @@
 ## Table of Contents
 
 - [Description](#description)  
-- [Licence](#licence)  
 - [Requirements](#requirements)  
 - [Supported Platform and Compilers](#supported-platforms-and-compilers)  
 - [5 Step Guide](#5-step-guide)  
@@ -28,10 +31,6 @@
 Simple logger is a **singleton**, **thread safe**, **one file** **header only** C++(17+) logger with focus on **simplicity**. It's simple to use and to integrate.  
 Less then 5 minutes ([5 Step Guide](#5-step-guide)) to read how integrate it and do it!  
 It also use the **RAII** idiom, that means that you don't have to take care about memory managment, but just to use it!
-
-## Licence
-
-// Todo: Probably MIT
 
 ## Requirements
 
@@ -52,7 +51,7 @@ It also use the **RAII** idiom, that means that you don't have to take care abou
 // Todo: clang (specify which)
 // Todo: mvsc (specify which)
 
-## 5 Step Guide
+## 3 Step Guide
 
 // Todo: revision it
 
@@ -64,34 +63,16 @@ Copy the _slogger.hpp_ file from the _include_ folder of this respository and pa
 
 ### 2. Inclusion
 
-- `#include <slogger.hpp>` (good practice) be sure that is in your _include_ path  
-or  
-- `#include "path-to-file/slogger.hpp"`
+Depending on your project configuration:
+
+- `#include <slogger.hpp>` or `#include "slogger.hpp"`
 
 ### 3. Usage
-
-**slogger** is a reserved word.  
 
 Usage example:
 
 ```c
 // Todo: revision it
-```
-
-### 5. Compilation
-
-// Todo: revision it
-
-**gnu**:
-
-```bash
-g++ -o example main.cpp
-```
-
-**clang**:
-
-```bash
-clang++ -o example main.cpp
 ```
 
 ## Wiki
@@ -112,13 +93,14 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 ## Roadmap
 
 - [x] Implement MPSCQueue tests
-- [ ] Implement CI/CD, debian, for tests
+- [x] Implement CI/CD, debian, for tests
 - [ ] Implement Worker (BackgroundWorker)
 - [ ] Integrate Worker in Logger
 - [ ] Implement naming for Logger
 - [ ] Implement LoggerRegistry
 - [ ] Update Logging Macros to use LoggerRegistry keeping a default case
 - [ ] Implement SinkRegistry
+- [ ] Rename slogger to slog where it has not yet done
 - [ ] Optimize compilation. Separating Definitio from declaration inside the same file. Definition with forward declaration when possible. Wrap the definition with a Macro to easly inject in in one file and use it as a .cpp file for compilation, without effecting other unit compile time
 - [ ] Implement Formatting
 - [ ] Implement SAST tests
