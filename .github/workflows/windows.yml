@@ -1,4 +1,4 @@
-name: Linux
+name: Windows
 
 on:
   push:
@@ -16,34 +16,23 @@ jobs:
       WORK_DIR: .
       BUILD_DIR: build
       CONAN_DIR: conan
-      CONAN_TOOLCHAIN: conan/build/Release/generators/conan_toolchain.cmake
-    name: Debian Trixie
-    runs-on: ubuntu-latest
-    container: debian:trixie
+      CONAN_TOOLCHAIN: conan/build/generators/conan_toolchain.cmake
+    
+    name: Windows
+    runs-on: windows-2022
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install System Dependencies
+    - name: Install Conan
       run: |
-        apt-get update
-        apt-get install -y \
-          cmake \
-          g++ \
-          git \
-          python3-pip \
-          python3-venv
+        pip install conan
+        conan profile detect --force
 
-    - name: Install and Setup Conan
-      run: |
-        python3 -m venv /opt/venv
-        /opt/venv/bin/pip install conan
-        echo "/opt/venv/bin" >> $GITHUB_PATH
-        /opt/venv/bin/conan profile detect --force
-    
     - name: Get Conan Cache Key
       id: conan-cache-key
-      run: echo "key=conan-$(date +'%Y-%m')" >> $GITHUB_OUTPUT
+      shell: bash
+      run: echo "key=conan-windows-$(date +'%Y-%m')" >> $GITHUB_OUTPUT
 
     - name: Cache Conan Packages
       uses: actions/cache@v4
@@ -51,27 +40,27 @@ jobs:
         path: ~/.conan2
         key: ${{ steps.conan-cache-key.outputs.key }}
         restore-keys: |
-          conan-
+          conan-windows-
 
     - name: Install Dependencies
       working-directory: ${{ env.WORK_DIR }}
       run: |
-        conan install tests/ --build=missing -s build_type=Release \
+        conan install tests/ --build=missing -s build_type=Release `
             --output-folder=${{ env.CONAN_DIR }}
 
     - name: Configure CMake
       working-directory: ${{ env.WORK_DIR }}
       run: |
-        cmake -B ${{ env.BUILD_DIR }} -S . \
-          -DCMAKE_BUILD_TYPE=Release \
+        cmake -B ${{ env.BUILD_DIR }} -S . `
+          -DCMAKE_BUILD_TYPE=Release `
           -DCMAKE_TOOLCHAIN_FILE=${{ env.CONAN_TOOLCHAIN }}
 
     - name: Build
       working-directory: ${{ env.WORK_DIR }}
       run: |
-        cmake --build ${{ env.BUILD_DIR }} --config Release -j$(nproc)
+        cmake --build ${{ env.BUILD_DIR }} --config Release -j $env:NUMBER_OF_PROCESSORS
 
     - name: Test
       working-directory: ${{ env.WORK_DIR }}
       run: |
-        ctest --test-dir ${{ env.BUILD_DIR }} --output-on-failure
+        ctest --test-dir ${{ env.BUILD_DIR }} --output-on-failure -C Release
