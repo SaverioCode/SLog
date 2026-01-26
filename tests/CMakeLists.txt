@@ -22,7 +22,7 @@ add_executable(${EXE_NAME}
 if (ENABLE_ASAN)
     if(MSVC)
         target_compile_options(${EXE_NAME} PRIVATE /fsanitize=address /Zi)
-        target_link_options(${EXE_NAME} PRIVATE /fsanitize=address /INCREMENTAL:NO)
+        target_link_options(${EXE_NAME} PRIVATE /INCREMENTAL:NO /DEBUG)
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         target_compile_options(${EXE_NAME} PRIVATE -fsanitize=address -fno-omit-frame-pointer)
         target_link_options(${EXE_NAME} PRIVATE -fsanitize=address)
