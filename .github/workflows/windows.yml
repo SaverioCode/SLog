@@ -54,7 +54,7 @@ jobs:
       run: |
         cmake -B ${{ env.BUILD_DIR }} -S . `
           -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_TOOLCHAIN_FILE=${{ env.CONAN_TOOLCHAIN }}
+          -DCMAKE_TOOLCHAIN_FILE="${{ env.CONAN_TOOLCHAIN }}"
 
     - name: Build
       working-directory: ${{ env.WORK_DIR }}
