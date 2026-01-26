@@ -1,0 +1,58 @@
+#ifndef SLOG_SINKS_ISINK_HPP
+#define SLOG_SINKS_ISINK_HPP
+
+#include <string>
+
+#include <slog/config.hpp>
+#include <slog/core/log_record.hpp>
+
+namespace slog::sinks
+{
+
+class ISink
+{
+    public:
+        ISink() = delete;
+        ISink(const std::string& name) : _name(name) {}
+        ISink(const ISink&) = default;
+        ISink(ISink&&) = default;
+        virtual ~ISink() = default;
+        
+        ISink& operator=(const ISink&) = default;
+        ISink& operator=(ISink&&) = default;
+
+        virtual void    flush() = 0;
+
+        [[nodiscard]] SLOG_FORCE_INLINE LogLevel    getLevel() const noexcept
+        {
+            return _level;
+        }
+
+        [[nodiscard]] SLOG_FORCE_INLINE const std::string&  getName() const noexcept
+        {
+            return _name;
+        }
+
+        SLOG_FORCE_INLINE void  log(const LogRecord& record)
+        {
+            SLOG_SINK_LOCK(_sink_mutex)
+            _write(record);
+        }
+
+        SLOG_FORCE_INLINE void  setLevel(const LogLevel level) noexcept
+        {
+            _level = level;
+        }
+    
+    protected:
+        virtual void    _write(const LogRecord& record) = 0;
+
+    private:
+        std::string     _name;
+        LogLevel        _level{LogLevel::TRACE};
+        SLOG_SINK_MUTEX_MEMBER(_sink_mutex)
+};
+
+}
+
+#endif // SLOG_SINKS_ISINK_HPP
