@@ -23,7 +23,7 @@ class ISink
 
         virtual void    flush() = 0;
 
-        [[nodiscard]] SLOG_FORCE_INLINE LogLevel    getLevel() const noexcept
+        [[nodiscard]] SLOG_FORCE_INLINE slog::core::LogLevel    getLevel() const noexcept
         {
             return _level;
         }
@@ -33,23 +33,23 @@ class ISink
             return _name;
         }
 
-        SLOG_FORCE_INLINE void  log(const LogRecord& record)
+        SLOG_FORCE_INLINE void  log(const slog::core::LogRecord& record)
         {
             SLOG_SINK_LOCK(_sink_mutex)
             _write(record);
         }
 
-        SLOG_FORCE_INLINE void  setLevel(const LogLevel level) noexcept
+        SLOG_FORCE_INLINE void  setLevel(const slog::core::LogLevel level) noexcept
         {
             _level = level;
         }
     
     protected:
-        virtual void    _write(const LogRecord& record) = 0;
+        virtual void    _write(const slog::core::LogRecord& record) = 0;
 
     private:
-        std::string     _name;
-        LogLevel        _level{LogLevel::TRACE};
+        std::string             _name;
+        slog::core::LogLevel    _level{slog::core::LogLevel::TRACE};
         SLOG_SINK_MUTEX_MEMBER(_sink_mutex)
 };
 

@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <exception>
+#include <string>
 
 #include <slog/sinks/isink.hpp>
 
@@ -46,7 +47,7 @@ class FileSink : public ISink
         }
 
     private:
-        void    _write(const LogRecord& record) override
+        void    _write(const slog::core::LogRecord& record) override
         {
             std::fwrite(record.message.data(), sizeof(char), record.message.size(), _fd);
         }

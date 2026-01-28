@@ -16,7 +16,7 @@ enum class LogLevel : uint8_t
     TRACE = 6
 };
 
-inline constexpr std::string_view to_string(LogLevel level) noexcept
+constexpr std::string_view to_string(LogLevel level) noexcept
 {
     switch (level) {
         case LogLevel::FATAL:  return "FATAL";

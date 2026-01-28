@@ -43,4 +43,17 @@
     #define SLOG_SINK_LOCK(name)         SLOG_LOCK(name)
 #endif
 
+// ----------------------------------------
+// Stream macros
+// ----------------------------------------
+
+#ifdef SLOG_STREAM_DISABLED
+    #ifdef SLOG_STREAM_ENABLED
+        #undef SLOG_STREAM_ENABLED
+    #endif
+#else
+    #define SLOG_STREAM_ENABLED
+#endif
+
+
 #endif // SLOG_CONFIG_HPP

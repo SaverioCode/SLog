@@ -17,6 +17,13 @@ class SinkManager
     
     public:
         SinkManager() : _sinks_ptr(std::make_shared<SinkVec>()) {}
+        SinkManager(std::shared_ptr<ISink> sink) : _sinks_ptr(std::make_shared<SinkVec>()) { addSink(sink); }
+        SinkManager(SinkVec sinks) : _sinks_ptr(std::make_shared<SinkVec>(sinks)) {}
+        SinkManager(const SinkManager&) = delete;
+        SinkManager(SinkManager&&) = delete;
+
+        SinkManager& operator=(const SinkManager&) = delete;
+        SinkManager& operator=(SinkManager&&) = delete;
         
         bool    addSink(std::shared_ptr<ISink> sink)
         {
@@ -36,7 +43,7 @@ class SinkManager
             return true;
         }
 
-        void    dispatch(const LogRecord& record)
+        void    dispatch(const slog::core::LogRecord& record)
         {
             auto current_sinks = _sinks_ptr.load(std::memory_order_acquire);
 
@@ -84,7 +91,6 @@ class SinkManager
         std::atomic<SinkPtr> _sinks_ptr;
         SLOG_MUTEX_MEMBER(_sink_manager_mutex)
 };
-
 
 }
 

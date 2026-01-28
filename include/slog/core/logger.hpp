@@ -1,14 +1,21 @@
 #ifndef SLOG_CORE_LOGGER_HPP
 #define SLOG_CORE_LOGGER_HPP
 
-#include <chrono>
+#include <chrono> // Todo: remove this when cleaned get_time_stamp
 #include <format>
 #include <memory>
-#include <sstream>
+#include <mutex>
+#include <source_location>
 #include <string>
 
 #include <slog/config.hpp>
-#include <slog/core/log_record.hpp>
+#include <slog/core/log_level.hpp>
+#include <slog/core/log_proxy.hpp>
+#include <slog/sinks/sink_manager.hpp>
+
+// ------------------------
+// Forward declarations
+// ------------------------
 
 namespace slog::core
 {
@@ -18,13 +25,28 @@ class Logger
 public:
     ~Logger() = default;
 
-    SLOG_FORCE_INLINE static Logger&	getInstance(const int options = 0)
+    SLOG_FORCE_INLINE static Logger&	getInstance()
     {
-        struct Temp : public Logger { Temp(const int tmp_options) : Logger(tmp_options) {} };
-        std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(options); });
+        struct Temp : public Logger { Temp() : Logger() {} };
+        std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(); });
         return *_instance;
     }
 
+    SLOG_FORCE_INLINE static Logger&	getInstance(std::shared_ptr<slog::sinks::ISink> sink)
+    {
+        struct Temp : public Logger { Temp(const std::shared_ptr<slog::sinks::ISink> tmp_sink) : Logger(tmp_sink) {} };
+        std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(sink); });
+        return *_instance;
+    }
+
+    SLOG_FORCE_INLINE static Logger&	getInstance(std::vector<std::shared_ptr<slog::sinks::ISink>> sinks)
+    {
+        struct Temp : public Logger { Temp(const std::vector<std::shared_ptr<slog::sinks::ISink>> tmp_sinks) : Logger(tmp_sinks) {} };
+        std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(sinks); });
+        return *_instance;
+    }
+
+#ifdef SLOG_STREAM_ENABLED
     template<LogLevel level>
     SLOG_FORCE_INLINE auto log()
     {
@@ -33,6 +55,7 @@ public:
         }
         return LogProxy(*this, level, level <= _global_log_level); 
     }
+#endif
 
     template<LogLevel level, typename... Args>
     void log(std::format_string<Args...> fmt, Args&&... args)
@@ -46,12 +69,14 @@ public:
         _submit(level, std::move(string_buffer), std::source_location::current());
     }
 
+#ifdef SLOG_STREAM_ENABLED
     SLOG_FORCE_INLINE auto fatal() { return log<LogLevel::FATAL>(); }
     SLOG_FORCE_INLINE auto error() { return log<LogLevel::ERROR>(); }
     SLOG_FORCE_INLINE auto warn()  { return log<LogLevel::WARNING>(); }
     SLOG_FORCE_INLINE auto info()  { return log<LogLevel::INFO>(); }
     SLOG_FORCE_INLINE auto debug() { return log<LogLevel::DEBUG>(); }
     SLOG_FORCE_INLINE auto trace() { return log<LogLevel::TRACE>(); }
+#endif
 
     template<typename... Args>
     SLOG_FORCE_INLINE auto fatal(std::format_string<Args...> fmt, Args&&... args)
@@ -84,15 +109,8 @@ public:
         return log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
     }
 
-    SLOG_FORCE_INLINE void    addSink(std::shared_ptr<ISink> sink)
-    {
-        _sink_manager.addSink(sink);
-    }
-
-    SLOG_FORCE_INLINE void    removeSink(const std::string& name) noexcept
-    {
-        _sink_manager.removeSink(name);
-    }
+    void    addSink(std::shared_ptr<slog::sinks::ISink> sink);
+    void    removeSink(const std::string& name) noexcept;
 
     [[nodiscard]] SLOG_FORCE_INLINE LogLevel    getGlobalLevel() const noexcept
     {
@@ -107,8 +125,9 @@ public:
 private:
     friend struct LogProxy;
 
-    Logger() = delete;
-    Logger(const int options) {} // Todo: option for having an out of the box std::cout sink?
+    Logger() = default;
+    Logger(const std::shared_ptr<slog::sinks::ISink> sink);
+    Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks);
     Logger(Logger&) = delete;
     Logger(Logger&&) = delete;
 
@@ -116,13 +135,9 @@ private:
     Logger  operator=(Logger&& other) = delete;
 
 
-    void            _submit(const LogLevel level, std::string&& message, std::source_location loc)
-    {
-        LogRecord record{level, std::move(message), loc};
+    void    _submit(const LogLevel level, std::string&& message, std::source_location loc);
 
-        _sink_manager.dispatch(record);
-    }
-
+    // Todo: no need to split this functionn because it is going to be moved to the formatter or removed
     [[nodiscard]] std::string		_getTimeStamp()
     {
         char formatted[20];
@@ -133,11 +148,10 @@ private:
         return std::string(formatted);
     }
 
-    inline static std::unique_ptr<Logger>   _instance{nullptr};
-    inline static SinkManager               _sink_manager{};
-    inline static std::once_flag    	    _once_flag{};
-    inline static std::mutex	            _log_mutex{};
-    LogLevel                                _global_log_level{LogLevel::TRACE};
+    inline static std::unique_ptr<Logger>    _instance{nullptr};
+    slog::sinks::SinkManager          _sink_manager;
+    inline static std::once_flag             _once_flag{};
+    LogLevel                          _global_log_level{LogLevel::TRACE}; // Todo: maybe rename it as logger log level? or something that clarify this
 };
 
 }
