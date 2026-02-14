@@ -2,6 +2,14 @@
 #define SLOG_CONFIG_HPP
 
 // ----------------------------------------
+// Default and Inactive loggers name
+// ----------------------------------------
+
+#define _SLOG_DEFAULT_LOGGER_NAME "default"
+#define _SLOG_INACTIVE_LOGGER_NAME "inactive"
+
+
+// ----------------------------------------
 // Default log level
 // ----------------------------------------
 #ifndef SLOG_MAX_LOG_LEVEL

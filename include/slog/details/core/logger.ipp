@@ -23,11 +23,13 @@ SLOG_FORCE_INLINE void    Logger::removeSink(const std::string& name) noexcept
 // Private methods
 // ------------------------
 
+inline Logger::Logger(std::string_view name) : _name(name) {}
+
 inline Logger::Logger(const std::shared_ptr<slog::sinks::ISink> sink) : 
-    _sink_manager(sink), _global_log_level(LogLevel::TRACE) {}
+    _sink_manager(sink), _local_log_level(LogLevel::TRACE) {}
 
 inline Logger::Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks) : 
-    _sink_manager(sinks), _global_log_level(LogLevel::TRACE) {}
+    _sink_manager(sinks), _local_log_level(LogLevel::TRACE) {}
 
 SLOG_FORCE_INLINE void    Logger::_submit(const LogLevel level, std::string&& message, std::source_location loc)
 {

@@ -13,7 +13,7 @@ namespace slog::core
 // PUBLIC
 // --------------
 
-SLOG_FORCE_INLINE LogProxy::LogProxy(Logger& logger, LogLevel level, bool is_active, std::source_location loc) :
+SLOG_FORCE_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel level, bool is_active, std::source_location loc) :
     _logger(logger), _level(level), _is_active(is_active), _location(loc) {}
 
 
@@ -59,7 +59,9 @@ SLOG_FORCE_INLINE void LogProxy::_ensure_stream()
 
 SLOG_FORCE_INLINE void LogProxy::_submit(LogLevel level, std::string&& buffer, std::source_location location)
 {
-    _logger._submit(level, std::move(buffer), location);
+    if (_logger) [[likely]] {
+        _logger->_submit(level, std::move(buffer), location);
+    }
 }
 
 }

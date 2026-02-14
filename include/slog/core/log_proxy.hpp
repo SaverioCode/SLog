@@ -37,7 +37,7 @@ struct NullProxy
 class LogProxy
 {
 public:
-    LogProxy(Logger& logger, LogLevel level,
+    LogProxy(std::shared_ptr<Logger> logger, LogLevel level,
         bool is_active = true, std::source_location loc = std::source_location::current());
     LogProxy(const LogProxy&) = delete;
     LogProxy(LogProxy&&) = delete;
@@ -78,7 +78,7 @@ private:
 
     void _submit(LogLevel level, std::string&& message, std::source_location location);
 
-    Logger&                             _logger;
+    std::shared_ptr<Logger>             _logger;
     LogLevel                            _level;
     bool                                _is_active;
     std::source_location                _location;

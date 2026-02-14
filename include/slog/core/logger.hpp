@@ -19,32 +19,22 @@
 
 namespace slog::core
 {
+    class Registry;
+}
 
-class Logger
+namespace slog::core
+{
+
+class Logger : public std::enable_shared_from_this<Logger>
 {
 public:
     ~Logger() = default;
 
-    SLOG_FORCE_INLINE static Logger&	getInstance()
-    {
-        struct Temp : public Logger { Temp() : Logger() {} };
-        std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(); });
-        return *_instance;
-    }
-
-    SLOG_FORCE_INLINE static Logger&	getInstance(std::shared_ptr<slog::sinks::ISink> sink)
-    {
-        struct Temp : public Logger { Temp(const std::shared_ptr<slog::sinks::ISink> tmp_sink) : Logger(tmp_sink) {} };
-        std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(sink); });
-        return *_instance;
-    }
-
-    SLOG_FORCE_INLINE static Logger&	getInstance(std::vector<std::shared_ptr<slog::sinks::ISink>> sinks)
-    {
-        struct Temp : public Logger { Temp(const std::vector<std::shared_ptr<slog::sinks::ISink>> tmp_sinks) : Logger(tmp_sinks) {} };
-        std::call_once(_once_flag, [&]() { _instance = std::make_unique<Temp>(sinks); });
-        return *_instance;
-    }
+#ifdef SLOG_REGISTRY_DISABLED
+    Logger(std::string_view name);
+    Logger(const std::shared_ptr<slog::sinks::ISink> sink);
+    Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks);
+#endif
 
 #ifdef SLOG_STREAM_ENABLED
     template<LogLevel level>
@@ -53,7 +43,7 @@ public:
         if constexpr (static_cast<uint8_t>(level) > SLOG_MAX_LOG_LEVEL) {
             return NullProxy{};
         }
-        return LogProxy(*this, level, level <= _global_log_level); 
+        return LogProxy(shared_from_this(), level, level <= _local_log_level); 
     }
 #endif
 
@@ -112,22 +102,33 @@ public:
     void    addSink(std::shared_ptr<slog::sinks::ISink> sink);
     void    removeSink(const std::string& name) noexcept;
 
-    [[nodiscard]] SLOG_FORCE_INLINE LogLevel    getGlobalLevel() const noexcept
+    [[nodiscard]] SLOG_FORCE_INLINE LogLevel    get_log_level() const noexcept
     {
-        return _global_log_level;
+        return _local_log_level;
     }
 
-    SLOG_FORCE_INLINE void  setGlobalLevel(const LogLevel level) noexcept
+    SLOG_FORCE_INLINE void  set_log_level(const LogLevel level) noexcept
     {
-        _global_log_level = level;
+        _local_log_level = level;
+    }
+
+    [[nodiscard]] SLOG_FORCE_INLINE std::string_view  get_name() const noexcept
+    {
+        return _name;
     }
 
 private:
     friend struct LogProxy;
+#ifndef SLOG_REGISTRY_DISABLED
+    friend class  Registry;
+#endif
 
-    Logger() = default;
+    Logger() = delete;
+#ifndef SLOG_REGISTRY_DISABLED
+    Logger(std::string_view name);
     Logger(const std::shared_ptr<slog::sinks::ISink> sink);
     Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks);
+#endif
     Logger(Logger&) = delete;
     Logger(Logger&&) = delete;
 
@@ -148,10 +149,9 @@ private:
         return std::string(formatted);
     }
 
-    inline static std::unique_ptr<Logger>    _instance{nullptr};
-    slog::sinks::SinkManager          _sink_manager;
-    inline static std::once_flag             _once_flag{};
-    LogLevel                          _global_log_level{LogLevel::TRACE}; // Todo: maybe rename it as logger log level? or something that clarify this
+    std::string               _name;
+    slog::sinks::SinkManager  _sink_manager;
+    LogLevel                  _local_log_level{LogLevel::TRACE}; // Todo: maybe rename it as logger log level? or something that clarify this
 };
 
 }

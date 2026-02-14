@@ -95,15 +95,14 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 - [x] Implement MPSCQueue tests
 - [x] Implement CI/CD, debian, for tests
 - [x] Update CI/CD for windows
-- [ ] Define desing/architecture and Implement Design/architecture professional documentation
+- [x] Define desing/architecture and Implement Design/architecture professional documentation (piu o meno)
+- [x] Define if logger registry will also act as a factory
+- [x] Implement LoggerRegistry
+- [x] Updatee Logger class (no more need to be singleton, constructor should be visible only to logger registry, it should accept a name, constructor without params not accepted)
+- [x] Update Logging Macros to use LoggerRegistry keeping a default case
 - [ ] Implement Worker (BackgroundWorker)
 - [ ] Integrate Worker in Logger
-- [ ] Implement naming for Logger
-- [ ] Implement LoggerRegistry
-- [ ] Update Logging Macros to use LoggerRegistry keeping a default case
-- [ ] Implement SinkRegistry
-- [ ] Rename slogger to slog where it has not yet done
-- [ ] Optimize compilation. Separating Definitio from declaration inside the same file. Definition with forward declaration when possible. Wrap the definition with a Macro to easly inject in in one file and use it as a .cpp file for compilation, without effecting other unit compile time
+- [ ] Implement custom LogLevels. Discuss if it's a good idea. and eventually do it.
 - [ ] Implement Formatting
 - [ ] Implement SAST tests
 - [ ] Update CI/CD for SAST tests
