@@ -1,6 +1,7 @@
 #ifndef SLOG_CORE_LOG_LEVEL_HPP
 #define SLOG_CORE_LOG_LEVEL_HPP
 
+#include <cstdint>
 #include <string_view>
 
 namespace slog::core
