@@ -3,7 +3,7 @@
 
 #include <chrono>
 #include <source_location>
-#include <string>
+#include <iosfwd>
 #include <thread>
 
 #include <slog/core/log_level.hpp>

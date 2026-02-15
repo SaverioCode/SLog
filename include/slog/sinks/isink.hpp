@@ -1,7 +1,7 @@
 #ifndef SLOG_SINKS_ISINK_HPP
 #define SLOG_SINKS_ISINK_HPP
 
-#include <string>
+#include <iosfwd>
 
 #include <slog/config.hpp>
 #include <slog/core/log_record.hpp>

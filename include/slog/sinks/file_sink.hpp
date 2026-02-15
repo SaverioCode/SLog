@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include <exception>
-#include <string>
+#include <iosfwd>
 
 #include <slog/sinks/isink.hpp>
 
