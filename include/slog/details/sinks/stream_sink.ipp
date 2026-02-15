@@ -1,3 +1,5 @@
+#ifndef SLOG_SINKS_STREAM_SINK_IPP
+#define SLOG_SINKS_STREAM_SINK_IPP
 
 #include <iostream>
 
@@ -31,3 +33,5 @@ SLOG_FORCE_INLINE void  StreamSink::_write(const slog::core::LogRecord& record)
 }
 
 }
+
+#endif // SLOG_SINKS_STREAM_SINK_IPP

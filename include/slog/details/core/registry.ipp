@@ -1,3 +1,6 @@
+#ifndef SLOG_CORE_REGISTRY_IPP
+#define SLOG_CORE_REGISTRY_IPP
+
 #include <slog/core/logger.hpp>
 #include <slog/core/registry.hpp>
 
@@ -90,3 +93,5 @@ SLOG_FORCE_INLINE std::shared_ptr<Registry>  Registry::_make_registry(LoggerStat
 }
 
 }
+
+#endif // SLOG_CORE_REGISTRY_IPP
