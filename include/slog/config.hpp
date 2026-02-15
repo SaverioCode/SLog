@@ -6,7 +6,7 @@
 // ----------------------------------------
 
 #ifndef SLOG_MAX_LOG_LEVEL
-    #define SLOG_MAX_LOG_LEVEL static_cast<uint8_t>(slog::core::LogLevel::TRACE)
+    #define SLOG_MAX_LOG_LEVEL static_cast<uint8_t>(slog::LogLevel::TRACE)
 #endif
 
 // ----------------------------------------
@@ -17,15 +17,21 @@
 #define _SLOG_INACTIVE_LOGGER_NAME "inactive"
 
 // ----------------------------------------
-// Force inline
+// Inline and Always inline
 // ----------------------------------------
 
-#if defined(_MSC_VER)
-    #define SLOG_FORCE_INLINE __forceinline
-#elif defined(__GNUC__) || defined(__clang__)
-    #define SLOG_FORCE_INLINE inline __attribute__((always_inline))
+#if !defined(SLOG_LIB_BUILD)
+    #if defined(_MSC_VER)
+        #define SLOG_ALWAYS_INLINE __forceinline
+    #elif defined(__GNUC__) || defined(__clang__)
+        #define SLOG_ALWAYS_INLINE inline __attribute__((always_inline))
+    #else
+        #define SLOG_ALWAYS_INLINE inline
+    #endif
+    #define SLOG_INLINE inline
 #else
-    #define SLOG_FORCE_INLINE inline
+    #define SLOG_INLINE
+    #define SLOG_ALWAYS_INLINE
 #endif
 
 // ----------------------------------------

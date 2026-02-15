@@ -3,6 +3,7 @@
 
 #include <atomic>
 
+#include <slog/config.hpp>
 #include <slog/async/common.hpp>
 
 namespace slog::async
@@ -31,7 +32,7 @@ class MPSCQueue
         MPSCQueue(const MPSCQueue&) = delete;
         MPSCQueue& operator=(const MPSCQueue&) = delete;
 
-        SLOG_FORCE_INLINE bool  push(T&& item)
+        SLOG_ALWAYS_INLINE bool  push(T&& item)
         {
             return Policy::push(*this, std::move(item));
         }

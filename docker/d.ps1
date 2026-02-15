@@ -9,6 +9,7 @@ $DockerSlogDir = "/home/dev/slog"
 
 docker run -it --rm `
     -v "${ParentDir}/include:${DockerSlogDir}/include" `
+    -v "${ParentDir}/src:${DockerSlogDir}/src" `
     -v "${ParentDir}/tests:${DockerSlogDir}/tests" `
     -v "${ParentDir}/example:${DockerSlogDir}/example" `
     -v "${ParentDir}/CMakeLists.txt:${DockerSlogDir}/CMakeLists.txt" `

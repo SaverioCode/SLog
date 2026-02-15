@@ -43,7 +43,7 @@ class SinkManager
             return true;
         }
 
-        void    dispatch(const slog::core::LogRecord& record)
+        void    dispatch(const slog::LogRecord& record)
         {
             auto current_sinks = _sinks_ptr.load(std::memory_order_acquire);
 
@@ -66,7 +66,7 @@ class SinkManager
             return nullptr;
         }
 
-        [[nodiscard]] SLOG_FORCE_INLINE SinkPtr getSinkList() const noexcept
+        [[nodiscard]] SLOG_ALWAYS_INLINE SinkPtr getSinkList() const noexcept
         {
             return _sinks_ptr.load(std::memory_order_acquire);
         }

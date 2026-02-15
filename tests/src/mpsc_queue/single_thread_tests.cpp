@@ -1,14 +1,15 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <slog/slog.hpp>
+#include <slog/async/mpsc_queue.hpp>
+#include <slog/async/policies.hpp>
 
 #include "common.hpp"
 
 TEST(MPSCQueue_Functional, BasicPushPop)
 {
     // Create a queue of size 4
-    sl::MPSCQueue<int, 4> queue;
+    slog::async::MPSCQueue<int, 4, slog::async::BlockOnFull> queue;
 
     EXPECT_TRUE(queue.push(10));
     EXPECT_TRUE(queue.push(20));
@@ -26,7 +27,7 @@ TEST(MPSCQueue_Functional, BasicPushPop)
 
 TEST(MPSCQueue_Functional, FIFOOrder)
 {
-    sl::MPSCQueue<int, 8> queue;
+    slog::async::MPSCQueue<int, 8, slog::async::BlockOnFull> queue;
     std::vector<int> inputs = {1, 2, 3, 4, 5};
 
     for (int i : inputs) {
@@ -44,7 +45,7 @@ TEST(MPSCQueue_Functional, WrapAround)
 {
     // Use a small queue size to force wrap-around quickly
     constexpr size_t         SIZE = 4;
-    sl::MPSCQueue<int, SIZE> queue;
+    slog::async::MPSCQueue<int, SIZE, slog::async::BlockOnFull> queue;
     constexpr int            CYCLES = 10;
     int                      counter = 0;
     
@@ -56,7 +57,7 @@ TEST(MPSCQueue_Functional, WrapAround)
         }
         // Empty
         for (size_t i = 0; i < SIZE; i++) {
-            int val;
+            int val = -1;
 
             EXPECT_TRUE(queue.pop(val));
             int expected = (c * SIZE) + i;
@@ -72,7 +73,7 @@ TEST(MPSCQueue_Functional, WrapAround)
 TEST(MPSCQueue_Functional, DiscardOnFull)
 {
     // Queue size 2
-    sl::MPSCQueue<int, 2, sl::DiscardOnFull> queue;
+    slog::async::MPSCQueue<int, 2, slog::async::DiscardOnFull> queue;
 
     EXPECT_TRUE(queue.push(1));
     EXPECT_TRUE(queue.push(2));
@@ -96,7 +97,7 @@ TEST(MPSCQueue_Functional, DiscardOnFull)
 
 TEST(MPSCQueue_Functional, ComplexTypes)
 {
-    sl::MPSCQueue<TestRecord, 4> queue;
+    slog::async::MPSCQueue<TestRecord, 4, slog::async::BlockOnFull> queue;
     
     TestRecord d1{"test", 1, 100};
     TestRecord d2{"foo", 1, 101};

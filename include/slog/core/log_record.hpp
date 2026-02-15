@@ -8,7 +8,7 @@
 
 #include <slog/core/log_level.hpp>
 
-namespace slog::core
+namespace slog
 {
 
 struct LogRecord

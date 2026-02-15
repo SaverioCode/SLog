@@ -29,7 +29,7 @@ if (ENABLE_ASAN)
     endif()
 endif()
 
-target_link_libraries(${EXE_NAME} PRIVATE gtest::gtest slog)
+target_link_libraries(${EXE_NAME} PRIVATE gtest::gtest slog::slog)
 
 include(GoogleTest)
 gtest_discover_tests(${EXE_NAME})

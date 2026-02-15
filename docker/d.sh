@@ -13,6 +13,7 @@ DOCKER_SLOG_DIR=/home/dev/slog
 
 docker run -it --rm \
     -v ${PARENT_DIR}/include:${DOCKER_SLOG_DIR}/include \
+    -v ${PARENT_DIR}/src:${DOCKER_SLOG_DIR}/src \
     -v ${PARENT_DIR}/tests:${DOCKER_SLOG_DIR}/tests \
     -v ${PARENT_DIR}/example:${DOCKER_SLOG_DIR}/example \
     -v ${PARENT_DIR}/CMakeLists.txt:${DOCKER_SLOG_DIR}/CMakeLists.txt \ 

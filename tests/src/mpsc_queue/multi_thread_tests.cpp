@@ -4,7 +4,8 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <slog/slog.hpp>
+#include <slog/async/mpsc_queue.hpp>
+#include <slog/async/policies.hpp>
 
 #include "common.hpp"
 
@@ -15,7 +16,7 @@ TEST(MPSCQueue_Concurrent, MultiProducerSingleConsumer_TestRecord)
     constexpr size_t ITEMS_PER_PRODUCER = 10000;
     
     // Use BlockOnFull to ensure we don't drop items during this integrity test
-    sl::MPSCQueue<TestRecord, QUEUE_SIZE, sl::BlockOnFull> queue;
+    slog::async::MPSCQueue<TestRecord, QUEUE_SIZE, slog::async::BlockOnFull> queue;
 
     std::atomic<bool> start_flag{false};
     std::vector<std::thread> producers;
@@ -71,7 +72,7 @@ TEST(MPSCQueue_Concurrent, DiscardOnFull_Stress)
     constexpr size_t NUM_PRODUCERS = 8;
     constexpr size_t ITEMS_PER_PRODUCER = 100000;
     
-    sl::MPSCQueue<TestRecord, QUEUE_SIZE, sl::DiscardOnFull> queue;
+    slog::async::MPSCQueue<TestRecord, QUEUE_SIZE, slog::async::DiscardOnFull> queue;
 
     std::atomic<bool> start_flag{false};
     std::vector<std::thread> producers;

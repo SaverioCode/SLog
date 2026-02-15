@@ -15,12 +15,12 @@
 // Forward declarations
 // ------------------------
 
-namespace slog::core
+namespace slog
 {
     class Logger;
 }
 
-namespace slog::core
+namespace slog
 {
 
 struct NullProxy

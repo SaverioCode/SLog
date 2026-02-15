@@ -8,12 +8,12 @@
 // Forward declarations
 // ------------------------
 
-namespace slog::core
+namespace slog
 {
     class Logger;
 }
 
-namespace slog::core
+namespace slog
 {
 
 class Registry
@@ -56,12 +56,12 @@ class Registry
             return nullptr;
         }
 
-        [[nodiscard]] SLOG_FORCE_INLINE LogLevel  get_log_level() const noexcept
+        [[nodiscard]] SLOG_ALWAYS_INLINE LogLevel  get_log_level() const noexcept
         {
             return _log_level;
         }
 
-        SLOG_FORCE_INLINE void  set_log_level(const LogLevel level) noexcept
+        SLOG_ALWAYS_INLINE void  set_log_level(const LogLevel level) noexcept
         {
             _log_level = level;
         }

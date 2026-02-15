@@ -36,7 +36,7 @@ class FileSink : public ISink
 
         FileSink& operator=(const FileSink&) = delete;
 
-        SLOG_FORCE_INLINE void  flush() override
+        SLOG_ALWAYS_INLINE void  flush() override
         {
             std::fflush(_fd);
         }
@@ -47,7 +47,7 @@ class FileSink : public ISink
         }
 
     private:
-        void    _write(const slog::core::LogRecord& record) override
+        void    _write(const slog::LogRecord& record) override
         {
             std::fwrite(record.message.data(), sizeof(char), record.message.size(), _fd);
         }

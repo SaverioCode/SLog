@@ -7,19 +7,19 @@
 #include <slog/core/logger.hpp>
 #include <slog/sinks/sink_manager.hpp>
 
-namespace slog::core
+namespace slog
 {
 
 // ------------------------
 // Public methods
 // ------------------------
 
-SLOG_FORCE_INLINE void    Logger::addSink(std::shared_ptr<slog::sinks::ISink> sink)
+SLOG_ALWAYS_INLINE void    Logger::addSink(std::shared_ptr<slog::sinks::ISink> sink)
 {
     _sink_manager.addSink(sink);
 }
 
-SLOG_FORCE_INLINE void    Logger::removeSink(const std::string& name) noexcept
+SLOG_ALWAYS_INLINE void    Logger::removeSink(const std::string& name) noexcept
 {
     _sink_manager.removeSink(name);
 }
@@ -28,22 +28,22 @@ SLOG_FORCE_INLINE void    Logger::removeSink(const std::string& name) noexcept
 // Private methods
 // ------------------------
 
-inline Logger::Logger(std::string_view name) : _name(name) {}
+SLOG_INLINE Logger::Logger(std::string_view name) : _name(name) {}
 
-inline Logger::Logger(const std::shared_ptr<slog::sinks::ISink> sink) : 
+SLOG_INLINE Logger::Logger(const std::shared_ptr<slog::sinks::ISink> sink) : 
     _sink_manager(sink), _log_level(LogLevel::TRACE) {}
 
-inline Logger::Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks) : 
+SLOG_INLINE Logger::Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks) : 
     _sink_manager(sinks), _log_level(LogLevel::TRACE) {}
 
-SLOG_FORCE_INLINE void    Logger::_submit(const LogLevel level, std::string&& message, std::source_location loc)
+SLOG_ALWAYS_INLINE void    Logger::_submit(const LogLevel level, std::string&& message, std::source_location loc)
 {
     LogRecord record{level, std::move(message), loc};
 
     _sink_manager.dispatch(record);
 }
 
-inline std::string  Logger::_getTimeStamp()
+SLOG_INLINE std::string  Logger::_getTimeStamp()
 {
     char formatted[20];
 

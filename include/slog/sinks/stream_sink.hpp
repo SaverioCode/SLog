@@ -23,7 +23,7 @@ class StreamSink : public ISink
         void    flush() override;
 
     private:
-        void    _write(const slog::core::LogRecord& record) override;
+        void    _write(const slog::LogRecord& record) override;
 
         std::ostream&   _ostream;
 };

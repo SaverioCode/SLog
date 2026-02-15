@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string_view>
 
-namespace slog::core
+namespace slog
 {
 
 enum class LogLevel : uint8_t

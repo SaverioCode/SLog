@@ -4,14 +4,14 @@
 #include <slog/core/logger.hpp>
 #include <slog/core/registry.hpp>
 
-namespace slog::core
+namespace slog
 {
 
 // ------------------------
 // Public methods
 // ------------------------
 
-inline std::shared_ptr<Logger>  Registry::create_logger(std::string_view name)
+SLOG_INLINE std::shared_ptr<Logger>  Registry::create_logger(std::string_view name)
 {
     auto new_logger = _make_logger(name);
     auto new_vec    = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
@@ -32,7 +32,7 @@ inline std::shared_ptr<Logger>  Registry::create_logger(std::string_view name)
     }
 }
 
-inline bool  Registry::set_default_logger_name(std::string_view name)
+SLOG_INLINE bool  Registry::set_default_logger_name(std::string_view name)
 {
     LoggerVecSPtr loggers = _loggers.load(std::memory_order_relaxed);
 
@@ -49,7 +49,7 @@ inline bool  Registry::set_default_logger_name(std::string_view name)
 // Private methods
 // ------------------------
 
-inline Registry::Registry(LoggerState state) : _local_state(state)
+SLOG_INLINE Registry::Registry(LoggerState state) : _local_state(state)
 {
     std::shared_ptr<Logger> logger;
     LoggerVecSPtr loggers = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
@@ -68,7 +68,7 @@ inline Registry::Registry(LoggerState state) : _local_state(state)
     _loggers.store(loggers, std::memory_order_relaxed);
 }
 
-inline std::shared_ptr<Logger>  Registry::_get_logger(std::string_view name) const noexcept
+SLOG_INLINE std::shared_ptr<Logger>  Registry::_get_logger(std::string_view name) const noexcept
 {
     LoggerVecSPtr loggers = _loggers.load(std::memory_order_relaxed);
 
@@ -80,13 +80,13 @@ inline std::shared_ptr<Logger>  Registry::_get_logger(std::string_view name) con
     return nullptr;
 }
 
-SLOG_FORCE_INLINE std::shared_ptr<Logger>  Registry::_make_logger(std::string_view name)
+SLOG_ALWAYS_INLINE std::shared_ptr<Logger>  Registry::_make_logger(std::string_view name)
 {
     struct TmpLogger : public Logger { TmpLogger(std::string_view name) : Logger(name) {} };
     return std::make_shared<TmpLogger>(name);
 }
 
-SLOG_FORCE_INLINE std::shared_ptr<Registry>  Registry::_make_registry(LoggerState state)
+SLOG_ALWAYS_INLINE std::shared_ptr<Registry>  Registry::_make_registry(LoggerState state)
 {
     struct TmpRegistry : public Registry { TmpRegistry(LoggerState state) : Registry(state) {} };
     return std::make_shared<TmpRegistry>(state);
