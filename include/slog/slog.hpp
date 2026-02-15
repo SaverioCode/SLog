@@ -58,8 +58,9 @@
          ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || _SLOG_IS_OFF(lvl, logger)) ? \
              (void)0 : slog::core::VodifyLogProxy() & slog::core::LogProxy(logger, lvl)
 #else
-    #define SLOG(lvl, logger) (static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) ? \
-        (void)0 : logger->log<lvl>
+    #define SLOG(lvl, logger) \
+        ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || _SLOG_IS_OFF(lvl, logger)) ? \
+            (void)0 : logger->log<lvl>
 #endif
 
 // ---------------------------------
