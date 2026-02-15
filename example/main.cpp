@@ -1,9 +1,11 @@
+#include <iostream>
+
 #include <slog/slog.hpp>
 #include <slog/sinks/stream_sink.hpp>
 
 int main(void)
 {
-    std::shared_ptr<slog::core::Logger> logger = slog::core::Registry::instance()->get_default_logger();
+    std::shared_ptr<slog::Logger> logger = slog::Registry::instance()->get_default_logger();
 
     std::shared_ptr<slog::sinks::ISink> console_sink = std::make_shared<slog::sinks::StreamSink>("console", std::cout);
     logger->addSink(console_sink);
@@ -21,6 +23,4 @@ int main(void)
     // Note: Non intended syntax that is also supported as collateral effect 
     // to unify MACRO interface for both stream and format style logging
     SLOG_INFO("Logging an integer: {}", 42) << " Crazy shit!";
-    logger->info()("Logging info level message with format: {}", "Hello, World!") << " Crazy shit!";
-
 }
