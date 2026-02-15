@@ -2,23 +2,24 @@
 #define SLOG_CONFIG_HPP
 
 // ----------------------------------------
+// Compile-time Max log level
+// ----------------------------------------
+
+#ifndef SLOG_MAX_LOG_LEVEL
+    #define SLOG_MAX_LOG_LEVEL static_cast<uint8_t>(slog::core::LogLevel::TRACE)
+#endif
+
+// ----------------------------------------
 // Default and Inactive loggers name
 // ----------------------------------------
 
 #define _SLOG_DEFAULT_LOGGER_NAME "default"
 #define _SLOG_INACTIVE_LOGGER_NAME "inactive"
 
-
-// ----------------------------------------
-// Default log level
-// ----------------------------------------
-#ifndef SLOG_MAX_LOG_LEVEL
-    #define SLOG_MAX_LOG_LEVEL 6
-#endif
-
 // ----------------------------------------
 // Force inline
 // ----------------------------------------
+
 #if defined(_MSC_VER)
     #define SLOG_FORCE_INLINE __forceinline
 #elif defined(__GNUC__) || defined(__clang__)
@@ -30,6 +31,7 @@
 // ----------------------------------------
 // Thread safety
 // ----------------------------------------
+
 #if defined(SLOG_TSAFE)
     #include <mutex>
 
@@ -43,6 +45,7 @@
 // ----------------------------------------
 // Async mode macros
 // ----------------------------------------
+
 #if defined(SLOG_ASYNC_ENABLED)
     #define SLOG_SINK_MUTEX_MEMBER(name)
     #define SLOG_SINK_LOCK(name)

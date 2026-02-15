@@ -1,14 +1,18 @@
 
-#ifdef SLOG_STREAM_ENABLED
+#ifndef SLOG_CORE_LOG_PROXY_IPP
+#define SLOG_CORE_LOG_PROXY_IPP
+
+#ifndef SLOG_STREAM_DISABLED
+
 #include <iostream>
-#endif
 
 #include <slog/core/logger.hpp>
 #include <slog/core/log_level.hpp>
 
+
 namespace slog::core
 {
-
+    
 // --------------
 // PUBLIC
 // --------------
@@ -17,7 +21,6 @@ SLOG_FORCE_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel le
     _logger(logger), _level(level), _is_active(is_active), _location(loc) {}
 
 
-#ifdef SLOG_STREAM_ENABLED
 inline LogProxy::~LogProxy()
 {
     // Log level behaviour safeguard when logging is done calling methods instead of using MACROS
@@ -37,25 +40,25 @@ inline LogProxy::~LogProxy()
     }
     _submit(_level, std::move(_string_buffer), _location);
 }
-#else
-SLOG_FORCE_INLINE LogProxy::~LogProxy()
-{
-    _submit(_level, std::move(_string_buffer), _location);
-}
-#endif
+// #else
+// SLOG_FORCE_INLINE LogProxy::~LogProxy()
+// {
+//     _submit(_level, std::move(_string_buffer), _location);
+// }
+// #endif
 
 // --------------
 // PRIVATE
 // --------------
 
-#ifdef SLOG_STREAM_ENABLED
+// #ifndef SLOG_STREAM_DISABLED
 SLOG_FORCE_INLINE void LogProxy::_ensure_stream()
 {
     if (!_stream_buffer) [[unlikely]] {
         _stream_buffer = std::make_unique<std::ostringstream>();
     }
 }
-#endif
+// #endif
 
 SLOG_FORCE_INLINE void LogProxy::_submit(LogLevel level, std::string&& buffer, std::source_location location)
 {
@@ -65,3 +68,7 @@ SLOG_FORCE_INLINE void LogProxy::_submit(LogLevel level, std::string&& buffer, s
 }
 
 }
+
+#endif // SLOG_STREAM_DISABLED
+
+#endif // SLOG_CORE_LOG_PROXY_IPP

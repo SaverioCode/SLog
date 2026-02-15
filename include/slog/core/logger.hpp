@@ -1,12 +1,8 @@
 #ifndef SLOG_CORE_LOGGER_HPP
 #define SLOG_CORE_LOGGER_HPP
 
-#include <chrono> // Todo: remove this when cleaned get_time_stamp
-#include <format>
-#include <memory>
-#include <mutex>
 #include <source_location>
-#include <string>
+#include <iosfwd>
 
 #include <slog/config.hpp>
 #include <slog/core/log_level.hpp>
@@ -43,7 +39,9 @@ public:
         if constexpr (static_cast<uint8_t>(level) > SLOG_MAX_LOG_LEVEL) {
             return NullProxy{};
         }
-        return LogProxy(shared_from_this(), level, level <= _local_log_level); 
+        else {
+            return LogProxy(shared_from_this(), level, level <= _log_level); 
+        }
     }
 #endif
 
@@ -53,6 +51,9 @@ public:
         std::string string_buffer;
 
         if constexpr (static_cast<uint8_t>(level) > SLOG_MAX_LOG_LEVEL) {
+            return;
+        }
+        if (level > _log_level) {
             return;
         }
         std::format_to(std::back_inserter(string_buffer), fmt, std::forward<Args>(args)...);
@@ -69,34 +70,34 @@ public:
 #endif
 
     template<typename... Args>
-    SLOG_FORCE_INLINE auto fatal(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_FORCE_INLINE void fatal(std::format_string<Args...> fmt, Args&&... args)
     {
-        return log<LogLevel::FATAL>(fmt, std::forward<Args>(args)...);
+        log<LogLevel::FATAL>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_FORCE_INLINE auto error(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_FORCE_INLINE void error(std::format_string<Args...> fmt, Args&&... args)
     {
-        return log<LogLevel::ERROR>(fmt, std::forward<Args>(args)...);
+        log<LogLevel::ERROR>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_FORCE_INLINE auto warn(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_FORCE_INLINE void warn(std::format_string<Args...> fmt, Args&&... args)
     {
-        return log<LogLevel::WARNING>(fmt, std::forward<Args>(args)...);
+        log<LogLevel::WARNING>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_FORCE_INLINE auto info(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_FORCE_INLINE void info(std::format_string<Args...> fmt, Args&&... args)
     {
-        return log<LogLevel::INFO>(fmt, std::forward<Args>(args)...);
+        log<LogLevel::INFO>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_FORCE_INLINE auto debug(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_FORCE_INLINE void debug(std::format_string<Args...> fmt, Args&&... args)
     {
-        return log<LogLevel::DEBUG>(fmt, std::forward<Args>(args)...);
+        log<LogLevel::DEBUG>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_FORCE_INLINE auto trace(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_FORCE_INLINE void trace(std::format_string<Args...> fmt, Args&&... args)
     {
-        return log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
+        log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
     }
 
     void    addSink(std::shared_ptr<slog::sinks::ISink> sink);
@@ -104,12 +105,12 @@ public:
 
     [[nodiscard]] SLOG_FORCE_INLINE LogLevel    get_log_level() const noexcept
     {
-        return _local_log_level;
+        return _log_level;
     }
 
     SLOG_FORCE_INLINE void  set_log_level(const LogLevel level) noexcept
     {
-        _local_log_level = level;
+        _log_level = level;
     }
 
     [[nodiscard]] SLOG_FORCE_INLINE std::string_view  get_name() const noexcept
@@ -118,7 +119,9 @@ public:
     }
 
 private:
-    friend struct LogProxy;
+#ifndef SLOG_STREAM_DISABLED
+    friend class LogProxy;
+#endif
 #ifndef SLOG_REGISTRY_DISABLED
     friend class  Registry;
 #endif
@@ -135,23 +138,14 @@ private:
     Logger	operator=(Logger& other) = delete;
     Logger  operator=(Logger&& other) = delete;
 
-
     void    _submit(const LogLevel level, std::string&& message, std::source_location loc);
 
     // Todo: no need to split this functionn because it is going to be moved to the formatter or removed
-    [[nodiscard]] std::string		_getTimeStamp()
-    {
-        char formatted[20];
-
-        std::time_t timestamp = std::time(nullptr);
-        std::tm* datetime = std::localtime(&timestamp);
-        std::strftime(formatted, sizeof(formatted), "%Y-%m-%d %H:%M:%S", datetime);
-        return std::string(formatted);
-    }
+    [[nodiscard]] std::string		_getTimeStamp();
 
     std::string               _name;
     slog::sinks::SinkManager  _sink_manager;
-    LogLevel                  _local_log_level{LogLevel::TRACE}; // Todo: maybe rename it as logger log level? or something that clarify this
+    LogLevel                  _log_level{LogLevel::TRACE};
 };
 
 }

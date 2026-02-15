@@ -1,12 +1,10 @@
 #ifndef SLOG_CORE_LOG_PROXY_HPP
 #define SLOG_CORE_LOG_PROXY_HPP
 
-#ifdef SLOG_STREAM_ENABLED
-    #include <iosfwd>
-    #include <memory>
-#endif
+#ifndef SLOG_STREAM_DISABLED
 
-#include <string>
+#include <iosfwd>
+#include <memory>
 #include <format>
 #include <utility>
 
@@ -29,6 +27,8 @@ struct NullProxy
 {
     template<typename T>
     constexpr NullProxy& operator<<(const T&) noexcept { return *this; }
+    NullProxy& operator<<(std::ostream& (*manip)(std::ostream&)) { (void)manip; return *this; }
+    NullProxy& operator<<(std::ios_base& (*manip)(std::ios_base&)) { (void)manip; return *this; }
 
     template<typename... Args>
     constexpr void operator()(std::string_view, Args&&...) noexcept {}
@@ -47,12 +47,10 @@ public:
     LogProxy& operator=(const LogProxy&) = delete;
     LogProxy& operator=(LogProxy&&) = delete;
 
-#ifdef SLOG_STREAM_ENABLED
     template<typename T>
     LogProxy& operator<<(const T& msg) { return _stream_write(msg); }
     LogProxy& operator<<(std::ostream& (*manip)(std::ostream&)) { return _stream_write(manip); }
     LogProxy& operator<<(std::ios_base& (*manip)(std::ios_base&)) { return _stream_write(manip); }
-#endif
 
     template<typename... Args>
     LogProxy& operator()(std::format_string<Args...> fmt, Args&&... args)
@@ -64,7 +62,6 @@ public:
 private:
     friend class Logger;
 
-#ifdef SLOG_STREAM_ENABLED
     void _ensure_stream();
 
     template<typename V>
@@ -74,7 +71,6 @@ private:
         (*_stream_buffer) << std::forward<V>(val);
         return *this;
     }
-#endif
 
     void _submit(LogLevel level, std::string&& message, std::source_location location);
 
@@ -83,10 +79,9 @@ private:
     bool                                _is_active;
     std::source_location                _location;
     std::string                         _string_buffer; 
-#ifdef SLOG_STREAM_ENABLED
     std::unique_ptr<std::ostringstream> _stream_buffer; 
-#endif
 };
+
 
 struct VodifyLogProxy
 {
@@ -94,5 +89,7 @@ struct VodifyLogProxy
 };
 
 }
+
+#endif // SLOG_STREAM_DISABLED
 
 #endif // SLOG_CORE_LOG_PROXY_HPP

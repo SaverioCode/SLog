@@ -105,7 +105,7 @@ class Registry
         LoggerState                             _local_state;
         std::atomic<LoggerVecSPtr>              _loggers{nullptr};
         static inline std::atomic<LoggerState>  _state{LoggerState::ACTIVE};
-        static inline LogLevel                  _log_level{SLOG_MAX_LOG_LEVEL};
+        static inline LogLevel                  _log_level{LogLevel::TRACE};
 };
 
 }
