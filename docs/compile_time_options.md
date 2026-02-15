@@ -10,12 +10,14 @@ Different compile-time options are available to configure the library. Following
 
 ## Build
 
-It **must** explicitely defined which kind of library build type is required.
+It **must** be explicitely defined which kind of library build type is required.
 
 | Macro | Default value | Scope | Notes |
 |:------|:-------------:|:------|:------|
-|`SLOG_HEADER_ONLY`| `undefined` | Define header only mode | Necessary only if not using the project _CMakeLists.txt_  |
-|`SLOG_BUILD_TYPE`| `undefined` | Define build type for CMake project library | Values are: `STATIC`, `SHARED`, `HEADER_ONLY` |
+|`SLOG_HEADER_ONLY`| `undefined` | Define header only mode | Necessary only if **not** using the project _CMakeLists.txt_  |
+|`SLOG_BUILD_TYPE`| `undefined` | Define build type for CMake project library | Values: `STATIC`, `SHARED`, `HEADER_ONLY` |
+|`SLOG_BUILD_TESTS`| `OFF` | Include building the tests | Values: `ON`, `OFF`. Only available when using the project _CMakeLists.txt_ |
+|`ENABLE_ASAN`| `ON` | Enable AddressSanitizer | Values: `ON`, `OFF`. Only available when using **Tests** and the project _CMakeLists.txt_ |
 
 ## General
 
