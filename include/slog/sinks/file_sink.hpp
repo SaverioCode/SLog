@@ -17,8 +17,8 @@ class FileSink : public ISink
         {
             _file_name = file_name;
 
-            _fd = std::fopen(file_name.c_str(), mode.c_str());
-            if (!_fd) {
+            _stream = std::fopen(file_name.c_str(), mode.c_str());
+            if (!_stream) {
                 throw std::runtime_error("Failed to open log file.");
             }
         }
@@ -28,9 +28,9 @@ class FileSink : public ISink
         
         ~FileSink() override
         {
-            if (_fd) {
+            if (_stream) {
                 this->flush();
-                std::fclose(_fd);
+                std::fclose(_stream);
             }
         };
 
@@ -38,7 +38,7 @@ class FileSink : public ISink
 
         SLOG_ALWAYS_INLINE void  flush() override
         {
-            std::fflush(_fd);
+            std::fflush(_stream);
         }
 
         [[nodiscard]] std::string get_file_name() const
@@ -49,10 +49,10 @@ class FileSink : public ISink
     private:
         void    _write(const slog::LogRecord& record) override
         {
-            std::fwrite(record.message.data(), sizeof(char), record.message.size(), _fd);
+            slog::sinks::fwrite_file(record.message.data(), record.message.size(), _stream);
         }
 
-        std::FILE*  _fd{nullptr};
+        std::FILE*  _stream{nullptr};
         std::string _file_name;
 };
 
