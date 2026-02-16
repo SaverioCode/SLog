@@ -17,7 +17,7 @@ class SinkManager
     
     public:
         SinkManager() : _sinks_ptr(std::make_shared<SinkVec>()) {}
-        SinkManager(std::shared_ptr<ISink> sink) : _sinks_ptr(std::make_shared<SinkVec>()) { addSink(sink); }
+        SinkManager(std::shared_ptr<ISink> sink) : _sinks_ptr(std::make_shared<SinkVec>()) { add_sink(sink); }
         SinkManager(SinkVec sinks) : _sinks_ptr(std::make_shared<SinkVec>(sinks)) {}
         SinkManager(const SinkManager&) = delete;
         SinkManager(SinkManager&&) = delete;
@@ -27,7 +27,6 @@ class SinkManager
         
         bool    add_sink(std::shared_ptr<ISink> sink)
         {
-            SLOG_LOCK(_sink_manager_mutex)
             auto name = sink->get_name();
             auto current_sinks = _sinks_ptr.load(std::memory_order_relaxed);
             SinkPtr new_sinks;
@@ -71,25 +70,8 @@ class SinkManager
             return _sinks_ptr.load(std::memory_order_acquire);
         }
 
-        void    remove_sink(const std::string& name)
-        {
-            SLOG_LOCK(_sink_manager_mutex)
-            auto current_sinks = _sinks_ptr.load(std::memory_order_relaxed);
-
-            for (auto it = current_sinks->begin(); it != current_sinks->end(); it++) {
-                if ((*it)->getName() == name) {
-                    auto new_sinks = std::make_shared<SinkVec>(*current_sinks);
-
-                    new_sinks->erase(std::next(new_sinks->begin(), std::distance(current_sinks->begin(), it)));
-                    _sinks_ptr.store(new_sinks, std::memory_order_release);
-                    return;
-                }
-            }
-        }
-
     private:
         std::atomic<SinkPtr> _sinks_ptr;
-        SLOG_MUTEX_MEMBER(_sink_manager_mutex)
 };
 
 }

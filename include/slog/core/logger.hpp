@@ -100,8 +100,7 @@ public:
         log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
     }
 
-    void    addSink(std::shared_ptr<slog::sinks::ISink> sink);
-    void    removeSink(const std::string& name) noexcept;
+    void    add_sink(std::shared_ptr<slog::sinks::ISink> sink);
 
     [[nodiscard]] SLOG_ALWAYS_INLINE LogLevel    get_log_level() const noexcept
     {
