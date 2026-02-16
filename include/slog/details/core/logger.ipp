@@ -19,6 +19,11 @@ SLOG_ALWAYS_INLINE void    Logger::add_sink(std::shared_ptr<slog::sinks::ISink> 
     _sink_manager.add_sink(sink);
 }
 
+SLOG_ALWAYS_INLINE void    Logger::remove_sink(const std::string& name) noexcept
+{
+    _sink_manager.remove_sink(name);
+}
+
 // ------------------------
 // Private methods
 // ------------------------
