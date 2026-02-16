@@ -1,7 +1,7 @@
 #ifndef SLOG_HPP
 #define SLOG_HPP
 
-#include <slog/config.hpp>
+#include <slog/common.hpp>
 #include <slog/core/logger.hpp>
 #include <slog/core/log_proxy.hpp>
 #include <slog/core/registry.hpp>

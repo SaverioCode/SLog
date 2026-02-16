@@ -8,7 +8,7 @@
 #include <format>
 #include <utility>
 
-#include <slog/config.hpp>
+#include <slog/common.hpp>
 #include <slog/core/log_level.hpp>
 
 // ------------------------

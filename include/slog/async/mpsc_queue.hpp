@@ -3,7 +3,7 @@
 
 #include <atomic>
 
-#include <slog/config.hpp>
+#include <slog/common.hpp>
 #include <slog/async/common.hpp>
 
 namespace slog::async

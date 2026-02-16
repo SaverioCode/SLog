@@ -3,7 +3,7 @@
 
 #include <iosfwd>
 
-#include <slog/config.hpp>
+#include <slog/common.hpp>
 #include <slog/core/log_record.hpp>
 
 namespace slog::sinks

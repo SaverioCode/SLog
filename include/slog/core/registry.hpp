@@ -1,7 +1,7 @@
 #ifndef SLOG_CORE_REGISTRY_HPP
 #define SLOG_CORE_REGISTRY_HPP
 
-#include <slog/config.hpp>
+#include <slog/common.hpp>
 #include <slog/core/log_level.hpp>
 
 // ------------------------

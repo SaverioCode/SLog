@@ -4,7 +4,7 @@
 #include <source_location>
 #include <iosfwd>
 
-#include <slog/config.hpp>
+#include <slog/common.hpp>
 #include <slog/core/log_level.hpp>
 #include <slog/core/log_proxy.hpp>
 #include <slog/sinks/sink_manager.hpp>
