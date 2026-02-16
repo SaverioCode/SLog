@@ -14,6 +14,11 @@ namespace slog
 // Public methods
 // ------------------------
 
+SLOG_ALWAYS_INLINE void    Logger::flush() const
+{
+    _sink_manager.flush();
+}
+
 SLOG_ALWAYS_INLINE void    Logger::add_sink(std::shared_ptr<slog::sinks::ISink> sink)
 {
     _sink_manager.add_sink(sink);

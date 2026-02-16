@@ -32,6 +32,16 @@ SLOG_INLINE std::shared_ptr<Logger>  Registry::create_logger(std::string_view na
     }
 }
 
+SLOG_INLINE void  Registry::flush() const
+{
+    auto loggers = this->get_logger_list();
+
+    for (auto& logger : *loggers) {
+        logger->flush();
+    }
+}
+
+
 SLOG_INLINE bool  Registry::set_default_logger_name(std::string_view name)
 {
     LoggerVecSPtr loggers = _loggers.load(std::memory_order_relaxed);

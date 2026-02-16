@@ -45,7 +45,7 @@ class SinkManager
 
         void    dispatch(const slog::LogRecord& record)
         {
-            auto current_sinks = _sinks_ptr.load(std::memory_order_acquire);
+            auto current_sinks = this->get_sink_list();
 
             for (auto& sink : *current_sinks) {
                 if (record.level <= sink->get_level()) {
@@ -54,9 +54,18 @@ class SinkManager
             }
         }
 
+        void    flush() const
+        {
+            auto current_sinks = this->get_sink_list();
+
+            for (auto& sink : *current_sinks) {
+                sink->flush();
+            }
+        }
+
         [[nodiscard]] std::shared_ptr<ISink>  get_sink(const std::string& name)
         {
-            auto current_sinks = _sinks_ptr.load(std::memory_order_acquire);
+            auto current_sinks = this->get_sink_list();
 
             for (const auto& sink : *current_sinks) {
                 if (sink->get_name() == name) {

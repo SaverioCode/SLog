@@ -27,6 +27,8 @@ class Registry
             _loggers.load(std::memory_order_relaxed)->clear();
         }
 
+        [[nodiscard]] std::shared_ptr<Logger> create_logger(std::string_view name);
+
         static std::shared_ptr<Registry> instance()
         {
             if (_state.load(std::memory_order_relaxed) == RegistryState::ACTIVE) [[likely]] {
@@ -39,6 +41,8 @@ class Registry
             }
             return nullptr;
         }
+
+        void    flush() const;
 
         [[nodiscard]] std::shared_ptr<Logger> get_default_logger() const noexcept
         {
@@ -56,6 +60,11 @@ class Registry
             return nullptr;
         }
 
+        [[nodiscard]] SLOG_ALWAYS_INLINE std::shared_ptr<Logger> get_logger_list() const noexcept
+        {
+            return _loggers.load(std::memory_order_acquire);
+        }
+
         [[nodiscard]] SLOG_ALWAYS_INLINE LogLevel  get_log_level() const noexcept
         {
             return _log_level;
@@ -67,9 +76,6 @@ class Registry
         }
 
         bool  set_default_logger_name(std::string_view name);
-
-        [[nodiscard]] std::shared_ptr<Logger> create_logger(std::string_view name);
-
 
     private:
         using LoggerVecSPtr = std::shared_ptr<std::vector<std::shared_ptr<Logger>>>;

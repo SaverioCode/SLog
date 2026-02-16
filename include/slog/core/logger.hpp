@@ -100,6 +100,8 @@ public:
         log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
     }
 
+    void    flush() const;
+
     void    add_sink(std::shared_ptr<slog::sinks::ISink> sink);
     void    remove_sink(const std::string& name) noexcept;
 
