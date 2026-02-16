@@ -1,8 +1,11 @@
 #ifndef SLOG_CORE_REGISTRY_IPP
 #define SLOG_CORE_REGISTRY_IPP
 
+#include <cstdio>
+
 #include <slog/core/logger.hpp>
 #include <slog/core/registry.hpp>
+#include <slog/sinks/console_sink.hpp>
 
 namespace slog
 {
@@ -67,12 +70,12 @@ SLOG_INLINE Registry::Registry(RegistryState state) : _local_state(state)
     if (state == RegistryState::ACTIVE) {
         _default_logger_name = _SLOG_DEFAULT_LOGGER_NAME;
         logger = _make_logger(_default_logger_name);
-        logger->add_sink(std::make_shared<ConsoleSink>(_SLOG_DEFAULT_SINK_NAME), stdout);
+        logger->add_sink(std::make_shared<slog::sinks::ConsoleSink>(_SLOG_DEFAULT_SINK_NAME, stdout));
     }
     else if (state == RegistryState::INACTIVE) {
         _default_logger_name = _SLOG_INACTIVE_LOGGER_NAME;
         logger = _make_logger(_default_logger_name);
-        logger->add_sink(std::make_shared<ConsoleSink>(_SLOG_INACTIVE_SINK_NAME), stderr);
+        logger->add_sink(std::make_shared<slog::sinks::ConsoleSink>(_SLOG_INACTIVE_SINK_NAME, stderr));
     }
     loggers->push_back(logger);
     _loggers.store(loggers, std::memory_order_relaxed);

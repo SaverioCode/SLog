@@ -9,7 +9,6 @@
 #include <slog/core/logger.hpp>
 #include <slog/core/log_level.hpp>
 
-
 namespace slog
 {
     

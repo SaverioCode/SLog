@@ -60,7 +60,7 @@ class Registry
             return nullptr;
         }
 
-        [[nodiscard]] SLOG_ALWAYS_INLINE std::shared_ptr<Logger> get_logger_list() const noexcept
+        [[nodiscard]] SLOG_ALWAYS_INLINE std::shared_ptr<std::vector<std::shared_ptr<Logger>>> get_logger_list() const noexcept
         {
             return _loggers.load(std::memory_order_acquire);
         }
