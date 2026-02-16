@@ -117,11 +117,12 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 
 ## Roadmap
 
+- [ ] Implement ConsoleSink
 - [ ] Implement Worker (BackgroundWorker)
 - [ ] Integrate Worker in Logger
-- [ ] Implement Formatting
+- [ ] Implement Signal Handler
+- [ ] Implement Format Layout
 - [ ] Implement Log Rotation
-- [ ] Implement ConsoleSink
 - [ ] Implement optional colors for the different logs levels (console ouotput)
 - [ ] Implement SAST tests
 - [ ] Implement CI/CD for SAST tests
