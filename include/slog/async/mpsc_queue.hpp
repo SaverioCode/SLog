@@ -53,7 +53,7 @@ class MPSCQueue
             return true;
         }
 
-        [[nodiscard]] bool      tre_reserve(Reservation& r)
+        [[nodiscard]] bool      try_reserve(Reservation& r)
         {
             size_t head = _head.load(std::memory_order_relaxed);
 
