@@ -10,11 +10,13 @@
 #endif
 
 // ----------------------------------------
-// Default and Inactive loggers name
+// Default and Inactive loggers and sinks name
 // ----------------------------------------
 
 #define _SLOG_DEFAULT_LOGGER_NAME "default"
 #define _SLOG_INACTIVE_LOGGER_NAME "inactive"
+#define _SLOG_DEFAULT_SINK_NAME "console_out"
+#define _SLOG_INACTIVE_SINK_NAME "console_err"
 
 // ----------------------------------------
 // Inline and Always inline

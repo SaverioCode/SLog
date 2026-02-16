@@ -57,12 +57,12 @@ SLOG_INLINE Registry::Registry(RegistryState state) : _local_state(state)
     if (state == RegistryState::ACTIVE) {
         _default_logger_name = _SLOG_DEFAULT_LOGGER_NAME;
         logger = _make_logger(_default_logger_name);
-        // Todo: create and add console/stdout sink
+        logger->add_sink(std::make_shared<ConsoleSink>(_SLOG_DEFAULT_SINK_NAME), stdout);
     }
     else if (state == RegistryState::INACTIVE) {
         _default_logger_name = _SLOG_INACTIVE_LOGGER_NAME;
         logger = _make_logger(_default_logger_name);
-        // Todo: create and add console/stderr sink
+        logger->add_sink(std::make_shared<ConsoleSink>(_SLOG_INACTIVE_SINK_NAME), stderr);
     }
     loggers->push_back(logger);
     _loggers.store(loggers, std::memory_order_relaxed);
