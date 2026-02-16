@@ -22,31 +22,30 @@
 
 ## Description
 
-The main goal of this library is to provide a **reliable** general purpose logging system for C++ applications, that can be use in most scenarios avoiding to switch between different loggers or changing the code. It's **simple** to start with and to integrate, it's **extensible**, still being very **fast** (~~benchmark~~). If you are looking for truly high performance logging or you need to work on bare metal (no allocations), you should look for other libraries.
+The main goal of this library is to provide a **reliable** general purpose logging system for C++ applications, that can be use in most scenarios avoiding to switch between different loggers or changing the code. It's **simple** to start with and to integrate, it's **extensible**, still being very **fast** (~~benchmark~~).
 
 ## Features
 
 - **Logger's Registry** (default/optional) to ensure loggers/synks life cycle and address the _Static Destruction Order Fiasco_ without leakages
-- **Sync** (default/optional)
-- **Async** (optional) completely lock-free with low latency on user application
+- **Sync** (default/optional) if _thread safe_ is not enabled, `<mutex>` and ~~`<thread>`~~ headers are not include
+- **Async** (optional) lock-free hot path with low latency on user application
 - **Unified Interface for Sync and Async**
-- **Thread Safe** (optional) _async_ mode it's thread safe by design, for _sync_ mode it must be enabled to protect _synks_
-- **No Mutex** (default/optional) _async_ mode never includes `<mutex>`, for _sync_ mode _thread safe_ must not be enabled
+- **Thread Safe** (optional) _thread safe_ needs to be enabled only for _sync_ mode, for _async_ mode it's just redundant
 - **5 different log levels** ~~extesible~~ (FATAL, ERROR, WARNING, INFO, DEBUG) 
 - **Compile-Time Log Levels**
 - **Runtime Log Levels** (_Registry_ -> _Logger_ -> _Sink_)
 - ~~**Fast compilation** C++ 20 modules~~
 - **Backpressure Policies** (_async_ mode only) extensible
 - **Sinks** extensible (you don't need to worry about thread 
-safety)
-    - ~~**Console Sink** (built-in/optional)~~
+safety implementation)
+    - ~~**Console Sink** (built-in)~~
     - **Stream Sink** (built-in/optional)
     - **File Sink** (built-in/optional)
     - **Custom Sinks**
 - **Logging Stream Syntax** (default/optional) it's possible to completely strip out the logging stream syntax
 - **Logging Format Strings Syntax** (default) `<format>`
 - **Unified Interface for Logging**
-- **No external Dependencies** (except for the test suite)
+- **No external Dependencies** (except for test suites that are not enabled by default)
 
 ## Requirements
 
