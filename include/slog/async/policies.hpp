@@ -13,7 +13,7 @@ struct DiscardOnFull
     {
         Reservation r;
 
-        if (q.tryReserve(r)) {
+        if (q.try_reserve(r)) {
             q.commit(r, std::move(item));
             return true;
         }

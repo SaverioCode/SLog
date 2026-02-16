@@ -41,7 +41,7 @@ class FileSink : public ISink
             std::fflush(_fd);
         }
 
-        [[nodiscard]] std::string getFileName() const
+        [[nodiscard]] std::string get_file_name() const
         {
             return _file_name;
         }

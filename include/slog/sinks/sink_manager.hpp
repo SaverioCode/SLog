@@ -25,15 +25,15 @@ class SinkManager
         SinkManager& operator=(const SinkManager&) = delete;
         SinkManager& operator=(SinkManager&&) = delete;
         
-        bool    addSink(std::shared_ptr<ISink> sink)
+        bool    add_sink(std::shared_ptr<ISink> sink)
         {
             SLOG_LOCK(_sink_manager_mutex)
-            auto name = sink->getName();
+            auto name = sink->get_name();
             auto current_sinks = _sinks_ptr.load(std::memory_order_relaxed);
             SinkPtr new_sinks;
 
             for (const auto& existing_sink : *current_sinks) {
-                if (existing_sink->getName() == name) {
+                if (existing_sink->get_name() == name) {
                     return false;
                 }
             }
@@ -48,30 +48,30 @@ class SinkManager
             auto current_sinks = _sinks_ptr.load(std::memory_order_acquire);
 
             for (auto& sink : *current_sinks) {
-                if (record.level <= sink->getLevel()) {
+                if (record.level <= sink->get_level()) {
                     sink->log(record);
                 }
             }
         }
 
-        [[nodiscard]] std::shared_ptr<ISink>  getSink(const std::string& name)
+        [[nodiscard]] std::shared_ptr<ISink>  get_sink(const std::string& name)
         {
             auto current_sinks = _sinks_ptr.load(std::memory_order_acquire);
 
             for (const auto& sink : *current_sinks) {
-                if (sink->getName() == name) {
+                if (sink->get_name() == name) {
                     return sink;
                 }
             }
             return nullptr;
         }
 
-        [[nodiscard]] SLOG_ALWAYS_INLINE SinkPtr getSinkList() const noexcept
+        [[nodiscard]] SLOG_ALWAYS_INLINE SinkPtr get_sink_list() const noexcept
         {
             return _sinks_ptr.load(std::memory_order_acquire);
         }
 
-        void    removeSink(const std::string& name)
+        void    remove_sink(const std::string& name)
         {
             SLOG_LOCK(_sink_manager_mutex)
             auto current_sinks = _sinks_ptr.load(std::memory_order_relaxed);

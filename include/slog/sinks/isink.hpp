@@ -23,12 +23,12 @@ class ISink
 
         virtual void    flush() = 0;
 
-        [[nodiscard]] SLOG_ALWAYS_INLINE slog::LogLevel    getLevel() const noexcept
+        [[nodiscard]] SLOG_ALWAYS_INLINE slog::LogLevel    get_level() const noexcept
         {
             return _level;
         }
 
-        [[nodiscard]] SLOG_ALWAYS_INLINE const std::string&  getName() const noexcept
+        [[nodiscard]] SLOG_ALWAYS_INLINE const std::string&  get_name() const noexcept
         {
             return _name;
         }
@@ -39,7 +39,7 @@ class ISink
             _write(record);
         }
 
-        SLOG_ALWAYS_INLINE void  setLevel(const slog::LogLevel level) noexcept
+        SLOG_ALWAYS_INLINE void  set_level(const slog::LogLevel level) noexcept
         {
             _level = level;
         }
