@@ -49,17 +49,17 @@ SLOG_INLINE bool  Registry::set_default_logger_name(std::string_view name)
 // Private methods
 // ------------------------
 
-SLOG_INLINE Registry::Registry(LoggerState state) : _local_state(state)
+SLOG_INLINE Registry::Registry(RegistryState state) : _local_state(state)
 {
     std::shared_ptr<Logger> logger;
     LoggerVecSPtr loggers = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
 
-    if (state == LoggerState::ACTIVE) {
+    if (state == RegistryState::ACTIVE) {
         _default_logger_name = _SLOG_DEFAULT_LOGGER_NAME;
         logger = _make_logger(_default_logger_name);
         // Todo: create and add console/stdout sink
     }
-    else if (state == LoggerState::INACTIVE) {
+    else if (state == RegistryState::INACTIVE) {
         _default_logger_name = _SLOG_INACTIVE_LOGGER_NAME;
         logger = _make_logger(_default_logger_name);
         // Todo: create and add console/stderr sink
@@ -86,9 +86,9 @@ SLOG_ALWAYS_INLINE std::shared_ptr<Logger>  Registry::_make_logger(std::string_v
     return std::make_shared<TmpLogger>(name);
 }
 
-SLOG_ALWAYS_INLINE std::shared_ptr<Registry>  Registry::_make_registry(LoggerState state)
+SLOG_ALWAYS_INLINE std::shared_ptr<Registry>  Registry::_make_registry(RegistryState state)
 {
-    struct TmpRegistry : public Registry { TmpRegistry(LoggerState state) : Registry(state) {} };
+    struct TmpRegistry : public Registry { TmpRegistry(RegistryState state) : Registry(state) {} };
     return std::make_shared<TmpRegistry>(state);
 }
 
