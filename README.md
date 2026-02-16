@@ -38,7 +38,7 @@ The main goal of this library is to provide a **reliable** general purpose loggi
 - **Backpressure Policies** (_async_ mode only) extensible
 - **Sinks** extensible (you don't need to worry about thread 
 safety implementation)
-    - ~~**Console Sink** (built-in)~~
+    - **Console Sink** (built-in)
     - **Stream Sink** (built-in/optional)
     - **File Sink** (built-in/optional)
     - **Custom Sinks**
@@ -116,7 +116,6 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 
 ## Roadmap
 
-- [ ] Implement ConsoleSink
 - [ ] Implement Worker (BackgroundWorker)
 - [ ] Integrate Worker in Logger
 - [ ] Implement Signal Handler
