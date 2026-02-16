@@ -69,7 +69,7 @@ safety)
 ## Quick Start
 
 > [!NOTE]
-> Quick start imply using it as a header only library without using cmake but only `-ISLog/include`, hence compiling with the macro `SLOG_HEADER_ONLY`.
+> Quick start imply using the library as _header only_ library the project CmakeLists.txt but only `-ISLog/include`, hence compiling with the macro `SLOG_HEADER_ONLY`. In alternative it's possible to include the _CMakeLists.txt_ in your project and use it as a _header only_ or _static/shared_ library leveraging the `SLOG_BUILD_TYPE` option [check compile-time options](docs/compile_time_options.md)
 
 ### 1. Installation
 
