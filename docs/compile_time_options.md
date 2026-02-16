@@ -7,6 +7,7 @@ Different compile-time options are available to configure the library. Following
 - [Build](#build)
 - [General](#general)
 - [Sinks](#sinks)
+- [Perfomance](#perfomance)
 
 ## Build
 
@@ -39,3 +40,10 @@ Each built-in **sink** is included by default but it can be omitted using the fo
 |:------|:-------------:|:------|:------|
 |`SLOG_STREAM_SINK_DISABLED`| `undefined` | Disable `StreamSink`| |
 |`SLOG_FILE_SINK_DISABLED`| `undefined` | Disable `FileSink`| |
+
+## Perfomance
+
+| Macro | Default value | Scope | Notes |
+|:------|:-------------:|:------|:------|
+|`SLOG_FILE_FWRITE_UNLOCKED`| `undefined` | Enable lock-free `fwrite` for `FileSink`| |
+|`SLOG_CONSOLE_FWRITE_UNLOCKED`| `undefined` | Enable lock-free `fwrite` for `ConsoleSink`| ⚠️ **[WARNING]** Be cautious when using this macro, while **SLog** guarantee _thread safeness_ of sinks it **cannot** guarantee that console streams (passed as `std::FILE*`) like `stdout` and `stderr` are not used by others |
