@@ -16,6 +16,7 @@ add_executable(${EXE_NAME}
     src/log_levels.cpp
     src/mpsc_queue/single_thread_tests.cpp
     src/mpsc_queue/multi_thread_tests.cpp
+    src/sinks/console_sink.cpp
     src/test_main.cpp
 )
 
