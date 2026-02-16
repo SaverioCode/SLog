@@ -21,20 +21,20 @@ class Registry
     public:
         ~Registry()
         {
-            if (_state.load(std::memory_order_relaxed) == LoggerState::ACTIVE) {
-                _state.store(LoggerState::INACTIVE);
+            if (_state.load(std::memory_order_relaxed) == RegistryState::ACTIVE) {
+                _state.store(RegistryState::INACTIVE);
             }
             _loggers.load(std::memory_order_relaxed)->clear();
         }
 
         static std::shared_ptr<Registry> instance()
         {
-            if (_state.load(std::memory_order_relaxed) == LoggerState::ACTIVE) [[likely]] {
-                static std::shared_ptr<Registry> instance = _make_registry(LoggerState::ACTIVE);
+            if (_state.load(std::memory_order_relaxed) == RegistryState::ACTIVE) [[likely]] {
+                static std::shared_ptr<Registry> instance = _make_registry(RegistryState::ACTIVE);
                 return instance;
             }
-            if (_state.load(std::memory_order_relaxed) == LoggerState::INACTIVE) [[unlikely]] {
-                static std::shared_ptr<Registry> instance = _make_registry(LoggerState::INACTIVE);
+            if (_state.load(std::memory_order_relaxed) == RegistryState::INACTIVE) [[unlikely]] {
+                static std::shared_ptr<Registry> instance = _make_registry(RegistryState::INACTIVE);
                 return instance;   
             }
             return nullptr;
@@ -47,10 +47,10 @@ class Registry
 
         [[nodiscard]] std::shared_ptr<Logger> get_logger(std::string_view name) const noexcept
         {
-            if (_local_state == LoggerState::ACTIVE) [[likely]] {
+            if (_local_state == RegistryState::ACTIVE) [[likely]] {
                 return this->_get_logger(name);
             }
-            else if (_local_state == LoggerState::INACTIVE) [[unlikely]] {
+            else if (_local_state == RegistryState::INACTIVE) [[unlikely]] {
                 return this->_get_logger(_default_logger_name);
             }
             return nullptr;
@@ -74,23 +74,23 @@ class Registry
     private:
         using LoggerVecSPtr = std::shared_ptr<std::vector<std::shared_ptr<Logger>>>;
 
-        enum class LoggerState
+        enum class RegistryState
         {
             ACTIVE,
             INACTIVE
         };
 
-        std::string_view  to_string(LoggerState state)
+        std::string_view  to_string(RegistryState state)
         {
             switch (state)
             {
-                case LoggerState::ACTIVE:   return "ACTIVE";
-                case LoggerState::INACTIVE: return "INACTIVE";
-                default:                    return "UNKNOWN";
+                case RegistryState::ACTIVE:   return "ACTIVE";
+                case RegistryState::INACTIVE: return "INACTIVE";
+                default:                      return "UNKNOWN";
             }
         }
 
-        Registry(LoggerState state);
+        Registry(RegistryState state);
         Registry(const Registry&) = delete;
         Registry(Registry&&) = delete;
 
@@ -99,12 +99,12 @@ class Registry
 
         std::shared_ptr<Logger>  _get_logger(std::string_view name) const noexcept;
         std::shared_ptr<Logger>  _make_logger(std::string_view name);
-        static std::shared_ptr<Registry>  _make_registry(LoggerState state);
+        static std::shared_ptr<Registry>  _make_registry(RegistryState state);
 
         std::string                             _default_logger_name;
-        LoggerState                             _local_state;
+        RegistryState                             _local_state;
         std::atomic<LoggerVecSPtr>              _loggers{nullptr};
-        static inline std::atomic<LoggerState>  _state{LoggerState::ACTIVE};
+        static inline std::atomic<RegistryState>  _state{RegistryState::ACTIVE};
         static inline LogLevel                  _log_level{LogLevel::TRACE};
 };
 
