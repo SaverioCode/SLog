@@ -32,7 +32,6 @@ graph TD
     %% Setup
     Macro -->|Get| Registry
     Registry -->|Ret| LoggerInstance
-    LoggerInstance -->|Make Record| LoggerInstance
     LoggerInstance -->|Dispatch| SinkMgr
 
     %% Path 1: SYNC MODE
