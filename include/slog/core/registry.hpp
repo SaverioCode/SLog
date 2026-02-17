@@ -1,6 +1,7 @@
 #ifndef SLOG_CORE_REGISTRY_HPP
 #define SLOG_CORE_REGISTRY_HPP
 
+#include <slog/async/worker.hpp>
 #include <slog/common.hpp>
 #include <slog/core/log_level.hpp>
 
@@ -96,6 +97,7 @@ class Registry
             }
         }
 
+        Registry() = delete;
         Registry(RegistryState state);
         Registry(const Registry&) = delete;
         Registry(Registry&&) = delete;
@@ -104,7 +106,7 @@ class Registry
         Registry& operator=(Registry&&) = delete;
 
         std::shared_ptr<Logger>  _get_logger(std::string_view name) const noexcept;
-        std::shared_ptr<Logger>  _make_logger(std::string_view name);
+        std::shared_ptr<Logger>  _make_logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker);
         static std::shared_ptr<Registry>  _make_registry(RegistryState state);
 
         std::string                             _default_logger_name;
@@ -112,6 +114,7 @@ class Registry
         std::atomic<LoggerVecSPtr>              _loggers{nullptr};
         static inline std::atomic<RegistryState>  _state{RegistryState::ACTIVE};
         static inline LogLevel                  _log_level{LogLevel::TRACE};
+        std::shared_ptr<Worker>  _worker{nullptr};
 };
 
 }

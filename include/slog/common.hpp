@@ -10,6 +10,14 @@
 #endif
 
 // ----------------------------------------
+// MPSC Queue Size
+// ----------------------------------------
+
+#ifndef SLOG_MPSC_QUEUE_SIZE
+    #define SLOG_MPSC_QUEUE_SIZE 8192
+#endif
+
+// ----------------------------------------
 // Default and Inactive loggers and sinks name
 // ----------------------------------------
 

@@ -27,7 +27,7 @@ The main goal of this library is to provide a **reliable** general purpose loggi
 ## Features
 
 - **Logger Registry** to ensure loggers/sinks/worker life cycle and address the _Static Destruction Order Fiasco_ without leakages
-- **Sync** (default/optional) if _thread safe_ is not enabled, `<mutex>` and ~~`<thread>`~~ headers are not include
+- **Sync** (default/optional) if _thread safe_ is not enabled, `<mutex>` and `<thread>` headers are not include
 - **Async** (optional) lock-free hot path with low latency on user application
 - **Unified Interface for Sync and Async**
 - **Thread Safe** (optional) _thread safe_ needs to be enabled only for _sync_ mode, for _async_ mode it's just redundant
@@ -68,7 +68,7 @@ safety implementation)
 ## Quick Start
 
 > [!NOTE]
-> Quick start imply using the library as _header only_ library the project CmakeLists.txt but only `-ISLog/include`, hence compiling with the macro `SLOG_HEADER_ONLY`. In alternative it's possible to include the _CMakeLists.txt_ in your project and use it as a _header only_ or _static/shared_ library leveraging the `SLOG_BUILD_TYPE` option [check compile-time options](docs/compile_time_options.md)
+> Quick start imply using the library as _header only_ without the project CmakeLists.txt but only `-ISLog/include`, hence compiling with the macro `SLOG_HEADER_ONLY`. In alternative it's possible to include the _CMakeLists.txt_ in your project and use it as a _header only_ or _static/shared_ library leveraging the `SLOG_BUILD_TYPE` option [check compile-time options](docs/compile_time_options.md)
 
 ### 1. Installation
 
@@ -81,7 +81,7 @@ git clone https://github.com/SaverioCode/SLog.git
 ### 2. Base Usage
 
 ```cpp
-#include <slog.hpp>
+#include <slog/slog.hpp>
 
 int main()
 {
@@ -93,18 +93,18 @@ int main()
 Or alternative
 
 ```cpp
-#include <slog.hpp>
+#include <slog/slog.hpp>
 
 int main()
 {
-    slog::Logger logger = slog::Registry::instance()->get_default_logger();
+    std::shared_ptr<slog::Logger> logger = slog::Registry::instance()->get_default_logger();
 
     logger.info("Hello World {}", 42);
     logger.info() << "Hello World " << 42;
 }
 ```
 
-Both code snippets use the **default logger** named "_default_".
+Both code snippets use the **default logger** named "_default_" that comes with a `ConsoleSink` with stream `stdout`.
 
 ## Wiki
 
@@ -116,11 +116,14 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 
 ## Roadmap
 
-- [ ] Implement Worker (BackgroundWorker)
-- [ ] Integrate Worker in Logger
+It's not ordered and it's more of a Todo list, but Roadmap sounds better.
+
+- [ ] Implement Worker Policies
+- [ ] Ensure log level propagation at creation
 - [ ] Implement Signal Handler
 - [ ] Implement Format Layout
 - [ ] Implement Log Rotation
+- [ ] Implement Config File
 - [ ] Implement optional colors for the different logs levels (console ouotput)
 - [ ] Implement SAST tests
 - [ ] Implement CI/CD for SAST tests

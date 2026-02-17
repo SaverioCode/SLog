@@ -4,6 +4,7 @@
 #include <source_location>
 #include <iosfwd>
 
+#include <slog/async/worker.hpp>
 #include <slog/common.hpp>
 #include <slog/core/log_level.hpp>
 #include <slog/core/log_proxy.hpp>
@@ -121,7 +122,7 @@ private:
     friend class  Registry;
 
     Logger() = delete;
-    Logger(std::string_view name);
+    Logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker);
     Logger(const std::shared_ptr<slog::sinks::ISink> sink);
     Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks);
     Logger(Logger&) = delete;
@@ -138,6 +139,7 @@ private:
     std::string               _name;
     slog::sinks::SinkManager  _sink_manager;
     LogLevel                  _log_level{LogLevel::TRACE};
+    std::shared_ptr<slog::async::Worker>  _worker;
 };
 
 }

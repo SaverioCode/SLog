@@ -33,19 +33,23 @@ SLOG_ALWAYS_INLINE void    Logger::remove_sink(const std::string& name) noexcept
 // Private methods
 // ------------------------
 
-SLOG_INLINE Logger::Logger(std::string_view name) : _name(name) {}
+SLOG_INLINE Logger::Logger(std::string_view name, std::shared_ptr<Worker> worker) : _name(name), _worker(worker) {}
 
-SLOG_INLINE Logger::Logger(const std::shared_ptr<slog::sinks::ISink> sink) : 
-    _sink_manager(sink), _log_level(LogLevel::TRACE) {}
+SLOG_INLINE Logger::Logger(std::string_view name, const std::shared_ptr<slog::sinks::ISink> sink, std::shared_ptr<Worker> worker) : 
+    _name(name), _sink_manager(sink), _worker(worker), _log_level(LogLevel::TRACE) {}
 
-SLOG_INLINE Logger::Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks) : 
-    _sink_manager(sinks), _log_level(LogLevel::TRACE) {}
+SLOG_INLINE Logger::Logger(std::string_view name, const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks, std::shared_ptr<Worker> worker) : 
+    _name(name), _sink_manager(sinks), _worker(worker), _log_level(LogLevel::TRACE) {}
 
 SLOG_ALWAYS_INLINE void    Logger::_submit(const LogLevel level, std::string&& message, std::source_location loc)
 {
     LogRecord record{level, std::move(message), loc};
 
+#ifdef SLOG_ASYNC_ENABLED
+    _worker->push(AsyncOp{record, &_sink_manager});
+#else
     _sink_manager.dispatch(record);
+#endif
 }
 
 SLOG_INLINE std::string  Logger::_getTimeStamp()

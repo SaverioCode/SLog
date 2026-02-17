@@ -16,8 +16,8 @@ class MPSCQueue
 
     struct Node
     {
-        alignas(64) std::atomic<size_t> seq;
-        T                               data;
+        T   data;
+        alignas(std::hardware_destructive_interference_size) std::atomic<size_t> seq;
     };
 
     public:
@@ -91,8 +91,8 @@ class MPSCQueue
         size_t                          _size;
         size_t                          _mask;
         Node*                           _buffer;
-        alignas(64) std::atomic<size_t> _head{0};
-        alignas(64) std::atomic<size_t> _tail{0};
+        alignas(std::hardware_destructive_interference_size) std::atomic<size_t> _head{0};
+        alignas(std::hardware_destructive_interference_size) std::atomic<size_t> _tail{0};
 };
 
 }

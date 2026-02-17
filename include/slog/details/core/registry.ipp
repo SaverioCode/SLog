@@ -16,7 +16,7 @@ namespace slog
 
 SLOG_INLINE std::shared_ptr<Logger>  Registry::create_logger(std::string_view name)
 {
-    auto new_logger = _make_logger(name);
+    auto new_logger = _make_logger(name, _worker);
     auto new_vec    = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
 
     while (true) {
@@ -67,14 +67,18 @@ SLOG_INLINE Registry::Registry(RegistryState state) : _local_state(state)
     std::shared_ptr<Logger> logger;
     LoggerVecSPtr loggers = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
 
+    #ifdef SLOG_ASYNC_ENABLED
+        _worker = std::make_shared<Worker>();
+    #endif
+
     if (state == RegistryState::ACTIVE) {
         _default_logger_name = _SLOG_DEFAULT_LOGGER_NAME;
-        logger = _make_logger(_default_logger_name);
+        logger = _make_logger(_default_logger_name, _worker);
         logger->add_sink(std::make_shared<slog::sinks::ConsoleSink>(_SLOG_DEFAULT_SINK_NAME, stdout));
     }
     else if (state == RegistryState::INACTIVE) {
         _default_logger_name = _SLOG_INACTIVE_LOGGER_NAME;
-        logger = _make_logger(_default_logger_name);
+        logger = _make_logger(_default_logger_name, _worker);
         logger->add_sink(std::make_shared<slog::sinks::ConsoleSink>(_SLOG_INACTIVE_SINK_NAME, stderr));
     }
     loggers->push_back(logger);
@@ -93,10 +97,15 @@ SLOG_INLINE std::shared_ptr<Logger>  Registry::_get_logger(std::string_view name
     return nullptr;
 }
 
-SLOG_ALWAYS_INLINE std::shared_ptr<Logger>  Registry::_make_logger(std::string_view name)
+SLOG_ALWAYS_INLINE std::shared_ptr<Logger>  Registry::_make_logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker)
 {
-    struct TmpLogger : public Logger { TmpLogger(std::string_view name) : Logger(name) {} };
-    return std::make_shared<TmpLogger>(name);
+    struct TmpLogger : public Logger
+    {
+        TmpLogger(std::string_view name, std::shared_ptr<slog::async::Worker> worker) 
+            : Logger(name, worker) 
+        {} 
+    };
+    return std::make_shared<TmpLogger>(name, worker);
 }
 
 SLOG_ALWAYS_INLINE std::shared_ptr<Registry>  Registry::_make_registry(RegistryState state)

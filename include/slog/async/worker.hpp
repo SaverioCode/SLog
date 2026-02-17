@@ -15,7 +15,6 @@
 namespace slog::async
 {
 
-template<typename Policy, size_t Size = 8192>
 class Worker
 {
     public:
@@ -33,6 +32,16 @@ class Worker
             join();
         }
 
+        SLOG_ALWAYS_INLINE bool push(AsyncOp&& op)
+        {
+            bool ret = _queue.push(std::move(op));
+
+            if (ret && !_flag.exchange(true, std::memory_order_release)) {
+                _flag.notify_one();
+            }
+            return ret;
+        }
+
         SLOG_ALWAYS_INLINE void stop()
         {
             _running.store(false, std::memory_order_release);
@@ -43,16 +52,6 @@ class Worker
             if (_worker_thread.joinable()) {
                 _worker_thread.join();
             }
-        }
-
-        SLOG_ALWAYS_INLINE bool push(AsyncOp&& op)
-        {
-            bool ret = _queue.push(std::move(op));
-
-            if (ret && !_flag.exchange(true, std::memory_order_release)) {
-                _flag.notify_one();
-            }
-            return ret;
         }
 
     private:
@@ -80,13 +79,17 @@ class Worker
             }
         }
 
-        MPSCQueue<AsyncOp, Size, Policy>     _queue;
+        MPSCQueue<AsyncOp, SLOG_MPSC_QUEUE_SIZE, BlockOnFull>     _queue;
         std::thread                          _worker_thread;
         alignas(std::hardware_destructive_interference_size) std::atomic<bool>  _running;
         alignas(std::hardware_destructive_interference_size) std::atomic<bool>  _flag{true};
 };
 
 }
+
+#else 
+
+struct Worker {};
 
 #endif // SLOG_ASYNC_ENABLED
 
