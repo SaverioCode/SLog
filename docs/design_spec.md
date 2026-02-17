@@ -32,17 +32,16 @@ graph TD
     %% Setup
     Macro -->|Get| Registry
     Registry -->|Ret| LoggerInstance
-    LoggerInstance -->|Dispatch| SinkMgr
 
     %% Path 1: SYNC MODE
+    LoggerInstance -->|Sync Mode: Submit| SinkMgr
     SinkMgr -->|Sync Mode: Write| File:::sync
     SinkMgr -->|Sync Mode: Write| Console:::sync
     
     %% Path 2: ASYNC MODE
-    SinkMgr -->|Async Mode: Push| Q:::async
+    LoggerInstance -->|Async Mode: Push| Q:::async
     Q -->|Pop| Worker
-    Worker -->|Write| File
-    Worker -->|Write| Console
+    Worker -->|Submit| SinkMgr
 
     %% Shared Sink Logic
     SinkMgr -->|Format| Layout
@@ -51,7 +50,7 @@ graph TD
 
     %% Crash Handling
     CrashSignal((SEGFAULT)):::crash -.->|Trigger| CrashGuard
-    CrashGuard -.->|Sync Mode: Flush| SinkMgr
+    CrashGuard -.->|Sync Mode: Flush| Registry
     CrashGuard -.->|Async Mode: Manual Drain| Q
     CrashGuard -.->|Emergency Write| Stderr
 ```
