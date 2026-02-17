@@ -22,14 +22,13 @@ It **must** be explicitely defined which kind of library build type is required.
 
 ## General
 
-
-
 | Macro | Default value | Scope | Notes |
 |:------|:-------------:|:------|:------|
 |`SLOG_MAX_LOG_LEVEL`| `6` (`slog::core::LogLevel::TRACE`) | Define Max log level for compile time stripping | |
 |`SLOG_ASYNC_ENABLED`| `undefined` | Define async mode | The entire library does **not** use the `<mutex>` header |
 |`SLOG_TSAFE`| `undefined` | Define thread safety for sync mode | It includes the `<mutex>` header for **sinks** |
 |`SLOG_STREAM_DISABLED`| `undefined` | Define stream logging syntax | It removes `LogProxy`, `NullProxy`, `VodifyLogProxy`, and everything related to streams except for `StreamSink` that have a dedicated macro [check below](#sinks) |
+|`SLOG_MPSC_QUEUE_SIZE`| `8192` | Define the size of the MPSC queue | Must be power of 2 |
 
 ## Sinks
 
@@ -41,7 +40,7 @@ Each built-in **sink** is included by default but it can be omitted using the fo
 |`SLOG_STREAM_SINK_DISABLED`| `undefined` | Disable `StreamSink`| |
 |`SLOG_FILE_SINK_DISABLED`| `undefined` | Disable `FileSink`| |
 
-## Perfomance
+## Performance
 
 | Macro | Default value | Scope | Notes |
 |:------|:-------------:|:------|:------|
