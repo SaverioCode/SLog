@@ -26,7 +26,7 @@ The main goal of this library is to provide a **reliable** general purpose loggi
 
 ## Features
 
-- **Logger's Registry** (default/optional) to ensure loggers/synks life cycle and address the _Static Destruction Order Fiasco_ without leakages
+- **Logger Registry** to ensure loggers/sinks/worker life cycle and address the _Static Destruction Order Fiasco_ without leakages
 - **Sync** (default/optional) if _thread safe_ is not enabled, `<mutex>` and ~~`<thread>`~~ headers are not include
 - **Async** (optional) lock-free hot path with low latency on user application
 - **Unified Interface for Sync and Async**

@@ -26,12 +26,6 @@ class Logger : public std::enable_shared_from_this<Logger>
 public:
     ~Logger() = default;
 
-#ifdef SLOG_REGISTRY_DISABLED
-    Logger(std::string_view name);
-    Logger(const std::shared_ptr<slog::sinks::ISink> sink);
-    Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks);
-#endif
-
 #ifdef SLOG_STREAM_ENABLED
     template<LogLevel level>
     SLOG_ALWAYS_INLINE auto log()
@@ -124,16 +118,12 @@ private:
 #ifndef SLOG_STREAM_DISABLED
     friend class LogProxy;
 #endif
-#ifndef SLOG_REGISTRY_DISABLED
     friend class  Registry;
-#endif
 
     Logger() = delete;
-#ifndef SLOG_REGISTRY_DISABLED
     Logger(std::string_view name);
     Logger(const std::shared_ptr<slog::sinks::ISink> sink);
     Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks);
-#endif
     Logger(Logger&) = delete;
     Logger(Logger&&) = delete;
 

@@ -63,16 +63,7 @@
             (void)0 : logger->log<lvl>
 #endif
 
-// ---------------------------------
-// Internal macros
-// ---------------------------------
-
-#ifndef SLOG_REGISTRY_DISABLED
-    #define _SLOG_IS_OFF(lvl, logger) \
-        (lvl > SLOG_REGISTRY->get_log_level()) || (lvl > logger->get_log_level())
-#else
-    #define _SLOG_IS_OFF(lvl, logger) \
-        (lvl > logger->get_log_level())
-#endif
+#define _SLOG_IS_OFF(lvl, logger) \
+    (lvl > SLOG_REGISTRY->get_log_level()) || (lvl > logger->get_log_level())
 
 #endif // SLOG_HPP
