@@ -27,6 +27,7 @@ def main():
         ("include", "include"),
         ("src", "src"),
         ("tests", "tests"),
+        ("scripts", "scripts"),
         ("example", "example"),
         ("CMakeLists.txt", "CMakeLists.txt"),
         ("CMakePreset.json", "CMakePreset.json"),
