@@ -28,6 +28,7 @@ It **must** be explicitely defined which kind of library build type is required.
 |`SLOG_ASYNC_ENABLED`| `undefined` | Define async mode | The entire library does **not** use the `<mutex>` header |
 |`SLOG_TSAFE`| `undefined` | Define thread safety for sync mode | It includes the `<mutex>` header for **sinks** |
 |`SLOG_STREAM_DISABLED`| `undefined` | Define stream logging syntax | It removes `LogProxy`, `NullProxy`, `VodifyLogProxy`, and everything related to streams except for `StreamSink` that have a dedicated macro [check below](#sinks) |
+|`SLOG_CACHELINE_SIZE`| `64` | Define the size of the cacheline | |
 |`SLOG_MPSC_QUEUE_SIZE`| `8192` | Define the size of the MPSC queue | Must be power of 2 |
 
 ## Sinks
