@@ -18,7 +18,7 @@ class MPSCQueue
     struct Node
     {
         T data;
-        alignas(std::hardware_destructive_interference_size) std::atomic<size_t> seq;
+        alignas(SLOG_CACHELINE_SIZE) std::atomic<size_t> seq;
     };
 
 public:
@@ -89,8 +89,8 @@ private:
     size_t _size;
     size_t _mask;
     Node* _buffer;
-    alignas(std::hardware_destructive_interference_size) std::atomic<size_t> _head{0};
-    alignas(std::hardware_destructive_interference_size) std::atomic<size_t> _tail{0};
+    alignas(SLOG_CACHELINE_SIZE) std::atomic<size_t> _head{0};
+    alignas(SLOG_CACHELINE_SIZE) std::atomic<size_t> _tail{0};
 };
 
 } // namespace slog::async

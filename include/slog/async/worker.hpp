@@ -77,8 +77,8 @@ private:
 
     MPSCQueue<AsyncOp, SLOG_MPSC_QUEUE_SIZE, BlockOnFull> _queue;
     std::thread _worker_thread;
-    alignas(std::hardware_destructive_interference_size) std::atomic<bool> _running;
-    alignas(std::hardware_destructive_interference_size) std::atomic<bool> _flag{true};
+    alignas(SLOG_CACHELINE_SIZE) std::atomic<bool> _running;
+    alignas(SLOG_CACHELINE_SIZE) std::atomic<bool> _flag{true};
 };
 
 } // namespace slog::async
