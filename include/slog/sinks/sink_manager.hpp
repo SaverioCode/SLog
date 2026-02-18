@@ -59,7 +59,7 @@ public:
 
     void flush() const
     {
-        auto current_sinks = this->get_sink_list();
+        auto current_sinks = this->get_sinks();
 
         for (auto& sink : *current_sinks) {
             sink->flush();
@@ -68,7 +68,7 @@ public:
 
     [[nodiscard]] std::shared_ptr<ISink> get_sink(const std::string& name)
     {
-        auto current_sinks = this->get_sink_list();
+        auto current_sinks = this->get_sinks();
 
         for (const auto& sink : *current_sinks) {
             if (sink->get_name() == name) {
@@ -78,7 +78,7 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] SLOG_ALWAYS_INLINE SinkPtr get_sink_list() const noexcept
+    [[nodiscard]] SLOG_ALWAYS_INLINE SinkPtr get_sinks() const noexcept
     {
         return _sinks_ptr.load(std::memory_order_acquire);
     }

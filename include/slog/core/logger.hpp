@@ -100,6 +100,9 @@ public:
     void add_sink(std::shared_ptr<slog::sinks::ISink> sink);
     void remove_sink(const std::string& name) noexcept;
 
+    [[nodiscard]] std::shared_ptr<slog::sinks::ISink> get_sink(const std::string& name) const;
+    [[nodiscard]] std::vector<std::shared_ptr<slog::sinks::ISink>> get_sinks() const;
+
     [[nodiscard]] SLOG_ALWAYS_INLINE LogLevel get_log_level() const noexcept { return _log_level; }
 
     SLOG_ALWAYS_INLINE void set_log_level(const LogLevel level) noexcept { _log_level = level; }
