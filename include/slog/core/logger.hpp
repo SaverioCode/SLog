@@ -132,9 +132,9 @@ private:
     [[nodiscard]] std::string _getTimeStamp();
 
     std::string _name;
-    slog::sinks::SinkManager _sink_manager;
     LogLevel _log_level{LogLevel::TRACE};
-    std::shared_ptr<slog::async::Worker> _worker;
+    std::shared_ptr<slog::sinks::SinkManager> _sink_manager{nullptr};
+    std::shared_ptr<slog::async::Worker> _worker{nullptr};
 };
 
 } // namespace slog

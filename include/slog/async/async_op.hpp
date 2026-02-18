@@ -9,7 +9,7 @@ namespace slog::async
 struct AsyncOp
 {
     slog::LogRecord record;
-    slog::sinks::SinkManager* sink_manager;
+    std::shared_ptr<slog::sinks::SinkManager> sink_manager;
 };
 } // namespace slog::async
 
