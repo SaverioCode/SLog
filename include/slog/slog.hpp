@@ -2,13 +2,13 @@
 #define SLOG_HPP
 
 #include <slog/common.hpp>
-#include <slog/core/logger.hpp>
 #include <slog/core/log_proxy.hpp>
+#include <slog/core/logger.hpp>
 #include <slog/core/registry.hpp>
 
 #ifdef SLOG_HEADER_ONLY
-    #include <slog/details/core/logger.ipp>  
     #include <slog/details/core/log_proxy.ipp>
+    #include <slog/details/core/logger.ipp>
     #include <slog/details/core/registry.ipp>
 #endif
 
@@ -54,16 +54,18 @@
 // ---------------------------------
 
 #ifdef SLOG_STREAM_ENABLED
-    #define SLOG(lvl, logger) \
-         ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || _SLOG_IS_OFF(lvl, logger)) ? \
-             (void)0 : slog::VodifyLogProxy() & slog::LogProxy(logger, lvl)
+    #define SLOG(lvl, logger)                                                                      \
+        ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || _SLOG_IS_OFF(lvl, logger))            \
+            ? (void)0                                                                              \
+            : slog::VodifyLogProxy() & slog::LogProxy(logger, lvl)
 #else
-    #define SLOG(lvl, logger) \
-        ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || _SLOG_IS_OFF(lvl, logger)) ? \
-            (void)0 : logger->log<lvl>
+    #define SLOG(lvl, logger)                                                                      \
+        ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || _SLOG_IS_OFF(lvl, logger))            \
+            ? (void)0                                                                              \
+            : logger->log<lvl>
 #endif
 
-#define _SLOG_IS_OFF(lvl, logger) \
+#define _SLOG_IS_OFF(lvl, logger)                                                                  \
     (lvl > SLOG_REGISTRY->get_log_level()) || (lvl > logger->get_log_level())
 
 #endif // SLOG_HPP

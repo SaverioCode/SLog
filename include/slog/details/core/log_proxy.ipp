@@ -4,21 +4,23 @@
 
 #ifndef SLOG_STREAM_DISABLED
 
-#include <iostream>
+    #include <iostream>
 
-#include <slog/core/logger.hpp>
-#include <slog/core/log_level.hpp>
+    #include <slog/core/log_level.hpp>
+    #include <slog/core/logger.hpp>
 
 namespace slog
 {
-    
+
 // --------------
 // PUBLIC
 // --------------
 
-SLOG_ALWAYS_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel level, bool is_active, std::source_location loc) :
-    _logger(logger), _level(level), _is_active(is_active), _location(loc) {}
-
+SLOG_ALWAYS_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel level,
+                                      bool is_active, std::source_location loc)
+    : _logger(logger), _level(level), _is_active(is_active), _location(loc)
+{
+}
 
 SLOG_INLINE LogProxy::~LogProxy()
 {
@@ -51,14 +53,15 @@ SLOG_ALWAYS_INLINE void LogProxy::_ensure_stream()
     }
 }
 
-SLOG_ALWAYS_INLINE void LogProxy::_submit(LogLevel level, std::string&& buffer, std::source_location location)
+SLOG_ALWAYS_INLINE void LogProxy::_submit(LogLevel level, std::string&& buffer,
+                                          std::source_location location)
 {
     if (_logger) [[likely]] {
         _logger->_submit(level, std::move(buffer), location);
     }
 }
 
-}
+} // namespace slog
 
 #endif // SLOG_STREAM_DISABLED
 

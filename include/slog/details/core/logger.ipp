@@ -14,17 +14,17 @@ namespace slog
 // Public methods
 // ------------------------
 
-SLOG_ALWAYS_INLINE void    Logger::flush() const
+SLOG_ALWAYS_INLINE void Logger::flush() const
 {
     _sink_manager.flush();
 }
 
-SLOG_ALWAYS_INLINE void    Logger::add_sink(std::shared_ptr<slog::sinks::ISink> sink)
+SLOG_ALWAYS_INLINE void Logger::add_sink(std::shared_ptr<slog::sinks::ISink> sink)
 {
     _sink_manager.add_sink(sink);
 }
 
-SLOG_ALWAYS_INLINE void    Logger::remove_sink(const std::string& name) noexcept
+SLOG_ALWAYS_INLINE void Logger::remove_sink(const std::string& name) noexcept
 {
     _sink_manager.remove_sink(name);
 }
@@ -33,15 +33,26 @@ SLOG_ALWAYS_INLINE void    Logger::remove_sink(const std::string& name) noexcept
 // Private methods
 // ------------------------
 
-SLOG_INLINE Logger::Logger(std::string_view name, std::shared_ptr<Worker> worker) : _name(name), _worker(worker) {}
+SLOG_INLINE Logger::Logger(std::string_view name, std::shared_ptr<Worker> worker)
+    : _name(name), _worker(worker)
+{
+}
 
-SLOG_INLINE Logger::Logger(std::string_view name, const std::shared_ptr<slog::sinks::ISink> sink, std::shared_ptr<Worker> worker) : 
-    _name(name), _sink_manager(sink), _worker(worker), _log_level(LogLevel::TRACE) {}
+SLOG_INLINE Logger::Logger(std::string_view name, const std::shared_ptr<slog::sinks::ISink> sink,
+                           std::shared_ptr<Worker> worker)
+    : _name(name), _sink_manager(sink), _worker(worker), _log_level(LogLevel::TRACE)
+{
+}
 
-SLOG_INLINE Logger::Logger(std::string_view name, const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks, std::shared_ptr<Worker> worker) : 
-    _name(name), _sink_manager(sinks), _worker(worker), _log_level(LogLevel::TRACE) {}
+SLOG_INLINE Logger::Logger(std::string_view name,
+                           const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks,
+                           std::shared_ptr<Worker> worker)
+    : _name(name), _sink_manager(sinks), _worker(worker), _log_level(LogLevel::TRACE)
+{
+}
 
-SLOG_ALWAYS_INLINE void    Logger::_submit(const LogLevel level, std::string&& message, std::source_location loc)
+SLOG_ALWAYS_INLINE void Logger::_submit(const LogLevel level, std::string&& message,
+                                        std::source_location loc)
 {
     LogRecord record{level, std::move(message), loc};
 
@@ -52,7 +63,7 @@ SLOG_ALWAYS_INLINE void    Logger::_submit(const LogLevel level, std::string&& m
 #endif
 }
 
-SLOG_INLINE std::string  Logger::_getTimeStamp()
+SLOG_INLINE std::string Logger::_getTimeStamp()
 {
     char formatted[20];
 
@@ -61,6 +72,6 @@ SLOG_INLINE std::string  Logger::_getTimeStamp()
     std::strftime(formatted, sizeof(formatted), "%Y-%m-%d %H:%M:%S", datetime);
     return std::string(formatted);
 }
-}
+} // namespace slog
 
 #endif // SLOG_CORE_LOGGER_IPP

@@ -6,11 +6,11 @@
 
 namespace slog::async
 {
-    struct AsyncOp
-    {
-        slog::LogRecord record;
-        slog::sinks::SinkManager* sink_manager;
-    };
-}
+struct AsyncOp
+{
+    slog::LogRecord record;
+    slog::sinks::SinkManager* sink_manager;
+};
+} // namespace slog::async
 
 #endif // SLOG_ASYNC_ASYNC_OP_HPP

@@ -10,25 +10,25 @@ namespace slog::sinks
 
 class StreamSink : public ISink
 {
-    public:
-        StreamSink() = delete;
-        StreamSink(const StreamSink&) = delete;
-        StreamSink(StreamSink&&) = delete;        
-        StreamSink(const std::string& sink_name, std::ostream& ostream);
-        ~StreamSink() override;
+public:
+    StreamSink() = delete;
+    StreamSink(const StreamSink&) = delete;
+    StreamSink(StreamSink&&) = delete;
+    StreamSink(const std::string& sink_name, std::ostream& ostream);
+    ~StreamSink() override;
 
-        StreamSink& operator=(const StreamSink&) = delete;
-        StreamSink& operator=(StreamSink&&) = delete;
+    StreamSink& operator=(const StreamSink&) = delete;
+    StreamSink& operator=(StreamSink&&) = delete;
 
-        void    flush() override;
+    void flush() override;
 
-    private:
-        void    _write(const slog::LogRecord& record) override;
+private:
+    void _write(const slog::LogRecord& record) override;
 
-        std::ostream&   _ostream;
+    std::ostream& _ostream;
 };
 
-}
+} // namespace slog::sinks
 
 #ifdef SLOG_HEADER_ONLY
     #include <slog/details/sinks/stream_sink.ipp>

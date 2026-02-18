@@ -67,7 +67,7 @@
     #define SLOG_SINK_LOCK(name)
 #else
     #define SLOG_SINK_MUTEX_MEMBER(name) SLOG_MUTEX_MEMBER(name)
-    #define SLOG_SINK_LOCK(name)         SLOG_LOCK(name)
+    #define SLOG_SINK_LOCK(name) SLOG_LOCK(name)
 #endif
 
 // ----------------------------------------
@@ -81,6 +81,5 @@
 #else
     #define SLOG_STREAM_ENABLED
 #endif
-
 
 #endif // SLOG_CONFIG_HPP

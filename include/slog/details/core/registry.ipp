@@ -14,14 +14,14 @@ namespace slog
 // Public methods
 // ------------------------
 
-SLOG_INLINE std::shared_ptr<Logger>  Registry::create_logger(std::string_view name)
+SLOG_INLINE std::shared_ptr<Logger> Registry::create_logger(std::string_view name)
 {
     auto new_logger = _make_logger(name, _worker);
-    auto new_vec    = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
+    auto new_vec = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
 
     while (true) {
         LoggerVecSPtr old_vec = _loggers.load(std::memory_order_acquire);
-        
+
         for (const auto& logger : *old_vec) {
             if (logger->get_name() == name) {
                 return nullptr;
@@ -35,7 +35,7 @@ SLOG_INLINE std::shared_ptr<Logger>  Registry::create_logger(std::string_view na
     }
 }
 
-SLOG_INLINE void  Registry::flush() const
+SLOG_INLINE void Registry::flush() const
 {
     auto loggers = this->get_logger_list();
 
@@ -44,8 +44,7 @@ SLOG_INLINE void  Registry::flush() const
     }
 }
 
-
-SLOG_INLINE bool  Registry::set_default_logger_name(std::string_view name)
+SLOG_INLINE bool Registry::set_default_logger_name(std::string_view name)
 {
     LoggerVecSPtr loggers = _loggers.load(std::memory_order_relaxed);
 
@@ -67,25 +66,27 @@ SLOG_INLINE Registry::Registry(RegistryState state) : _local_state(state)
     std::shared_ptr<Logger> logger;
     LoggerVecSPtr loggers = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
 
-    #ifdef SLOG_ASYNC_ENABLED
-        _worker = std::make_shared<Worker>();
-    #endif
+#ifdef SLOG_ASYNC_ENABLED
+    _worker = std::make_shared<Worker>();
+#endif
 
     if (state == RegistryState::ACTIVE) {
         _default_logger_name = _SLOG_DEFAULT_LOGGER_NAME;
         logger = _make_logger(_default_logger_name, _worker);
-        logger->add_sink(std::make_shared<slog::sinks::ConsoleSink>(_SLOG_DEFAULT_SINK_NAME, stdout));
+        logger->add_sink(
+            std::make_shared<slog::sinks::ConsoleSink>(_SLOG_DEFAULT_SINK_NAME, stdout));
     }
     else if (state == RegistryState::INACTIVE) {
         _default_logger_name = _SLOG_INACTIVE_LOGGER_NAME;
         logger = _make_logger(_default_logger_name, _worker);
-        logger->add_sink(std::make_shared<slog::sinks::ConsoleSink>(_SLOG_INACTIVE_SINK_NAME, stderr));
+        logger->add_sink(
+            std::make_shared<slog::sinks::ConsoleSink>(_SLOG_INACTIVE_SINK_NAME, stderr));
     }
     loggers->push_back(logger);
     _loggers.store(loggers, std::memory_order_relaxed);
 }
 
-SLOG_INLINE std::shared_ptr<Logger>  Registry::_get_logger(std::string_view name) const noexcept
+SLOG_INLINE std::shared_ptr<Logger> Registry::_get_logger(std::string_view name) const noexcept
 {
     LoggerVecSPtr loggers = _loggers.load(std::memory_order_relaxed);
 
@@ -97,23 +98,28 @@ SLOG_INLINE std::shared_ptr<Logger>  Registry::_get_logger(std::string_view name
     return nullptr;
 }
 
-SLOG_ALWAYS_INLINE std::shared_ptr<Logger>  Registry::_make_logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker)
+SLOG_ALWAYS_INLINE std::shared_ptr<Logger>
+Registry::_make_logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker)
 {
     struct TmpLogger : public Logger
     {
-        TmpLogger(std::string_view name, std::shared_ptr<slog::async::Worker> worker) 
-            : Logger(name, worker) 
-        {} 
+        TmpLogger(std::string_view name, std::shared_ptr<slog::async::Worker> worker)
+            : Logger(name, worker)
+        {
+        }
     };
     return std::make_shared<TmpLogger>(name, worker);
 }
 
-SLOG_ALWAYS_INLINE std::shared_ptr<Registry>  Registry::_make_registry(RegistryState state)
+SLOG_ALWAYS_INLINE std::shared_ptr<Registry> Registry::_make_registry(RegistryState state)
 {
-    struct TmpRegistry : public Registry { TmpRegistry(RegistryState state) : Registry(state) {} };
+    struct TmpRegistry : public Registry
+    {
+        TmpRegistry(RegistryState state) : Registry(state) {}
+    };
     return std::make_shared<TmpRegistry>(state);
 }
 
-}
+} // namespace slog
 
 #endif // SLOG_CORE_REGISTRY_IPP

@@ -14,93 +14,97 @@ class SinkManager
 {
     using SinkVec = std::vector<std::shared_ptr<ISink>>;
     using SinkPtr = std::shared_ptr<SinkVec>;
-    
-    public:
-        SinkManager() : _sinks_ptr(std::make_shared<SinkVec>()) {}
-        SinkManager(std::shared_ptr<ISink> sink) : _sinks_ptr(std::make_shared<SinkVec>()) { add_sink(sink); }
-        SinkManager(SinkVec sinks) : _sinks_ptr(std::make_shared<SinkVec>(sinks)) {}
-        SinkManager(const SinkManager&) = delete;
-        SinkManager(SinkManager&&) = delete;
 
-        SinkManager& operator=(const SinkManager&) = delete;
-        SinkManager& operator=(SinkManager&&) = delete;
-        
-        bool    add_sink(std::shared_ptr<ISink> sink)
-        {
-            SLOG_LOCK(_sink_manager_mutex)
-            auto name = sink->get_name();
-            auto current_sinks = _sinks_ptr.load(std::memory_order_relaxed);
-            SinkPtr new_sinks;
+public:
+    SinkManager() : _sinks_ptr(std::make_shared<SinkVec>()) {}
+    SinkManager(std::shared_ptr<ISink> sink) : _sinks_ptr(std::make_shared<SinkVec>())
+    {
+        add_sink(sink);
+    }
+    SinkManager(SinkVec sinks) : _sinks_ptr(std::make_shared<SinkVec>(sinks)) {}
+    SinkManager(const SinkManager&) = delete;
+    SinkManager(SinkManager&&) = delete;
 
-            for (const auto& existing_sink : *current_sinks) {
-                if (existing_sink->get_name() == name) {
-                    return false;
-                }
-            }
-            new_sinks = std::make_shared<SinkVec>(*current_sinks);
-            new_sinks->push_back(sink);
-            _sinks_ptr.store(new_sinks, std::memory_order_release);
-            return true;
-        }
+    SinkManager& operator=(const SinkManager&) = delete;
+    SinkManager& operator=(SinkManager&&) = delete;
 
-        void    dispatch(const slog::LogRecord& record)
-        {
-            auto current_sinks = this->get_sink_list();
+    bool add_sink(std::shared_ptr<ISink> sink)
+    {
+        SLOG_LOCK(_sink_manager_mutex)
+        auto name = sink->get_name();
+        auto current_sinks = _sinks_ptr.load(std::memory_order_relaxed);
+        SinkPtr new_sinks;
 
-            for (auto& sink : *current_sinks) {
-                if (record.level <= sink->get_level()) {
-                    sink->log(record);
-                }
+        for (const auto& existing_sink : *current_sinks) {
+            if (existing_sink->get_name() == name) {
+                return false;
             }
         }
+        new_sinks = std::make_shared<SinkVec>(*current_sinks);
+        new_sinks->push_back(sink);
+        _sinks_ptr.store(new_sinks, std::memory_order_release);
+        return true;
+    }
 
-        void    flush() const
-        {
-            auto current_sinks = this->get_sink_list();
+    void dispatch(const slog::LogRecord& record)
+    {
+        auto current_sinks = this->get_sink_list();
 
-            for (auto& sink : *current_sinks) {
-                sink->flush();
+        for (auto& sink : *current_sinks) {
+            if (record.level <= sink->get_level()) {
+                sink->log(record);
             }
         }
+    }
 
-        [[nodiscard]] std::shared_ptr<ISink>  get_sink(const std::string& name)
-        {
-            auto current_sinks = this->get_sink_list();
+    void flush() const
+    {
+        auto current_sinks = this->get_sink_list();
 
-            for (const auto& sink : *current_sinks) {
-                if (sink->get_name() == name) {
-                    return sink;
-                }
-            }
-            return nullptr;
+        for (auto& sink : *current_sinks) {
+            sink->flush();
         }
+    }
 
-        [[nodiscard]] SLOG_ALWAYS_INLINE SinkPtr get_sink_list() const noexcept
-        {
-            return _sinks_ptr.load(std::memory_order_acquire);
-        }
+    [[nodiscard]] std::shared_ptr<ISink> get_sink(const std::string& name)
+    {
+        auto current_sinks = this->get_sink_list();
 
-        void    remove_sink(const std::string& name)
-        {
-            SLOG_LOCK(_sink_manager_mutex)
-            auto current_sinks = _sinks_ptr.load(std::memory_order_relaxed);
-
-            for (auto it = current_sinks->begin(); it != current_sinks->end(); it++) {
-                if ((*it)->get_name() == name) {
-                    auto new_sinks = std::make_shared<SinkVec>(*current_sinks);
-
-                    new_sinks->erase(std::next(new_sinks->begin(), std::distance(current_sinks->begin(), it)));
-                    _sinks_ptr.store(new_sinks, std::memory_order_release);
-                    return;
-                }
+        for (const auto& sink : *current_sinks) {
+            if (sink->get_name() == name) {
+                return sink;
             }
         }
+        return nullptr;
+    }
 
-    private:
-        std::atomic<SinkPtr> _sinks_ptr;
-        SLOG_MUTEX_MEMBER(_sink_manager_mutex)
+    [[nodiscard]] SLOG_ALWAYS_INLINE SinkPtr get_sink_list() const noexcept
+    {
+        return _sinks_ptr.load(std::memory_order_acquire);
+    }
+
+    void remove_sink(const std::string& name)
+    {
+        SLOG_LOCK(_sink_manager_mutex)
+        auto current_sinks = _sinks_ptr.load(std::memory_order_relaxed);
+
+        for (auto it = current_sinks->begin(); it != current_sinks->end(); it++) {
+            if ((*it)->get_name() == name) {
+                auto new_sinks = std::make_shared<SinkVec>(*current_sinks);
+
+                new_sinks->erase(
+                    std::next(new_sinks->begin(), std::distance(current_sinks->begin(), it)));
+                _sinks_ptr.store(new_sinks, std::memory_order_release);
+                return;
+            }
+        }
+    }
+
+private:
+    std::atomic<SinkPtr> _sinks_ptr;
+    SLOG_MUTEX_MEMBER(_sink_manager_mutex)
 };
 
-}
+} // namespace slog::sinks
 
 #endif // SLOG_SINKS_SINK_MANAGER_HPP

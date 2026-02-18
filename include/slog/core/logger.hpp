@@ -1,8 +1,8 @@
 #ifndef SLOG_CORE_LOGGER_HPP
 #define SLOG_CORE_LOGGER_HPP
 
-#include <source_location>
 #include <iosfwd>
+#include <source_location>
 
 #include <slog/async/worker.hpp>
 #include <slog/common.hpp>
@@ -16,7 +16,7 @@
 
 namespace slog
 {
-    class Registry;
+class Registry;
 }
 
 namespace slog
@@ -35,7 +35,7 @@ public:
             return NullProxy{};
         }
         else {
-            return LogProxy(shared_from_this(), level, level <= _log_level); 
+            return LogProxy(shared_from_this(), level, level <= _log_level);
         }
     }
 #endif
@@ -58,8 +58,8 @@ public:
 #ifdef SLOG_STREAM_ENABLED
     SLOG_ALWAYS_INLINE auto fatal() { return log<LogLevel::FATAL>(); }
     SLOG_ALWAYS_INLINE auto error() { return log<LogLevel::ERROR>(); }
-    SLOG_ALWAYS_INLINE auto warn()  { return log<LogLevel::WARNING>(); }
-    SLOG_ALWAYS_INLINE auto info()  { return log<LogLevel::INFO>(); }
+    SLOG_ALWAYS_INLINE auto warn() { return log<LogLevel::WARNING>(); }
+    SLOG_ALWAYS_INLINE auto info() { return log<LogLevel::INFO>(); }
     SLOG_ALWAYS_INLINE auto debug() { return log<LogLevel::DEBUG>(); }
     SLOG_ALWAYS_INLINE auto trace() { return log<LogLevel::TRACE>(); }
 #endif
@@ -95,31 +95,22 @@ public:
         log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
     }
 
-    void    flush() const;
+    void flush() const;
 
-    void    add_sink(std::shared_ptr<slog::sinks::ISink> sink);
-    void    remove_sink(const std::string& name) noexcept;
+    void add_sink(std::shared_ptr<slog::sinks::ISink> sink);
+    void remove_sink(const std::string& name) noexcept;
 
-    [[nodiscard]] SLOG_ALWAYS_INLINE LogLevel    get_log_level() const noexcept
-    {
-        return _log_level;
-    }
+    [[nodiscard]] SLOG_ALWAYS_INLINE LogLevel get_log_level() const noexcept { return _log_level; }
 
-    SLOG_ALWAYS_INLINE void  set_log_level(const LogLevel level) noexcept
-    {
-        _log_level = level;
-    }
+    SLOG_ALWAYS_INLINE void set_log_level(const LogLevel level) noexcept { _log_level = level; }
 
-    [[nodiscard]] SLOG_ALWAYS_INLINE std::string_view  get_name() const noexcept
-    {
-        return _name;
-    }
+    [[nodiscard]] SLOG_ALWAYS_INLINE std::string_view get_name() const noexcept { return _name; }
 
 private:
 #ifndef SLOG_STREAM_DISABLED
     friend class LogProxy;
 #endif
-    friend class  Registry;
+    friend class Registry;
 
     Logger() = delete;
     Logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker);
@@ -128,20 +119,21 @@ private:
     Logger(Logger&) = delete;
     Logger(Logger&&) = delete;
 
-    Logger	operator=(Logger& other) = delete;
-    Logger  operator=(Logger&& other) = delete;
+    Logger operator=(Logger& other) = delete;
+    Logger operator=(Logger&& other) = delete;
 
-    void    _submit(const LogLevel level, std::string&& message, std::source_location loc);
+    void _submit(const LogLevel level, std::string&& message, std::source_location loc);
 
-    // Todo: no need to split this functionn because it is going to be moved to the formatter or removed
-    [[nodiscard]] std::string		_getTimeStamp();
+    // Todo: no need to split this functionn because it is going to be moved to the formatter or
+    // removed
+    [[nodiscard]] std::string _getTimeStamp();
 
-    std::string               _name;
-    slog::sinks::SinkManager  _sink_manager;
-    LogLevel                  _log_level{LogLevel::TRACE};
-    std::shared_ptr<slog::async::Worker>  _worker;
+    std::string _name;
+    slog::sinks::SinkManager _sink_manager;
+    LogLevel _log_level{LogLevel::TRACE};
+    std::shared_ptr<slog::async::Worker> _worker;
 };
 
-}
+} // namespace slog
 
 #endif // SLOG_CORE_LOGGER_HPP

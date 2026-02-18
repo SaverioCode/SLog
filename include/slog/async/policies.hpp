@@ -33,6 +33,6 @@ struct BlockOnFull
     }
 };
 
-}
+} // namespace slog::async
 
 #endif // SLOG_ASYNC_POLICIES_HPP

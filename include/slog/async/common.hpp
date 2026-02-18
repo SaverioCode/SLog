@@ -9,6 +9,6 @@ struct Reservation
     size_t index;
 };
 
-}
+} // namespace slog::async
 
 #endif // SLOG_ASYNC_COMMON_HPP
