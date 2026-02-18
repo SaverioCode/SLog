@@ -1,0 +1,60 @@
+Language: Cpp
+BasedOnStyle: LLVM
+Standard: Latest
+UseTab: Never
+TabWidth: 4
+IndentWidth: 4
+ColumnLimit: 100
+
+InsertBraces: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterStruct: true
+  AfterEnum: true
+  AfterUnion: true
+  AfterNamespace: true
+  AfterControlStatement: Never
+  BeforeElse: true
+  BeforeCatch: true
+
+AllowShortCaseLabelsOnASingleLine: true
+SpaceBeforeCaseColon: false
+
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortBlocksOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+AccessModifierOffset: -4
+EmptyLineBeforeAccessModifier: Always
+
+AlwaysBreakTemplateDeclarations: Yes
+SpaceAfterTemplateKeyword: false
+
+NamespaceIndentation: None
+FixNamespaceComments: true
+
+IndentPPDirectives: BeforeHash
+
+IncludeBlocks: Regroup
+SortIncludes: true
+IncludeCategories:
+  # Block 1: Standard Library (Strictly <headers> without slashes or with known STL paths)
+  - Regex:           '^<(algorithm|vector|iostream|string|map|memory|utility|type_traits|thread|mutex)>'
+    Priority:        1
+  - Regex:           '^<[a-z_]+>$'
+    Priority:        1
+
+  # Block 2: External Libraries (Everything in <> that isn't STL and isn't slog)
+  - Regex:           '^<(?!(slog/))'
+    Priority:        2
+
+  # Block 3: Own Headers (Everything starting with <slog/...)
+  - Regex:           '^<slog/'
+    Priority:        3
+
+PointerAlignment: Left
