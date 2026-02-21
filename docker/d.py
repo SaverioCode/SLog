@@ -26,11 +26,12 @@ def main():
     mounts = [
         ("include", "include"),
         ("src", "src"),
+        ("benchmark", "benchmark"),
         ("tests", "tests"),
         ("scripts", "scripts"),
         ("example", "example"),
         ("CMakeLists.txt", "CMakeLists.txt"),
-        ("CMakePreset.json", "CMakePreset.json"),
+        ("CMakePresets.json", "CMakePresets.json"),
         (".clang-format", ".clang-format"),
         (".gitignore", ".gitignore"),
         ("LICENSE", "LICENSE"),

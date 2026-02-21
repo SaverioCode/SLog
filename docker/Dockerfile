@@ -13,8 +13,11 @@ RUN apt install -y \
     build-essential \
     cmake \
     clang \
+    clang-format \
+    valgrind \
     python3-pip \
     python3-venv \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -s /bin/bash dev \
