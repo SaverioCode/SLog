@@ -85,9 +85,12 @@ private:
 
 #else
 
+namespace slog::async
+{
 struct Worker
 {
 };
+}
 
 #endif // SLOG_ASYNC_ENABLED
 
