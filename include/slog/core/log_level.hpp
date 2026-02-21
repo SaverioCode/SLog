@@ -9,6 +9,7 @@ namespace slog
 
 enum class LogLevel : uint8_t
 {
+    OFF = 0,
     FATAL = 1,
     ERROR = 2,
     WARNING = 3,
@@ -20,6 +21,7 @@ enum class LogLevel : uint8_t
 constexpr std::string_view to_string(LogLevel level) noexcept
 {
     switch (level) {
+    case LogLevel::OFF: return "OFF";
     case LogLevel::FATAL: return "FATAL";
     case LogLevel::ERROR: return "ERROR";
     case LogLevel::WARNING: return "WARNING";
