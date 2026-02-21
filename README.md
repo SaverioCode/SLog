@@ -115,9 +115,12 @@ int main()
 
 Both code snippets use the **default logger** named "_default_" that comes with a `ConsoleSink` with stream `stdout`.
 
-## Wiki
+## Wiki (Work in progress)
 
-// Todo
+For now the following docs pages are available:
+
+- [Compile-time options](docs/compile_time_options.md)
+- [Design Specefications](docs/design_specs.md)
 
 ## Contribute
 
