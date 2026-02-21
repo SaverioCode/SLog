@@ -9,7 +9,8 @@
 
     #include <slog/async/async_op.hpp>
     #include <slog/async/mpsc_queue.hpp>
-    #include <slog/core/common.hpp>
+    #include <slog/async/policies.hpp>
+    #include <slog/common.hpp>
     #include <slog/sinks/sink_manager.hpp>
 
 namespace slog::async
@@ -42,7 +43,14 @@ public:
         return ret;
     }
 
-    SLOG_ALWAYS_INLINE void stop() { _running.store(false, std::memory_order_release); }
+    SLOG_ALWAYS_INLINE void stop()
+    {
+        if (!_flag.load(std::memory_order_acquire)) {
+            _flag.store(true, std::memory_order_release);
+            _flag.notify_one();
+        }
+        _running.store(false, std::memory_order_release);
+    }
 
     SLOG_ALWAYS_INLINE void join()
     {
@@ -76,9 +84,9 @@ private:
     }
 
     MPSCQueue<AsyncOp, SLOG_MPSC_QUEUE_SIZE, BlockOnFull> _queue;
-    std::thread _worker_thread;
     alignas(SLOG_CACHELINE_SIZE) std::atomic<bool> _running;
     alignas(SLOG_CACHELINE_SIZE) std::atomic<bool> _flag{true};
+    std::thread _worker_thread;
 };
 
 } // namespace slog::async
