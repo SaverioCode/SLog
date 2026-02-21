@@ -15,7 +15,7 @@ TEST(ConsoleSinkTest, FlushAndWriteToTempFile)
 
     const std::string message = "Testing console sink flush functionality";
     auto sink = std::make_shared<slog::sinks::ConsoleSink>("console_sink", stream);
-    auto logger = slog::Registry::instance()->create_logger("console_test_logger");
+    auto logger = slog::Registry::instance().create_logger("console_test_logger");
 
     logger->add_sink(sink);
 
