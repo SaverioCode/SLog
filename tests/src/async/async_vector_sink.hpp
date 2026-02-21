@@ -34,11 +34,20 @@ public:
         messages.clear();
     }
 
+    std::string get(size_t index) {
+        std::lock_guard<std::mutex> lock(_mutex);
+        return messages[index];
+    }
+
+    size_t buffer_size() {
+        std::lock_guard<std::mutex> lock(_mutex);
+        return messages.size();
+    }
+
     void flush() override {}
     
-    std::vector<std::string> messages;
-
-private:
+    
+    private:
     void _write(const slog::LogRecord& record) override 
     {
         std::lock_guard<std::mutex> lock(_mutex);
@@ -46,6 +55,7 @@ private:
         _cv.notify_one();
     }
     
+    std::vector<std::string> messages;
     std::mutex _mutex;
     std::condition_variable _cv;
 };
