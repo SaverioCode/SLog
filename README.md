@@ -32,7 +32,7 @@ The main goal of this library is to provide a **reliable** general purpose loggi
 - **Async** (optional) ~~lock-free hot path with low latency on user application~~
 - **Unified Interface for Sync and Async**
 - **Thread Safe** (optional) _thread safe_ needs to be enabled only for _sync_ mode, for _async_ mode it's just redundant
-- **5 different log levels** ~~extesible~~ (FATAL, ERROR, WARNING, INFO, DEBUG) 
+- **7 different log levels** ~~extesible~~ (OFF, FATAL, ERROR, WARNING, INFO, DEBUG, TRACE) 
 - **Compile-Time Log Levels**
 - **Runtime Log Levels** (_Registry_ -> _Logger_ -> _Sink_)
 - ~~**Fast compilation** C++ 20 modules~~
