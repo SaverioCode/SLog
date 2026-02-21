@@ -39,6 +39,11 @@ SLOG_ALWAYS_INLINE void Logger::remove_sink(const std::string& name) noexcept
     return _sink_manager->get_sinks();
 }
 
+[[nodiscard]] SLOG_ALWAYS_INLINE bool Logger::has_sink(const std::string& name) const noexcept
+{
+    return _sink_manager->has_sink(name);
+}
+
 // ------------------------
 // Private methods
 // ------------------------

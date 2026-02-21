@@ -102,6 +102,7 @@ public:
 
     [[nodiscard]] std::shared_ptr<slog::sinks::ISink> get_sink(const std::string& name) const;
     [[nodiscard]] std::shared_ptr<std::vector<std::shared_ptr<slog::sinks::ISink>>> get_sinks() const;
+    [[nodiscard]] bool has_sink(const std::string& name) const noexcept;
 
     [[nodiscard]] SLOG_ALWAYS_INLINE LogLevel get_log_level() const noexcept { return _log_level; }
 

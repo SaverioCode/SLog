@@ -100,6 +100,19 @@ public:
         }
     }
 
+    // Todo: need to be thread safe
+    [[nodiscard]] bool has_sink(const std::string& name) const noexcept
+    {
+        auto current_sinks = this->get_sinks();
+
+        for (const auto& sink : *current_sinks) {
+            if (sink->get_name() == name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 private:
     std::atomic<SinkVecPtr> _sinks_vec_ptr;
     SLOG_MUTEX_MEMBER(_sink_manager_mutex)
