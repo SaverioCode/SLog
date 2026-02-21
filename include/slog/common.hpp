@@ -56,10 +56,10 @@
 // Thread safety
 // ----------------------------------------
 
-#if defined(SLOG_TSAFE)
+#ifndef SLOG_TSAFE_DISABLED
     #include <mutex>
 
-    #define SLOG_MUTEX_MEMBER(name) std::mutex name;
+    #define SLOG_MUTEX_MEMBER(name) mutable std::mutex name;
     #define SLOG_LOCK(name) std::lock_guard<std::mutex> lock(name);
 #else
     #define SLOG_MUTEX_MEMBER(name)
@@ -70,24 +70,12 @@
 // Async mode macros
 // ----------------------------------------
 
-#if defined(SLOG_ASYNC_ENABLED)
+#ifdef SLOG_ASYNC_ENABLED
     #define SLOG_SINK_MUTEX_MEMBER(name)
     #define SLOG_SINK_LOCK(name)
 #else
     #define SLOG_SINK_MUTEX_MEMBER(name) SLOG_MUTEX_MEMBER(name)
     #define SLOG_SINK_LOCK(name) SLOG_LOCK(name)
-#endif
-
-// ----------------------------------------
-// Stream macros
-// ----------------------------------------
-
-#ifdef SLOG_STREAM_DISABLED
-    #ifdef SLOG_STREAM_ENABLED
-        #undef SLOG_STREAM_ENABLED
-    #endif
-#else
-    #define SLOG_STREAM_ENABLED
 #endif
 
 #endif // SLOG_CONFIG_HPP
