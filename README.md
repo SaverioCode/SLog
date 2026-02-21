@@ -13,6 +13,7 @@
 
 - [Description](#description)  
 - [Features](#features)  
+- [Limitations](#limitations)  
 - [Requirements](#requirements)  
 - [Supported Platform and Compilers](#supported-platforms-and-compilers)  
 - [Quick Start](#quick-start)  
@@ -28,7 +29,7 @@ The main goal of this library is to provide a **reliable** general purpose loggi
 
 - **Logger Registry** to ensure loggers/sinks/worker life cycle and address the _Static Destruction Order Fiasco_ without leakages
 - **Sync** (default/optional) if _thread safe_ is not enabled, `<mutex>` and `<thread>` headers are not include
-- **Async** (optional) lock-free hot path with low latency on user application
+- **Async** (optional) ~~lock-free hot path with low latency on user application~~
 - **Unified Interface for Sync and Async**
 - **Thread Safe** (optional) _thread safe_ needs to be enabled only for _sync_ mode, for _async_ mode it's just redundant
 - **5 different log levels** ~~extesible~~ (FATAL, ERROR, WARNING, INFO, DEBUG) 
@@ -46,6 +47,14 @@ safety implementation)
 - **Logging Format Strings Syntax** (default) `<format>`
 - **Unified Interface for Logging**
 - **No external Dependencies** (except for test suites that are not enabled by default)
+
+## Limitations
+
+- **Multi process** (partial support)
+    - **Sync**
+        - **Not thread safe** supported
+        - **Thread safe** supported on Windows, on Linux/MacOS it's missing the clean of dangerous shared state after a `fork` (eg. Mutex)
+    - **Async** supported on Windows, on Linux/MacOS it's missing the clean of dangerous shared state after `fork` (eg. Queue)
 
 ## Requirements
 
@@ -120,6 +129,11 @@ It's not ordered and it's more of a Todo list, but Roadmap sounds better.
 
 - [ ] Implement Worker Policies
 - [ ] Ensure log level propagation at creation
+- [ ] Finilize EBR implementation for lock-free Registry
+- [ ] Implement clean/reset for multiprocess (fork)
+- [ ] Unify .sh/.ps1 update_badge scripts to .py
+- [ ] Implement clang-format CI
+- [ ] Implement clang-format hook
 - [ ] Implement Signal Handler
 - [ ] Implement Format Layout
 - [ ] Implement Log Rotation
