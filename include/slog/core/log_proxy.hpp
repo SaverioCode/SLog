@@ -3,13 +3,14 @@
 
 #ifndef SLOG_STREAM_DISABLED
 
-    #include <format>
-    #include <iosfwd>
-    #include <memory>
-    #include <utility>
+#include <format>
+#include <iosfwd>
+#include <memory>
+#include <source_location>
+#include <utility>
 
-    #include <slog/common.hpp>
-    #include <slog/core/log_level.hpp>
+#include <slog/common.hpp>
+#include <slog/core/log_level.hpp>
 
 // ------------------------
 // Forward declarations
