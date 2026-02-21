@@ -101,7 +101,7 @@ public:
     void remove_sink(const std::string& name) noexcept;
 
     [[nodiscard]] std::shared_ptr<slog::sinks::ISink> get_sink(const std::string& name) const;
-    [[nodiscard]] std::vector<std::shared_ptr<slog::sinks::ISink>> get_sinks() const;
+    [[nodiscard]] std::shared_ptr<std::vector<std::shared_ptr<slog::sinks::ISink>>> get_sinks() const;
 
     [[nodiscard]] SLOG_ALWAYS_INLINE LogLevel get_log_level() const noexcept { return _log_level; }
 
@@ -117,8 +117,8 @@ private:
 
     Logger() = delete;
     Logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker);
-    Logger(const std::shared_ptr<slog::sinks::ISink> sink);
-    Logger(const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks);
+    Logger(std::string_view name, const std::shared_ptr<slog::sinks::ISink> sink, std::shared_ptr<slog::async::Worker> worker);
+    Logger(std::string_view name, const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks, std::shared_ptr<slog::async::Worker> worker);
     Logger(Logger&) = delete;
     Logger(Logger&&) = delete;
 
@@ -134,7 +134,7 @@ private:
     std::string _name;
     LogLevel _log_level{LogLevel::TRACE};
     std::shared_ptr<slog::sinks::SinkManager> _sink_manager{nullptr};
-    std::shared_ptr<slog::async::Worker> _worker{nullptr};
+    std::shared_ptr<slog::async::Worker> _worker;
 };
 
 } // namespace slog

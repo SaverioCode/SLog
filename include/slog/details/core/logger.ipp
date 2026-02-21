@@ -34,7 +34,7 @@ SLOG_ALWAYS_INLINE void Logger::remove_sink(const std::string& name) noexcept
     return _sink_manager->get_sink(name);
 }
 
-[[nodiscard]] SLOG_ALWAYS_INLINE std::vector<std::shared_ptr<slog::sinks::ISink>> Logger::get_sinks() const
+[[nodiscard]] SLOG_ALWAYS_INLINE std::shared_ptr<std::vector<std::shared_ptr<slog::sinks::ISink>>> Logger::get_sinks() const
 {
     return _sink_manager->get_sinks();
 }
@@ -43,25 +43,25 @@ SLOG_ALWAYS_INLINE void Logger::remove_sink(const std::string& name) noexcept
 // Private methods
 // ------------------------
 
-SLOG_INLINE Logger::Logger(std::string_view name, std::shared_ptr<Worker> worker)
+SLOG_INLINE Logger::Logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker)
     : _name(name), _worker(worker)
 {
     _sink_manager = std::make_shared<slog::sinks::SinkManager>();
 }
 
 SLOG_INLINE Logger::Logger(std::string_view name, const std::shared_ptr<slog::sinks::ISink> sink,
-                           std::shared_ptr<Worker> worker)
-    : _name(name), _worker(worker), _log_level(LogLevel::TRACE)
+                           std::shared_ptr<slog::async::Worker> worker)
+    : _name(name), _worker(worker)
 {
     _sink_manager = std::make_shared<slog::sinks::SinkManager>(sink);
 }
 
 SLOG_INLINE Logger::Logger(std::string_view name,
                            const std::vector<std::shared_ptr<slog::sinks::ISink>> sinks,
-                           std::shared_ptr<Worker> worker)
-    : _name(name), _worker(worker), _log_level(LogLevel::TRACE)
+                           std::shared_ptr<slog::async::Worker> worker)
+    : _name(name), _worker(worker)
 {
-    _sink_manager = std::make_shared<slog::sinks::SinkManger>(sinks);
+    _sink_manager = std::make_shared<slog::sinks::SinkManager>(sinks);
 }
 
 SLOG_ALWAYS_INLINE void Logger::_submit(const LogLevel level, std::string&& message,
