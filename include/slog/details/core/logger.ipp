@@ -70,7 +70,7 @@ SLOG_ALWAYS_INLINE void Logger::_submit(const LogLevel level, std::string&& mess
     LogRecord record{level, std::move(message), loc};
 
 #ifdef SLOG_ASYNC_ENABLED
-    _worker->push(AsyncOp{record, _sink_manager});
+    _worker->push(slog::async::AsyncOp{record, _sink_manager});
 #else
     _sink_manager->dispatch(record);
 #endif
