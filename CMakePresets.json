@@ -10,7 +10,7 @@
             "name": "default",
             "description": "Default build: static library, test off, Asan off",
             "generator": "",
-            "binaryDir": "${sourceDir}/build/default",
+            "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "SLOG_BUILD_TYPE": "STATIC",
                 "SLOG_BUILD_TESTS": "OFF",
@@ -19,15 +19,15 @@
             }
         },
         {
-            "name": "dev",
+            "name": "test",
             "description": "Development build: header-only, test on, Asan on",
             "generator": "",
-            "binaryDir": "${sourceDir}/build/dev",
+            "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "SLOG_BUILD_TYPE": "HEADER_ONLY",
                 "SLOG_BUILD_TESTS": "ON",
                 "ENABLE_ASAN": "ON",
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
     ]
