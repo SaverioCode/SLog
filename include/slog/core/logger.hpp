@@ -27,7 +27,7 @@ class Logger : public std::enable_shared_from_this<Logger>
 public:
     ~Logger() = default;
 
-#ifdef SLOG_STREAM_ENABLED
+#ifndef SLOG_STREAM_DISABLED
     template<LogLevel level>
     SLOG_ALWAYS_INLINE auto log()
     {
@@ -55,7 +55,7 @@ public:
         _submit(level, std::move(string_buffer), std::source_location::current());
     }
 
-#ifdef SLOG_STREAM_ENABLED
+#ifndef SLOG_STREAM_DISABLED
     SLOG_ALWAYS_INLINE auto fatal() { return log<LogLevel::FATAL>(); }
     SLOG_ALWAYS_INLINE auto error() { return log<LogLevel::ERROR>(); }
     SLOG_ALWAYS_INLINE auto warn() { return log<LogLevel::WARNING>(); }
