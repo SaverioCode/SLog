@@ -17,38 +17,26 @@ namespace slog
 SLOG_INLINE std::shared_ptr<Logger> Registry::create_logger(std::string_view name)
 {
     auto new_logger = _make_logger(name, _worker);
-    auto new_vec = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
+    SLOG_LOCK(_mutex);
 
-    while (true) {
-        LoggerVecSPtr old_vec = _loggers.load(std::memory_order_acquire);
-
-        for (const auto& logger : *old_vec) {
-            if (logger->get_name() == name) {
-                return nullptr;
-            }
-        }
-        *new_vec = *old_vec;
-        new_vec->push_back(new_logger);
-        if (_loggers.compare_exchange_strong(old_vec, new_vec, std::memory_order_acq_rel)) {
-            return new_logger;
-        }
-    }
+    _loggers.push_back(new_logger);
+    return new_logger;
 }
 
 SLOG_INLINE void Registry::flush() const
 {
-    auto loggers = this->get_logger_list();
+    SLOG_LOCK(_mutex);
 
-    for (auto& logger : *loggers) {
+    for (auto& logger : _loggers) {
         logger->flush();
     }
 }
 
 SLOG_INLINE bool Registry::set_default_logger_name(std::string_view name)
 {
-    LoggerVecSPtr loggers = _loggers.load(std::memory_order_relaxed);
+    SLOG_LOCK(_mutex);
 
-    for (const auto& logger : *loggers) {
+    for (const auto& logger : _loggers) {
         if (logger->get_name() == name) {
             _default_logger_name = name;
             return true;
@@ -61,38 +49,53 @@ SLOG_INLINE bool Registry::set_default_logger_name(std::string_view name)
 // Private methods
 // ------------------------
 
-SLOG_INLINE Registry::Registry(RegistryState state) : _local_state(state)
+SLOG_INLINE Registry::Registry()
 {
     std::shared_ptr<Logger> logger;
-    LoggerVecSPtr loggers = std::make_shared<std::vector<std::shared_ptr<Logger>>>();
+    _local_state = _state.load(std::memory_order_relaxed);
 
 #ifdef SLOG_ASYNC_ENABLED
     _worker = std::make_shared<Worker>();
 #endif
 
-    if (state == RegistryState::ACTIVE) {
+    if (_local_state == RegistryState::ACTIVE) {
         _default_logger_name = _SLOG_DEFAULT_LOGGER_NAME;
         logger = _make_logger(_default_logger_name, _worker);
         logger->add_sink(
             std::make_shared<slog::sinks::ConsoleSink>(_SLOG_DEFAULT_SINK_NAME, stdout));
     }
-    else if (state == RegistryState::INACTIVE) {
+    else if (_local_state == RegistryState::INACTIVE) {
         _default_logger_name = _SLOG_INACTIVE_LOGGER_NAME;
         logger = _make_logger(_default_logger_name, _worker);
         logger->add_sink(
             std::make_shared<slog::sinks::ConsoleSink>(_SLOG_INACTIVE_SINK_NAME, stderr));
     }
-    loggers->push_back(logger);
-    _loggers.store(loggers, std::memory_order_relaxed);
+    _loggers.push_back(logger);
 }
 
-SLOG_INLINE std::shared_ptr<Logger> Registry::_get_logger(std::string_view name) const noexcept
+SLOG_INLINE Logger& Registry::_get_logger(std::string_view name) const noexcept
 {
-    LoggerVecSPtr loggers = _loggers.load(std::memory_order_relaxed);
+    {
+        SLOG_LOCK(_mutex);
 
-    for (auto& logger : *loggers) {
-        if (logger->get_name() == name) {
-            return logger;
+        for (auto& logger : _loggers) {
+            if (logger->get_name() == name) {
+                return *(logger.get());
+            }
+        }
+    }
+    return this->get_default_logger();
+}
+
+SLOG_INLINE std::shared_ptr<Logger> Registry::_get_logger_ptr(std::string_view name) const noexcept
+{
+    {
+        SLOG_LOCK(_mutex);
+
+        for (auto& logger : _loggers) {
+            if (logger->get_name() == name) {
+                return logger;
+            }
         }
     }
     return nullptr;
@@ -109,15 +112,6 @@ Registry::_make_logger(std::string_view name, std::shared_ptr<slog::async::Worke
         }
     };
     return std::make_shared<TmpLogger>(name, worker);
-}
-
-SLOG_ALWAYS_INLINE std::shared_ptr<Registry> Registry::_make_registry(RegistryState state)
-{
-    struct TmpRegistry : public Registry
-    {
-        TmpRegistry(RegistryState state) : Registry(state) {}
-    };
-    return std::make_shared<TmpRegistry>(state);
 }
 
 } // namespace slog
