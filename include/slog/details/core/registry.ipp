@@ -55,7 +55,7 @@ SLOG_INLINE Registry::Registry()
     _local_state = _state.load(std::memory_order_relaxed);
 
 #ifdef SLOG_ASYNC_ENABLED
-    _worker = std::make_shared<Worker>();
+    _worker = std::make_shared<slog::async::Worker>();
 #endif
 
     if (_local_state == RegistryState::ACTIVE) {
