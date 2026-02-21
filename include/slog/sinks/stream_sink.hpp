@@ -31,7 +31,7 @@ private:
 } // namespace slog::sinks
 
 #ifdef SLOG_HEADER_ONLY
-    #include <slog/details/sinks/stream_sink.ipp>
+    #include <slog/impl/sinks/stream_sink.ipp>
 #endif // SLOG_HEADER_ONLY
 
 #endif // SLOG_SINKS_STREAM_SINK_HPP

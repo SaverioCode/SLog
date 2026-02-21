@@ -7,9 +7,9 @@
 #include <slog/core/registry.hpp>
 
 #ifdef SLOG_HEADER_ONLY
-    #include <slog/details/core/log_proxy.ipp>
-    #include <slog/details/core/logger.ipp>
-    #include <slog/details/core/registry.ipp>
+    #include <slog/impl/core/log_proxy.ipp>
+    #include <slog/impl/core/logger.ipp>
+    #include <slog/impl/core/registry.ipp>
 #endif
 
 #define SLOG_REGISTRY slog::Registry::instance()
