@@ -12,12 +12,12 @@ namespace slog::sinks
 class ConsoleSink : public ISink
 {
 public:
-    ConsoleSink(const std::string& name, std::FILE* stream) : ISink(name), _stream(stream) {}
+    ConsoleSink(const std::string_view name, std::FILE* stream) : ISink(name), _stream(stream) {}
 
     ConsoleSink(const ConsoleSink&) = delete;
     ConsoleSink(ConsoleSink&&) = delete;
-
     ~ConsoleSink() override = default;
+
     ConsoleSink& operator=(const ConsoleSink&) = delete;
     ConsoleSink& operator=(ConsoleSink&&) = delete;
 

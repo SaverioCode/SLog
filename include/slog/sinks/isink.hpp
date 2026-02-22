@@ -13,7 +13,7 @@ class ISink
 {
 public:
     ISink() = delete;
-    ISink(const std::string& name) : _name(name) {}
+    ISink(std::string_view name) : _name(name) {}
     ISink(const ISink&) = default;
     ISink(ISink&&) = default;
     virtual ~ISink() = default;

@@ -13,8 +13,8 @@ namespace slog::sinks
 class FileSink : public ISink
 {
 public:
-    FileSink(const std::string& sink_name, const std::string& file_name,
-             const std::string& mode = "w")
+    FileSink(const std::string_view sink_name, const std::string_view file_name,
+             const std::string_view mode = "w")
         : ISink(sink_name)
     {
         _file_name = file_name;
