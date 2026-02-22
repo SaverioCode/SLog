@@ -45,11 +45,11 @@ TEST(MPSCQueue_Functional, WrapAround)
 {
     // Use a small queue size to force wrap-around quickly
     constexpr size_t         SIZE = 4;
-    slog::async::MPSCQueue<int, SIZE, slog::async::BlockOnFull> queue;
-    constexpr int            CYCLES = 10;
-    int                      counter = 0;
+    slog::async::MPSCQueue<size_t, SIZE, slog::async::BlockOnFull> queue;
+    constexpr size_t           CYCLES = 10;
+    size_t                     counter = 0;
     
-    for (int c = 0; c < CYCLES; c++) {
+    for (size_t c = 0; c < CYCLES; c++) {
         // Fill
         for (size_t i = 0; i < SIZE; i++) {
             EXPECT_TRUE(queue.push(std::move(counter)));
@@ -57,14 +57,14 @@ TEST(MPSCQueue_Functional, WrapAround)
         }
         // Empty
         for (size_t i = 0; i < SIZE; i++) {
-            int val = -1;
+            size_t val = -1;
 
             EXPECT_TRUE(queue.pop(val));
-            int expected = (c * SIZE) + i;
+            size_t expected = (c * SIZE) + i;
             EXPECT_EQ(val, expected);
         }
         // Verify Empty
-        int dummy;
+        size_t dummy;
         EXPECT_FALSE(queue.pop(dummy));
     }
     ASSERT_EQ(counter, CYCLES * SIZE);
