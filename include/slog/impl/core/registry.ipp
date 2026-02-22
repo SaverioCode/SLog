@@ -16,9 +16,15 @@ namespace slog
 
 SLOG_INLINE std::shared_ptr<Logger> Registry::create_logger(std::string_view name)
 {
-    auto new_logger = _make_logger(name, _worker);
+    std::shared_ptr<Logger> new_logger{nullptr};
     SLOG_LOCK(_mutex);
 
+    for (auto& logger : _loggers) {
+        if (logger->get_name() == name) {
+            return logger;
+        }
+    }
+    new_logger = _make_logger(name, _worker);
     _loggers.push_back(new_logger);
     return new_logger;
 }
