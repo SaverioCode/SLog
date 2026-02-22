@@ -20,9 +20,10 @@ struct LogRecord
     std::thread::id thread_id;
 
     LogRecord() : level(LogLevel::INFO) {}
-    LogRecord(LogLevel lvl, std::string&& msg, std::source_location loc)
+    LogRecord(LogLevel lvl, std::string&& msg, std::source_location loc,
+              std::chrono::system_clock::time_point ts)
         : level(lvl), message(std::move(msg)), location(loc),
-          timestamp(std::chrono::system_clock::now()), thread_id(std::this_thread::get_id())
+          timestamp(ts), thread_id(std::this_thread::get_id())
     {
     }
     LogRecord(LogRecord&&) noexcept = default;

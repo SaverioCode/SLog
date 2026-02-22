@@ -57,7 +57,8 @@ SLOG_ALWAYS_INLINE void LogProxy::_submit(LogLevel level, std::string&& buffer,
                                           std::source_location location)
 {
     if (_logger) [[likely]] {
-        _logger->_submit(level, std::move(buffer), location);
+        LogRecord record{level, std::move(buffer), location, std::chrono::system_clock::now()};
+        _logger->_submit(std::move(record));
     }
 }
 

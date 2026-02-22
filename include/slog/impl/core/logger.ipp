@@ -1,7 +1,6 @@
 #ifndef SLOG_CORE_LOGGER_IPP
 #define SLOG_CORE_LOGGER_IPP
 
-#include <chrono> // Todo: remove this when cleaned get_time_stamp
 
 #include <slog/core/log_record.hpp>
 #include <slog/core/logger.hpp>
@@ -69,26 +68,13 @@ SLOG_INLINE Logger::Logger(std::string_view name,
     _sink_manager = std::make_shared<slog::sinks::SinkManager>(sinks);
 }
 
-SLOG_ALWAYS_INLINE void Logger::_submit(const LogLevel level, std::string&& message,
-                                        std::source_location loc)
+SLOG_ALWAYS_INLINE void Logger::_submit(LogRecord&& record)
 {
-    LogRecord record{level, std::move(message), loc};
-
 #ifdef SLOG_ASYNC_ENABLED
-    _worker->push(slog::async::AsyncOp{record, _sink_manager});
+    _worker->push(slog::async::AsyncOp{std::move(record), _sink_manager});
 #else
     _sink_manager->dispatch(record);
 #endif
-}
-
-SLOG_INLINE std::string Logger::_getTimeStamp()
-{
-    char formatted[20];
-
-    std::time_t timestamp = std::time(nullptr);
-    std::tm* datetime = std::localtime(&timestamp);
-    std::strftime(formatted, sizeof(formatted), "%Y-%m-%d %H:%M:%S", datetime);
-    return std::string(formatted);
 }
 } // namespace slog
 

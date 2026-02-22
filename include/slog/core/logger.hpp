@@ -1,13 +1,16 @@
 #ifndef SLOG_CORE_LOGGER_HPP
 #define SLOG_CORE_LOGGER_HPP
 
+#include <chrono>
 #include <iosfwd>
 #include <source_location>
 
 #include <slog/async/worker.hpp>
 #include <slog/common.hpp>
+#include <slog/core/format_with_location.hpp>
 #include <slog/core/log_level.hpp>
 #include <slog/core/log_proxy.hpp>
+#include <slog/core/log_record.hpp>
 #include <slog/sinks/sink_manager.hpp>
 
 // ------------------------
@@ -41,18 +44,18 @@ public:
 #endif
 
     template<LogLevel level, typename... Args>
-    void log(std::format_string<Args...> fmt, Args&&... args)
+    void log(FormatWithLocation<Args...> fmt, Args&&... args)
     {
-        std::string string_buffer;
-
         if constexpr (static_cast<uint8_t>(level) > SLOG_MAX_LOG_LEVEL) {
             return;
         }
         if (level > _log_level) {
             return;
         }
-        std::format_to(std::back_inserter(string_buffer), fmt, std::forward<Args>(args)...);
-        _submit(level, std::move(string_buffer), std::source_location::current());
+        auto timestamp = std::chrono::system_clock::now();
+        std::string string_buffer = std::format(fmt.fmt, std::forward<Args>(args)...);
+        LogRecord record{level, std::move(string_buffer), fmt.loc, timestamp};
+        _submit(std::move(record));
     }
 
 #ifndef SLOG_STREAM_DISABLED
@@ -65,32 +68,32 @@ public:
 #endif
 
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void fatal(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void fatal(FormatWithLocation<Args...> fmt, Args&&... args)
     {
         log<LogLevel::FATAL>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void error(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void error(FormatWithLocation<Args...> fmt, Args&&... args)
     {
         log<LogLevel::ERROR>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void warn(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void warn(FormatWithLocation<Args...> fmt, Args&&... args)
     {
         log<LogLevel::WARNING>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void info(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void info(FormatWithLocation<Args...> fmt, Args&&... args)
     {
         log<LogLevel::INFO>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void debug(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void debug(FormatWithLocation<Args...> fmt, Args&&... args)
     {
         log<LogLevel::DEBUG>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void trace(std::format_string<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void trace(FormatWithLocation<Args...> fmt, Args&&... args)
     {
         log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
     }
@@ -126,11 +129,7 @@ private:
     Logger operator=(Logger& other) = delete;
     Logger operator=(Logger&& other) = delete;
 
-    void _submit(const LogLevel level, std::string&& message, std::source_location loc);
-
-    // Todo: no need to split this functionn because it is going to be moved to the formatter or
-    // removed
-    [[nodiscard]] std::string _getTimeStamp();
+    void _submit(LogRecord&& record);
 
     std::string _name;
     LogLevel _log_level{LogLevel::TRACE};
