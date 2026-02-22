@@ -84,8 +84,10 @@ private:
     }
 
     MPSCQueue<AsyncOp, SLOG_MPSC_QUEUE_SIZE, BlockOnFull> _queue;
+    _SLOG_DISABLE_PADDING_WARNING
     alignas(SLOG_CACHELINE_SIZE) std::atomic<bool> _running;
     alignas(SLOG_CACHELINE_SIZE) std::atomic<bool> _flag{true};
+    _SLOG_RESTORE_PADDING_WARNING
     std::thread _worker_thread;
 };
 

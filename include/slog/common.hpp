@@ -78,4 +78,17 @@
     #define SLOG_SINK_LOCK(name) SLOG_LOCK(name)
 #endif
 
+// ----------------------------------------
+// Temporary disable padding warning for MSVC
+// ----------------------------------------
+
+#ifdef _MSC_VER
+  #define _SLOG_DISABLE_PADDING_WARNING __pragma(warning(push)) __pragma(warning(disable: 4324))
+  #define _SLOG_RESTORE_PADDING_WARNING __pragma(warning(pop))
+#else
+  #define _SLOG_DISABLE_PADDING_WARNING
+  #define _SLOG_RESTORE_PADDING_WARNING
+#endif
+
+
 #endif // SLOG_CONFIG_HPP
