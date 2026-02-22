@@ -24,6 +24,7 @@
             "generator": "",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
+                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/cmake/conan_provider.cmake",
                 "SLOG_BUILD_TYPE": "HEADER_ONLY",
                 "SLOG_BUILD_TESTS": "ON",
                 "ENABLE_ASAN": "ON",
