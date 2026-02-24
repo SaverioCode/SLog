@@ -45,7 +45,7 @@ public:
 private:
     void _write(const slog::LogRecord& record) override
     {
-        slog::sinks::fwrite_file(record.message.data(), record.message.size(), _stream);
+        slog::sinks::fwrite_file(record.string_buffer.data(), record.string_buffer.size(), _stream);
     }
 
     std::FILE* _stream{nullptr};

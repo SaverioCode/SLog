@@ -1,10 +1,11 @@
 #ifndef SLOG_CORE_LOG_RECORD_HPP
 #define SLOG_CORE_LOG_RECORD_HPP
 
+#include <any>
 #include <chrono>
 #include <iosfwd>
 #include <source_location>
-#include <thread>
+#include <string_view>
 
 #include <slog/core/log_level.hpp>
 
@@ -14,18 +15,15 @@ namespace slog
 struct LogRecord
 {
     LogLevel level;
-    std::string message;
+    std::string string_buffer;
     std::source_location location;
     std::chrono::system_clock::time_point timestamp;
-    std::thread::id thread_id;
+    size_t thread_id;
+    std::any stored_args;
+    std::string_view format_str;
+    void (*format_fn)(std::string_view, std::any&, std::string&);
 
     LogRecord() : level(LogLevel::INFO) {}
-    LogRecord(LogLevel lvl, std::string&& msg, std::source_location loc,
-              std::chrono::system_clock::time_point ts)
-        : level(lvl), message(std::move(msg)), location(loc),
-          timestamp(ts), thread_id(std::this_thread::get_id())
-    {
-    }
     LogRecord(LogRecord&&) noexcept = default;
     LogRecord(const LogRecord&) = default;
     ~LogRecord() = default;

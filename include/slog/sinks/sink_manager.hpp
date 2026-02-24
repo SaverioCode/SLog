@@ -20,23 +20,23 @@ private:
     template <typename F>
     SLOG_ALWAYS_INLINE decltype(auto) _guard(F&& func) const noexcept
     {
-        #ifdef SLOG_ASYNC_ENABLED
+#ifdef SLOG_ASYNC_ENABLED
         while (_flag.test_and_set(std::memory_order_acquire)) {
             std::this_thread::yield();
         }
-        #endif
+#endif
 
         if constexpr (std::is_void_v<std::invoke_result_t<F>>) {
             func();
-            #ifdef SLOG_ASYNC_ENABLED
+#ifdef SLOG_ASYNC_ENABLED
             _flag.clear(std::memory_order_release);
-            #endif
+#endif
         }
         else {
             auto result = func();
-            #ifdef SLOG_ASYNC_ENABLED
+#ifdef SLOG_ASYNC_ENABLED
             _flag.clear(std::memory_order_release);
-            #endif
+#endif
             return result;
         }
     }
@@ -78,8 +78,11 @@ public:
         });
     }
 
-    void dispatch(const slog::LogRecord& record)
+    void dispatch(slog::LogRecord& record)
     {
+        if (record.format_fn) {
+            record.format_fn(record.format_str, record.stored_args, record.string_buffer);
+        }
         _guard([&]()
         {
             for (const std::shared_ptr<ISink>& sink : _sinks_vec) {

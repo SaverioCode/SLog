@@ -11,6 +11,8 @@
 
 #include <slog/common.hpp>
 #include <slog/core/log_level.hpp>
+#include <slog/core/log_record.hpp>
+#include <slog/fmt/deferred_format.hpp>
 
 // ------------------------
 // Forward declarations
@@ -70,10 +72,11 @@ public:
     LogProxy& operator<<(std::ios_base& (*manip)(std::ios_base&)) { return _stream_write(manip); }
 
     template<typename... Args>
-    LogProxy& operator()(std::format_string<Args...> fmt, Args&&... args)
+    void operator()(std::format_string<Args...> fmt, Args&&... args)
     {
-        std::format_to(std::back_inserter(_string_buffer), fmt, std::forward<Args>(args)...);
-        return *this;
+        _record.format_str = fmt.get();
+        _record.format_fn = &slog::fmt::format_deferred<std::decay_t<Args>...>;
+        _record.stored_args.emplace<std::tuple<std::decay_t<Args>...>>(std::forward<Args>(args)...);
     }
 
 private:
@@ -89,13 +92,9 @@ private:
         return *this;
     }
 
-    void _submit(LogLevel level, std::string&& message, std::source_location location);
-
+    LogRecord _record;
     std::shared_ptr<Logger> _logger;
-    LogLevel _level;
     bool _is_active;
-    std::source_location _location;
-    std::string _string_buffer;
     std::unique_ptr<std::ostringstream> _stream_buffer;
 };
 

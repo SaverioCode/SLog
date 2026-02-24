@@ -8,6 +8,7 @@
 
     #include <slog/core/log_level.hpp>
     #include <slog/core/logger.hpp>
+    #include <slog/details/thread_id.hpp>
 
 namespace slog
 {
@@ -18,8 +19,12 @@ namespace slog
 
 SLOG_ALWAYS_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel level,
                                       bool is_active, std::source_location loc)
-    : _logger(logger), _level(level), _is_active(is_active), _location(loc)
+    : _logger(logger), _is_active(is_active)
 {
+    _record.level = level;
+    _record.location = loc;
+    _record.timestamp = std::chrono::system_clock::now();
+    _record.thread_id = slog::details::current_thread_id();
 }
 
 SLOG_INLINE LogProxy::~LogProxy()
@@ -30,16 +35,11 @@ SLOG_INLINE LogProxy::~LogProxy()
     }
     // Format strings are preferred for performance
     if (_stream_buffer) [[unlikely]] {
-        // The else is to prevent unintended usage from user
-        // who might use both streams and format strings for one log line
-        if (_string_buffer.empty()) [[likely]] {
-            _string_buffer = std::move(*_stream_buffer).str();
-        }
-        else {
-            _string_buffer.append(std::move(*_stream_buffer).str());
-        }
+        _record.string_buffer = std::move(*_stream_buffer).str();
     }
-    _submit(_level, std::move(_string_buffer), _location);
+    if (_logger) [[likely]] {
+        _logger->_submit(std::move(_record));
+    }
 }
 
 // --------------
@@ -50,15 +50,6 @@ SLOG_ALWAYS_INLINE void LogProxy::_ensure_stream()
 {
     if (!_stream_buffer) [[unlikely]] {
         _stream_buffer = std::make_unique<std::ostringstream>();
-    }
-}
-
-SLOG_ALWAYS_INLINE void LogProxy::_submit(LogLevel level, std::string&& buffer,
-                                          std::source_location location)
-{
-    if (_logger) [[likely]] {
-        LogRecord record{level, std::move(buffer), location, std::chrono::system_clock::now()};
-        _logger->_submit(std::move(record));
     }
 }
 

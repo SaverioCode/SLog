@@ -27,7 +27,7 @@ private:
     void _write(const slog::LogRecord& record) override
     {
         if (_stream) [[likely]] {
-            slog::sinks::fwrite_console(record.message.data(), record.message.size(), _stream);
+            slog::sinks::fwrite_console(record.string_buffer.data(), record.string_buffer.size(), _stream);
         }
     }
     std::FILE* _stream;

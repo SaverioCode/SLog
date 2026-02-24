@@ -11,6 +11,8 @@
 #include <slog/core/log_level.hpp>
 #include <slog/core/log_proxy.hpp>
 #include <slog/core/log_record.hpp>
+#include <slog/details/thread_id.hpp>
+#include <slog/fmt/deferred_format.hpp>
 #include <slog/sinks/sink_manager.hpp>
 
 // ------------------------
@@ -19,6 +21,7 @@
 
 namespace slog
 {
+struct LogRecord;
 class Registry;
 }
 
@@ -52,9 +55,16 @@ public:
         if (level > _log_level) {
             return;
         }
-        auto timestamp = std::chrono::system_clock::now();
-        std::string string_buffer = std::format(fmt.fmt, std::forward<Args>(args)...);
-        LogRecord record{level, std::move(string_buffer), fmt.loc, timestamp};
+
+        LogRecord record;
+
+        record.level = level;
+        record.location = fmt.loc;
+        record.timestamp = std::chrono::system_clock::now();
+        record.thread_id = slog::details::current_thread_id();
+        record.format_str = fmt.fmt.get();
+        record.format_fn = &slog::fmt::format_deferred<std::decay_t<Args>...>;
+        record.stored_args.emplace<std::tuple<std::decay_t<Args>...>>(std::forward<Args>(args)...);
         _submit(std::move(record));
     }
 
