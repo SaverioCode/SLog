@@ -23,16 +23,19 @@
 
 ## Description
 
-The main goal of this library is to provide a **reliable** general purpose logging system for C++ applications, that can be use in most scenarios avoiding to switch between different loggers or changing the code. It's **simple** to start with and to integrate, it's **extensible**, still being very **fast** (~~benchmark~~).
+The main goal of this library is to provide a **reliable**, **safe to use**, general purpose logging system for C++ applications, that can be use in most scenarios avoiding to switch between different loggers or changing the code, but rather leveraging the library options. It's **simple** to start with and to integrate, it's **extensible**, still being very **fast** (~~benchmark~~).
+
+> [!NOTE]  
+> The default settings are more preserving, ensuring no mistakes from the user, but it's possible to tune the library to your needs.
 
 ## Features
 
 - **Logger Registry** to ensure loggers/sinks/worker life cycle and address the _Static Destruction Order Fiasco_ without leakages
-- **Sync** (default/optional) if _thread safe_ is not enabled, `<mutex>` and `<thread>` headers are not include
+- **Sync** (default/optional) if _thread safe_ is disabled, `<mutex>` and `<thread>` headers are not included
 - **Async** (optional) ~~lock-free hot path with low latency on user application~~
 - **Unified Interface for Sync and Async**
-- **Thread Safe** (optional) _thread safe_ needs to be enabled only for _sync_ mode, for _async_ mode it's just redundant
-- **7 different log levels** ~~extesible~~ (OFF, FATAL, ERROR, WARNING, INFO, DEBUG, TRACE) 
+- **Thread Safe** (default/optional) _thread safe_ can be disable for _sync_ mode, for _async_ mode has no effects
+- **6 + 1 different log levels** ~~extesible~~ (OFF, FATAL, ERROR, WARNING, INFO, DEBUG, TRACE) 
 - **Compile-Time Log Levels**
 - **Runtime Log Levels** (_Registry_ -> _Logger_ -> _Sink_)
 - ~~**Fast compilation** C++ 20 modules~~
@@ -106,7 +109,7 @@ Or alternative
 
 int main()
 {
-    std::shared_ptr<slog::Logger> logger = slog::Registry::instance()->get_default_logger();
+    std::shared_ptr<slog::Logger> logger = slog::Registry::instance().get_default_logger();
 
     logger.info("Hello World {}", 42);
     logger.info() << "Hello World " << 42;
