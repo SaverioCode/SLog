@@ -24,16 +24,18 @@ def main():
     project_root = script_dir.parent
     
     mounts = [
-        ("include", "include"),
-        ("src", "src"),
         ("benchmark", "benchmark"),
-        ("tests", "tests"),
-        ("scripts", "scripts"),
+        ("cmake", "cmake"),
         ("example", "example"),
-        ("CMakeLists.txt", "CMakeLists.txt"),
-        ("CMakePresets.json", "CMakePresets.json"),
+        ("include", "include"),
+        ("scripts", "scripts"),
+        ("src", "src"),
+        ("tests", "tests"),
         (".clang-format", ".clang-format"),
         (".gitignore", ".gitignore"),
+        ("CMakeLists.txt", "CMakeLists.txt"),
+        ("CMakePresets.json", "CMakePresets.json"),
+        ("conanfile.py", "conanfile.py"),
         ("LICENSE", "LICENSE"),
         ("README.md", "README.md"),
     ]
