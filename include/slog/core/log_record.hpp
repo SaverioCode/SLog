@@ -15,13 +15,14 @@ namespace slog
 struct LogRecord
 {
     LogLevel level;
+    std::string_view logger_name;
     std::string string_buffer;
     std::source_location location;
     std::chrono::system_clock::time_point timestamp;
     size_t thread_id;
     std::any stored_args;
     std::string_view format_str;
-    void (*format_fn)(std::string_view, std::any&, std::string&);
+    void (*format_fn)(std::string_view, std::any&, std::string&){nullptr};
 
     LogRecord() : level(LogLevel::INFO) {}
     LogRecord(LogRecord&&) noexcept = default;

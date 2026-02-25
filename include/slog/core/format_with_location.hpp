@@ -11,12 +11,11 @@ template<typename... Args>
 struct FormatWithLocation
 {
     std::format_string<Args...> fmt;
-    std::source_location loc;
+    std::source_location location;
 
-    template<typename T>
-    consteval FormatWithLocation(const T& s,
-                                 std::source_location l = std::source_location::current())
-        : fmt(s), loc(l)
+    consteval FormatWithLocation(const char* str,
+                                 std::source_location loc = std::source_location::current())
+        : fmt(str), location(loc)
     {
     }
 };

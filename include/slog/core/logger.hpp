@@ -47,7 +47,7 @@ public:
 #endif
 
     template<LogLevel level, typename... Args>
-    void log(FormatWithLocation<Args...> fmt, Args&&... args)
+    void log(FormatWithLocation<std::type_identity_t<Args>...> fmt, Args&&... args)
     {
         if constexpr (static_cast<uint8_t>(level) > SLOG_MAX_LOG_LEVEL) {
             return;
@@ -59,7 +59,8 @@ public:
         LogRecord record;
 
         record.level = level;
-        record.location = fmt.loc;
+        record.logger_name = _name;
+        record.location = fmt.location;
         record.timestamp = std::chrono::system_clock::now();
         record.thread_id = slog::details::current_thread_id();
         record.format_str = fmt.fmt.get();
@@ -78,32 +79,32 @@ public:
 #endif
 
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void fatal(FormatWithLocation<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void fatal(FormatWithLocation<std::type_identity_t<Args>...> fmt, Args&&... args)
     {
         log<LogLevel::FATAL>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void error(FormatWithLocation<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void error(FormatWithLocation<std::type_identity_t<Args>...> fmt, Args&&... args)
     {
         log<LogLevel::ERROR>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void warn(FormatWithLocation<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void warn(FormatWithLocation<std::type_identity_t<Args>...> fmt, Args&&... args)
     {
         log<LogLevel::WARNING>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void info(FormatWithLocation<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void info(FormatWithLocation<std::type_identity_t<Args>...> fmt, Args&&... args)
     {
         log<LogLevel::INFO>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void debug(FormatWithLocation<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void debug(FormatWithLocation<std::type_identity_t<Args>...> fmt, Args&&... args)
     {
         log<LogLevel::DEBUG>(fmt, std::forward<Args>(args)...);
     }
     template<typename... Args>
-    SLOG_ALWAYS_INLINE void trace(FormatWithLocation<Args...> fmt, Args&&... args)
+    SLOG_ALWAYS_INLINE void trace(FormatWithLocation<std::type_identity_t<Args>...> fmt, Args&&... args)
     {
         log<LogLevel::TRACE>(fmt, std::forward<Args>(args)...);
     }

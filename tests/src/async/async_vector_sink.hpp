@@ -51,7 +51,7 @@ public:
     void _write(const slog::LogRecord& record) override 
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        messages.push_back(record.message);
+        messages.push_back(record.string_buffer);
         _cv.notify_one();
     }
     

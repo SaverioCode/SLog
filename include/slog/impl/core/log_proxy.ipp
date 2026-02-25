@@ -38,6 +38,7 @@ SLOG_INLINE LogProxy::~LogProxy()
         _record.string_buffer = std::move(*_stream_buffer).str();
     }
     if (_logger) [[likely]] {
+        _record.logger_name = _logger->get_name();
         _logger->_submit(std::move(_record));
     }
 }
