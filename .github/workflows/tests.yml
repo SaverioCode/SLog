@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  build_and_test:
+  tests:
     runs-on: ${{ inputs.runner }}
     container: ${{ inputs.container || null }}
 
