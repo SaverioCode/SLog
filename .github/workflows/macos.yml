@@ -1,4 +1,4 @@
-name: Linux
+name: MacOS
 
 on:
   push:
@@ -11,9 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  linux:
-    name: Debian Trixie
+  macos:
+    name: macOS
     uses: ./.github/workflows/tests.yml
     with:
-      runner: ubuntu-24.04
-      container: debian:trixie
+      runner: macos-14

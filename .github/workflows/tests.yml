@@ -54,6 +54,10 @@ jobs:
       if: runner.os == 'Windows'
       run: pip install conan
 
+    - name: Install Conan (macOS)
+      if: runner.os == 'macOS'
+      run: pip install conan
+
     - name: Cache Conan Packages
       uses: actions/cache@v4
       with:
@@ -75,6 +79,10 @@ jobs:
       if: runner.os == 'Windows'
       run: cmake --build --preset test -- /maxcpucount:$env:NUMBER_OF_PROCESSORS
 
+    - name: Build Tests (macOS)
+      if: runner.os == 'macOS'
+      run: cmake --build --preset test -- -j$(sysctl -n hw.logicalcpu)
+
     - name: Run Tests
       run: ctest --preset test
 
@@ -90,3 +98,7 @@ jobs:
     - name: Build Examples (Windows)
       if: runner.os == 'Windows'
       run: cmake --build --preset examples -- /maxcpucount:$env:NUMBER_OF_PROCESSORS
+
+    - name: Build Examples (macOS)
+      if: runner.os == 'macOS'
+      run: cmake --build --preset examples -- -j$(sysctl -n hw.logicalcpu)

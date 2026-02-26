@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/linux.yml?branch=main&label=Linux&logo=linux&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/linux.yml)
 [![Windows](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/windows.yml?branch=main&label=Windows&logo=windows&logoColor=blue&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/windows.yml)
+[![MacOS](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/macos.yml?branch=main&label=MacOS&logo=apple&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/macos.yml)
 
 **Simple, Reliable, Fast**.
 
@@ -46,18 +47,14 @@ safety implementation)
     - **Stream Sink** (built-in/optional)
     - **File Sink** (built-in/optional)
     - **Custom Sinks**
-- **Logging Stream Syntax** (default/optional) it's possible to completely strip out the logging stream syntax
+- **Logging Stream Syntax** (optional) it must be enabled with `SLOG_STREAM_ENABLED` and cause overall performance degradation
 - **Logging Format Strings Syntax** (default) `<format>`
 - **Unified Interface for Logging**
 - **No external Dependencies** (except for test suites that are not enabled by default)
 
 ## Limitations
 
-- **Multi process** (partial support)
-    - **Sync**
-        - **Not thread safe** supported
-        - **Thread safe** supported on Windows, on Linux/MacOS it's missing the clean of dangerous shared state after a `fork` (eg. Mutex)
-    - **Async** supported on Windows, on Linux/MacOS it's missing the clean of dangerous shared state after `fork` (eg. Queue)
+- **Multi process** (not supported yet)
 
 ## Requirements
 
@@ -135,9 +132,10 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 It's not ordered and it's more of a Todo list, but Roadmap sounds better.
 
 - [ ] Implement Worker Policies
-- [ ] Ensure log level propagation at creation
+- [ ] Implement modules
+- [ ] Improve compilation time
 - [ ] Finilize EBR implementation for lock-free Registry
-- [ ] Implement clean/reset for multiprocess (fork)
+- [ ] Implement multiprocess support
 - [ ] Unify .sh/.ps1 update_badge scripts to .py
 - [ ] Implement clang-format CI
 - [ ] Implement clang-format hook
@@ -152,7 +150,6 @@ It's not ordered and it's more of a Todo list, but Roadmap sounds better.
 - [ ] Update tests CI/CD for fuzzing test
 - [ ] Improve test suites
 - [ ] Improve performance
-- [ ] Update CI/CD for MacOS ?
 - [ ] Write Wiki
 - [ ] Implement conan package
 - [ ] Implement custom LogLevels. Discuss if it's a good idea. and eventually do it.
