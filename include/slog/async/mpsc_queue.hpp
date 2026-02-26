@@ -2,6 +2,7 @@
 #define SLOG_ASYNC_MPSC_QUEUE_HPP
 
 #include <atomic>
+#include <thread>
 
 #include <slog/async/common.hpp>
 #include <slog/common.hpp>
