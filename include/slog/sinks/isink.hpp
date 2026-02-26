@@ -15,12 +15,12 @@ class ISink
 public:
     ISink() = delete;
     ISink(std::string_view name) : _name(name) {}
-    ISink(const ISink&) = default;
-    ISink(ISink&&) = default;
+    ISink(const ISink&) = delete;
+    ISink(ISink&&) = delete;
     virtual ~ISink() = default;
 
-    ISink& operator=(const ISink&) = default;
-    ISink& operator=(ISink&&) = default;
+    ISink& operator=(const ISink&) = delete;
+    ISink& operator=(ISink&&) = delete;
 
     virtual void flush() = 0;
 
