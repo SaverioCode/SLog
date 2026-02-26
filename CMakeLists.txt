@@ -11,6 +11,7 @@ set(TARGET_NAME slog)
 ###################
 
 option(SLOG_BUILD_TESTS "Build with tests" OFF)
+option(SLOG_BUILD_EXAMPLES "Build examples" OFF)
 
 set(BUILD_OPTIONS "STATIC" "SHARED" "HEADER_ONLY")
 set(SLOG_BUILD_TYPE "STATIC" CACHE STRING "SLOG_BUILD_TYPE chosen by the user at CMake configure time")
@@ -73,4 +74,8 @@ add_library(slog::slog ALIAS slog)
 if(SLOG_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+if(SLOG_BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()

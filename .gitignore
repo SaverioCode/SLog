@@ -9,3 +9,5 @@ build*/
 exe
 
 CMakeUserPresets.json
+
+*.log

@@ -22,12 +22,26 @@
             "name": "test",
             "description": "Development build: header-only, test on, Asan on",
             "generator": "",
-            "binaryDir": "${sourceDir}/build",
+            "binaryDir": "${sourceDir}/build-test",
             "cacheVariables": {
                 "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/cmake/conan_provider.cmake",
                 "SLOG_BUILD_TYPE": "HEADER_ONLY",
                 "SLOG_BUILD_TESTS": "ON",
                 "ENABLE_ASAN": "ON",
+                "CMAKE_BUILD_TYPE": "Release"
+            },
+            "environment": {
+                "CXXFLAGS": "-DSLOG_STREAM_ENABLED"
+            }
+        },
+        {
+            "name": "examples",
+            "description": "Build all examples: header-only",
+            "generator": "",
+            "binaryDir": "${sourceDir}/build-examples",
+            "cacheVariables": {
+                "SLOG_BUILD_TYPE": "HEADER_ONLY",
+                "SLOG_BUILD_EXAMPLES": "ON",
                 "CMAKE_BUILD_TYPE": "Release"
             }
         }

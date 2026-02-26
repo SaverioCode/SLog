@@ -26,7 +26,7 @@ def main():
     mounts = [
         ("benchmark", "benchmark"),
         ("cmake", "cmake"),
-        ("example", "example"),
+        ("examples", "examples"),
         ("include", "include"),
         ("scripts", "scripts"),
         ("src", "src"),
