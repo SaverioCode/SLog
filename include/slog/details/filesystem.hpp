@@ -39,8 +39,10 @@ SLOG_ALWAYS_INLINE void _fwrite_unlocked(const void* data, const size_t size, st
 {
 #ifdef _WIN32
     ::_fwrite_nolock(data, sizeof(char), size, stream);
-#else
+#elif __linux__
     ::fwrite_unlocked(data, sizeof(char), size, stream);
+#else
+    std::fwrite(data, sizeof(char), size, stream);
 #endif
 }
 
