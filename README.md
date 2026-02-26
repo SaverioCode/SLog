@@ -24,7 +24,7 @@
 
 ## Description
 
-The main goal of this library is to provide a **reliable**, **safe to use**, general purpose logging system for C++ applications, that can be use in most scenarios avoiding to switch between different loggers or changing the code, but rather leveraging the library options. It's **simple** to start with and to integrate, it's **extensible**, still being very **fast** (~~benchmark~~).
+The main goal of this library is to provide a **reliable**, **safe to use**, general purpose logging system for C++ applications, that can be use in most scenarios avoiding to switch between different loggers or changing the code, but rather leveraging the library options. It's **simple** to start with and to integrate, it's **extensible**, still being very **fast** (~~benchmark~~). It's available as _header only_ or _static/shared_ library.
 
 > [!NOTE]  
 > The default settings are more preserving, ensuring no mistakes from the user, but it's possible to tune the library to your needs.
@@ -37,9 +37,9 @@ The main goal of this library is to provide a **reliable**, **safe to use**, gen
 - **Unified Interface for Sync and Async**
 - **Thread Safe** (default/optional) _thread safe_ can be disable for _sync_ mode, for _async_ mode has no effects
 - **6 + 1 different log levels** ~~extesible~~ (OFF, FATAL, ERROR, WARNING, INFO, DEBUG, TRACE) 
-- **Compile-Time Log Levels**
-- **Runtime Log Levels** (_Registry_ -> _Logger_ -> _Sink_)
+- **Log Filtering** compile time and runtime (_Registry_ -> _Logger_ -> _Sink_)
 - ~~**Fast compilation** C++ 20 modules~~
+- **Custom Formatting** with extensible [format flags](docs/format_flags.md)
 - **Backpressure Policies** (_async_ mode only) extensible
 - **Sinks** extensible (you don't need to worry about thread 
 safety implementation)
@@ -76,9 +76,6 @@ safety implementation)
 
 ## Quick Start
 
-> [!NOTE]
-> Quick start imply using the library as _header only_ without the project CmakeLists.txt but only `-ISLog/include`, hence compiling with the macro `SLOG_HEADER_ONLY`. In alternative it's possible to include the _CMakeLists.txt_ in your project and use it as a _header only_ or _static/shared_ library leveraging the `SLOG_BUILD_TYPE` option [check compile-time options](docs/compile_time_options.md)
-
 ### 1. Installation
 
 Clone the repository
@@ -113,7 +110,8 @@ int main()
 }
 ```
 
-Both code snippets use the **default logger** named "_default_" that comes with a `ConsoleSink` with stream `stdout`.
+Both code snippets use the **default logger** named "_default_" that comes with a `ConsoleSink` with stream `stdout`.  
+For more examples check [examples](examples) folder.
 
 ## Wiki (Work in progress)
 
@@ -131,13 +129,13 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 
 It's not ordered and it's more of a Todo list, but Roadmap sounds better.
 
+- [ ] Implement SLOG_API for windows static/shared library
 - [ ] Implement Worker Policies
 - [ ] Implement modules
 - [ ] Improve compilation time
 - [ ] Finilize EBR implementation for lock-free Registry
 - [ ] Implement multiprocess support
 - [ ] Unify .sh/.ps1 update_badge scripts to .py
-- [ ] Implement clang-format CI
 - [ ] Implement clang-format hook
 - [ ] Implement Signal Handler
 - [ ] Implement Log Rotation
