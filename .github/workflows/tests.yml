@@ -1,0 +1,92 @@
+name: Tests
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        required: true
+        type: string
+      container:
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  build_and_test:
+    runs-on: ${{ inputs.runner }}
+    container: ${{ inputs.container || null }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Platform-specific setup
+
+    - name: Install System Dependencies
+      if: runner.os == 'Linux'
+      run: |
+        apt-get update
+        apt-get install -y \
+          cmake \
+          g++ \
+          git \
+          python3-pip \
+          python3-venv
+
+    - name: Set up MSVC Developer Command Prompt
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    # Conan
+
+    - name: Install Conan (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        python3 -m venv /opt/venv
+        /opt/venv/bin/pip install conan
+        echo "/opt/venv/bin" >> $GITHUB_PATH
+
+    - name: Install Conan (Windows)
+      if: runner.os == 'Windows'
+      run: pip install conan
+
+    - name: Cache Conan Packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.conan2
+        key: conan-${{ runner.os }}-${{ hashFiles('conanfile.py') }}
+        restore-keys: |
+          conan-${{ runner.os }}-
+
+    # Tests
+
+    - name: Configure Tests
+      run: cmake --preset test
+
+    - name: Build Tests (Linux)
+      if: runner.os == 'Linux'
+      run: cmake --build --preset test -- -j$(nproc)
+
+    - name: Build Tests (Windows)
+      if: runner.os == 'Windows'
+      run: cmake --build --preset test -- /maxcpucount:$env:NUMBER_OF_PROCESSORS
+
+    - name: Run Tests
+      run: ctest --preset test
+
+    # Examples
+
+    - name: Configure Examples
+      run: cmake --preset examples
+
+    - name: Build Examples (Linux)
+      if: runner.os == 'Linux'
+      run: cmake --build --preset examples -- -j$(nproc)
+
+    - name: Build Examples (Windows)
+      if: runner.os == 'Windows'
+      run: cmake --build --preset examples -- /maxcpucount:$env:NUMBER_OF_PROCESSORS

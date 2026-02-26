@@ -11,61 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  build_and_test:
-    env:
-      WORK_DIR: .
-      BUILD_DIR: build
-      CONAN_DIR: conan
-      CONAN_TOOLCHAIN: conan/build/generators/conan_toolchain.cmake
-    
+  windows:
     name: Windows
-    runs-on: windows-2022
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up MSVC Developer Command Prompt
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: x64
-
-    - name: Install Conan
-      run: |
-        pip install conan
-        conan profile detect --force
-
-    - name: Get Conan Cache Key
-      id: conan-cache-key
-      shell: bash
-      run: echo "key=conan-windows-$(date +'%Y-%m')" >> $GITHUB_OUTPUT
-
-    - name: Cache Conan Packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.conan2
-        key: ${{ steps.conan-cache-key.outputs.key }}
-        restore-keys: |
-          conan-windows-
-
-    - name: Install Dependencies
-      working-directory: ${{ env.WORK_DIR }}
-      run: |
-        conan install tests/ --build=missing -s build_type=Release `
-            --output-folder=${{ env.CONAN_DIR }} `
-            -s compiler.cppstd=20 `
-            -c tools.build:cxxflags="['/fsanitize=address']"
-
-    - name: Configure CMake
-      working-directory: ${{ env.WORK_DIR }}
-      run: |
-        cmake --preset test -DCMAKE_TOOLCHAIN_FILE="${{ env.CONAN_TOOLCHAIN }}"
-
-    - name: Build
-      working-directory: ${{ env.WORK_DIR }}
-      run: |
-        cmake --build ${{ env.BUILD_DIR }} --config Release -j $env:NUMBER_OF_PROCESSORS
-
-    - name: Test
-      working-directory: ${{ env.WORK_DIR }}
-      run: |
-        ctest --test-dir ${{ env.BUILD_DIR }} --output-on-failure -C Release
+    uses: ./.github/workflows/tests.yml
+    with:
+      runner: windows-2022

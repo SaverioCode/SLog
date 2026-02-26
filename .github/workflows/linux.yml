@@ -11,65 +11,9 @@ permissions:
   contents: read
 
 jobs:
-  build_and_test:
-    env:
-      WORK_DIR: .
-      BUILD_DIR: build
-      CONAN_DIR: conan
-      CONAN_TOOLCHAIN: conan/build/Release/generators/conan_toolchain.cmake
+  linux:
     name: Debian Trixie
-    runs-on: ubuntu-latest
-    container: debian:trixie
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install System Dependencies
-      run: |
-        apt-get update
-        apt-get install -y \
-          cmake \
-          g++ \
-          git \
-          python3-pip \
-          python3-venv
-
-    - name: Install and Setup Conan
-      run: |
-        python3 -m venv /opt/venv
-        /opt/venv/bin/pip install conan
-        echo "/opt/venv/bin" >> $GITHUB_PATH
-        /opt/venv/bin/conan profile detect --force
-    
-    - name: Get Conan Cache Key
-      id: conan-cache-key
-      run: echo "key=conan-$(date +'%Y-%m')" >> $GITHUB_OUTPUT
-
-    - name: Cache Conan Packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.conan2
-        key: ${{ steps.conan-cache-key.outputs.key }}
-        restore-keys: |
-          conan-
-
-    - name: Install Dependencies
-      working-directory: ${{ env.WORK_DIR }}
-      run: |
-        conan install tests/ --build=missing -s build_type=Release \
-            --output-folder=${{ env.CONAN_DIR }}
-
-    - name: Configure CMake
-      working-directory: ${{ env.WORK_DIR }}
-      run: |
-        cmake --preset test -DCMAKE_TOOLCHAIN_FILE=${{ env.CONAN_TOOLCHAIN }}
-
-    - name: Build
-      working-directory: ${{ env.WORK_DIR }}
-      run: |
-        cmake --build ${{ env.BUILD_DIR }} --config Release -j$(nproc)
-
-    - name: Test
-      working-directory: ${{ env.WORK_DIR }}
-      run: |
-        ctest --test-dir ${{ env.BUILD_DIR }} --output-on-failure
+    uses: ./.github/workflows/tests.yml
+    with:
+      runner: ubuntu-latest
+      container: debian:trixie
