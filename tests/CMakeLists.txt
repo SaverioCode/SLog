@@ -19,6 +19,14 @@ function(finalize_slog_test_target target_name)
 
     target_link_libraries(${target_name} PRIVATE gtest::gtest slog::slog)
 
+    # To avoid MSVC error linking Gtest without ASAN when the library is built with ASAN
+    if(MSVC AND ENABLE_ASAN)
+        target_compile_definitions(${target_name} PRIVATE 
+            _DISABLE_STRING_ANNOTATION=1
+            _DISABLE_VECTOR_ANNOTATION=1
+        )
+    endif()
+
     include(GoogleTest)
     gtest_discover_tests(${target_name})
 endfunction()
