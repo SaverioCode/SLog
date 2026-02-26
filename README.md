@@ -111,8 +111,8 @@ int main()
 {
     std::shared_ptr<slog::Logger> logger = slog::Registry::instance().get_default_logger();
 
-    logger.info("Hello World {}", 42);
-    logger.info() << "Hello World " << 42;
+    logger->info("Hello World {}", 42);
+    logger->info() << "Hello World " << 42;
 }
 ```
 
@@ -124,6 +124,7 @@ For now the following docs pages are available:
 
 - [Compile-time options](docs/compile_time_options.md)
 - [Design Specefications](docs/design_specs.md)
+- [Format Flags](docs/format_flags.md)
 
 ## Contribute
 
@@ -141,7 +142,6 @@ It's not ordered and it's more of a Todo list, but Roadmap sounds better.
 - [ ] Implement clang-format CI
 - [ ] Implement clang-format hook
 - [ ] Implement Signal Handler
-- [ ] Implement Format Layout
 - [ ] Implement Log Rotation
 - [ ] Implement Config File
 - [ ] Implement optional colors for the different logs levels (console ouotput)

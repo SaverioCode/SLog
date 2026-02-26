@@ -3,9 +3,11 @@
 
 #include <atomic>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include <slog/sinks/isink.hpp>
+#include <slog/fmt/pattern_formatter.hpp>
 
 namespace slog::sinks
 {
@@ -20,7 +22,7 @@ private:
     template <typename F>
     SLOG_ALWAYS_INLINE decltype(auto) _guard(F&& func) const noexcept
     {
-#ifdef SLOG_ASYNC_ENABLED
+#if defined(SLOG_ASYNC_ENABLED) || defined(SLOG_TSAFE_ENABLED)
         while (_flag.test_and_set(std::memory_order_acquire)) {
             std::this_thread::yield();
         }
@@ -28,13 +30,13 @@ private:
 
         if constexpr (std::is_void_v<std::invoke_result_t<F>>) {
             func();
-#ifdef SLOG_ASYNC_ENABLED
+#if defined(SLOG_ASYNC_ENABLED) || defined(SLOG_TSAFE_ENABLED)
             _flag.clear(std::memory_order_release);
 #endif
         }
         else {
             auto result = func();
-#ifdef SLOG_ASYNC_ENABLED
+#if defined(SLOG_ASYNC_ENABLED) || defined(SLOG_TSAFE_ENABLED)
             _flag.clear(std::memory_order_release);
 #endif
             return result;
@@ -85,9 +87,10 @@ public:
         }
         _guard([&]()
         {
+            _formatter.format(record, record.message);
             for (const std::shared_ptr<ISink>& sink : _sinks_vec) {
                 if (record.level <= sink->get_level()) {
-                    sink->log(record);
+                    sink->log(record, _formatter.get_pattern());
                 }
             }
         });
@@ -124,19 +127,6 @@ public:
         });
     }
 
-    void remove_sink(const std::string& name)
-    {
-        _guard([&]()
-        {
-            for (auto it = _sinks_vec.begin(); it != _sinks_vec.end(); it++) {
-                if ((*it)->get_name() == name) {
-                    _sinks_vec.erase(it);
-                    return;
-                }
-            }
-        });
-    }
-
     [[nodiscard]] bool has_sink(const std::string& name) const noexcept
     {
         return _guard([&]()
@@ -150,8 +140,33 @@ public:
         });
     }
 
+    void remove_sink(const std::string& name)
+    {
+        _guard([&]()
+        {
+            for (auto it = _sinks_vec.begin(); it != _sinks_vec.end(); it++) {
+                if ((*it)->get_name() == name) {
+                    _sinks_vec.erase(it);
+                    return;
+                }
+            }
+        });
+    }
+
+    void set_pattern(std::string_view pattern)
+    {
+        _guard([&]()
+        {
+            _formatter.set_pattern(pattern);
+            for (const std::shared_ptr<ISink>& sink : _sinks_vec) {
+                sink->set_pattern(pattern);
+            }
+        });
+    }
+
 private:
 
+    slog::fmt::PatternFormatter _formatter;
     std::vector<std::shared_ptr<ISink>> _sinks_vec;
     mutable std::atomic_flag _flag;
 };

@@ -10,13 +10,19 @@
 
 TEST(ConsoleSinkTest, FlushAndWriteToTempFile)
 {
+#ifdef _WIN32
+    std::FILE* stream;
+    tmpfile_s(&stream);
+#else
     std::FILE* stream = std::tmpfile();
+#endif
     ASSERT_NE(stream, nullptr) << "Failed to create temporary file for console sink test";
 
     const std::string message = "Testing console sink flush functionality";
     auto sink = std::make_shared<slog::sinks::ConsoleSink>("console_sink", stream);
     auto logger = slog::Registry::instance().create_logger("console_test_logger");
 
+    sink->set_pattern("%v");
     logger->add_sink(sink);
 
     logger->info("{}", message);

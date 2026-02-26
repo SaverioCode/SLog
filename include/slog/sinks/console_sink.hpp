@@ -3,7 +3,7 @@
 
 #include <cstdio>
 
-#include <slog/sinks/common.hpp>
+#include <slog/details/filesystem.hpp>
 #include <slog/sinks/isink.hpp>
 
 namespace slog::sinks
@@ -24,10 +24,10 @@ public:
     SLOG_ALWAYS_INLINE void flush() override { std::fflush(_stream); }
 
 private:
-    void _write(const slog::LogRecord& record) override
+    void _write(std::string_view message) override
     {
         if (_stream) [[likely]] {
-            slog::sinks::fwrite_console(record.string_buffer.data(), record.string_buffer.size(), _stream);
+            slog::details::fwrite_console(message.data(), message.size(), _stream);
         }
     }
     std::FILE* _stream;

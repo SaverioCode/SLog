@@ -1,4 +1,5 @@
 #include <vector>
+#include <limits>
 
 #include <gtest/gtest.h>
 #include <slog/async/mpsc_queue.hpp>
@@ -57,7 +58,7 @@ TEST(MPSCQueue_Functional, WrapAround)
         }
         // Empty
         for (size_t i = 0; i < SIZE; i++) {
-            size_t val = -1;
+            size_t val = std::numeric_limits<size_t>::max();
 
             EXPECT_TRUE(queue.pop(val));
             size_t expected = (c * SIZE) + i;

@@ -68,6 +68,11 @@ SLOG_INLINE Logger::Logger(std::string_view name,
     _sink_manager = std::make_shared<slog::sinks::SinkManager>(sinks);
 }
 
+SLOG_ALWAYS_INLINE void Logger::set_pattern(std::string_view pattern)
+{
+    _sink_manager->set_pattern(pattern);
+}
+
 SLOG_ALWAYS_INLINE void Logger::_submit(LogRecord&& record)
 {
 #ifdef SLOG_ASYNC_ENABLED

@@ -16,7 +16,8 @@ struct LogRecord
 {
     LogLevel level;
     std::string_view logger_name;
-    std::string string_buffer;
+    std::string message; // pattern formatted message
+    std::string string_buffer; // raw buffer
     std::source_location location;
     std::chrono::system_clock::time_point timestamp;
     size_t thread_id;

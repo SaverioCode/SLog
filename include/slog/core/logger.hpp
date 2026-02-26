@@ -13,7 +13,7 @@
 #include <slog/core/log_record.hpp>
 #include <slog/details/thread_id.hpp>
 #include <slog/fmt/deferred_format.hpp>
-#include <slog/sinks/sink_manager.hpp>
+#include <slog/sinks/isink.hpp>
 
 // ------------------------
 // Forward declarations
@@ -24,16 +24,20 @@ namespace slog
 struct LogRecord;
 class Registry;
 }
+namespace slog::sinks
+{
+class SinkManager;
+}
 
 namespace slog
 {
 
-class Logger : public std::enable_shared_from_this<Logger>
+class Logger
 {
 public:
     ~Logger() = default;
 
-#ifndef SLOG_STREAM_DISABLED
+#ifdef SLOG_STREAM_ENABLED
     template<LogLevel level>
     SLOG_ALWAYS_INLINE auto log()
     {
@@ -41,7 +45,7 @@ public:
             return NullProxy{};
         }
         else {
-            return LogProxy(shared_from_this(), level, level <= _log_level);
+            return LogProxy(this, level, level <= _log_level);
         }
     }
 #endif
@@ -69,7 +73,7 @@ public:
         _submit(std::move(record));
     }
 
-#ifndef SLOG_STREAM_DISABLED
+#ifdef SLOG_STREAM_ENABLED
     SLOG_ALWAYS_INLINE auto fatal() { return log<LogLevel::FATAL>(); }
     SLOG_ALWAYS_INLINE auto error() { return log<LogLevel::ERROR>(); }
     SLOG_ALWAYS_INLINE auto warn() { return log<LogLevel::WARNING>(); }
@@ -122,10 +126,14 @@ public:
 
     SLOG_ALWAYS_INLINE void set_log_level(const LogLevel level) noexcept { _log_level = level; }
 
+    SLOG_ALWAYS_INLINE void set_name(std::string_view name) noexcept { _name = name; }
+
+    SLOG_ALWAYS_INLINE void set_pattern(std::string_view pattern);
+
     [[nodiscard]] SLOG_ALWAYS_INLINE std::string_view get_name() const noexcept { return _name; }
 
 private:
-#ifndef SLOG_STREAM_DISABLED
+#ifdef SLOG_STREAM_ENABLED
     friend class LogProxy;
 #endif
     friend class Registry;

@@ -23,7 +23,7 @@ public:
     void flush() override;
 
 private:
-    void _write(const slog::LogRecord& record) override;
+    void _write(std::string_view message) override;
 
     std::ostream& _ostream;
 };

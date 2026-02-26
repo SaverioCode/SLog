@@ -117,7 +117,11 @@ Registry::_make_logger(std::string_view name, std::shared_ptr<slog::async::Worke
         {
         }
     };
-    return std::make_shared<TmpLogger>(name, worker);
+
+    auto logger = std::make_shared<TmpLogger>(name, worker);
+    logger->set_pattern(_format_pattern);
+    logger->set_log_level(_log_level);
+    return logger;
 }
 
 } // namespace slog

@@ -2,7 +2,7 @@
 #ifndef SLOG_CORE_LOG_PROXY_IPP
 #define SLOG_CORE_LOG_PROXY_IPP
 
-#ifndef SLOG_STREAM_DISABLED
+#ifdef SLOG_STREAM_ENABLED
 
     #include <iostream>
 
@@ -17,7 +17,17 @@ namespace slog
 // PUBLIC
 // --------------
 
-SLOG_ALWAYS_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel level,
+SLOG_ALWAYS_INLINE LogProxy::LogProxy(Logger& logger, LogLevel level,
+                                      bool is_active, std::source_location loc)
+    : _logger(&logger), _is_active(is_active)
+{
+    _record.level = level;
+    _record.location = loc;
+    _record.timestamp = std::chrono::system_clock::now();
+    _record.thread_id = slog::details::current_thread_id();
+}
+
+SLOG_ALWAYS_INLINE LogProxy::LogProxy(Logger* logger, LogLevel level,
                                       bool is_active, std::source_location loc)
     : _logger(logger), _is_active(is_active)
 {
@@ -27,14 +37,24 @@ SLOG_ALWAYS_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel l
     _record.thread_id = slog::details::current_thread_id();
 }
 
+SLOG_ALWAYS_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel level,
+                                      bool is_active, std::source_location loc)
+    : _logger(logger.get()), _is_active(is_active)
+{
+    _record.level = level;
+    _record.location = loc;
+    _record.timestamp = std::chrono::system_clock::now();
+    _record.thread_id = slog::details::current_thread_id();
+}
+
+
 SLOG_INLINE LogProxy::~LogProxy()
 {
     // Log level behaviour safeguard when logging is done calling methods instead of using MACROS
     if (!_is_active) [[unlikely]] {
         return;
     }
-    // Format strings are preferred for performance
-    if (_stream_buffer) [[unlikely]] {
+    if (_stream_buffer) {
         _record.string_buffer = std::move(*_stream_buffer).str();
     }
     if (_logger) [[likely]] {
@@ -56,6 +76,6 @@ SLOG_ALWAYS_INLINE void LogProxy::_ensure_stream()
 
 } // namespace slog
 
-#endif // SLOG_STREAM_DISABLED
+#endif // SLOG_STREAM_ENABLED
 
 #endif // SLOG_CORE_LOG_PROXY_IPP

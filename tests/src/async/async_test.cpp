@@ -9,81 +9,65 @@
 
 #include "async_vector_sink.hpp"
 
-std::shared_ptr<slog::tests::AsyncVectorSink> get_or_create_sink(std::shared_ptr<slog::Logger> logger, const std::string& name)
+class AsyncTest : public ::testing::Test
 {
-    std::shared_ptr<slog::tests::AsyncVectorSink> sink{nullptr};
-    if (!logger->has_sink(name)) {
-        sink = std::make_shared<slog::tests::AsyncVectorSink>(name);
-        logger->add_sink(sink);
-    }
-    else {
-        sink = std::dynamic_pointer_cast<slog::tests::AsyncVectorSink>(logger->get_sink(name));
-    }
-    return sink;
-}
+protected:
+    void SetUp() override
+    {
+        logger_a = slog::Registry::instance().create_logger("async_a");
+        logger_b = slog::Registry::instance().create_logger("async_b");
+        sink_a = std::make_shared<slog::tests::AsyncVectorSink>("sink_a");
+        sink_b = std::make_shared<slog::tests::AsyncVectorSink>("sink_b");
 
-TEST(AsyncLog, BasicFlow) 
+        logger_a->add_sink(sink_a);
+        logger_b->add_sink(sink_b);
+
+        sink_a->set_pattern("%v");
+        sink_b->set_pattern("%v");
+    }
+
+    std::shared_ptr<slog::Logger> logger_a;
+    std::shared_ptr<slog::Logger> logger_b;
+    std::shared_ptr<slog::tests::AsyncVectorSink> sink_a;
+    std::shared_ptr<slog::tests::AsyncVectorSink> sink_b;
+};
+
+TEST_F(AsyncTest, BasicFlow) 
 {
-    std::shared_ptr<slog::Logger> logger = slog::Registry::instance().create_logger("async_a");
-    auto sink = std::make_shared<slog::tests::AsyncVectorSink>("sink_a");
-
-    ASSERT_NE(logger, nullptr);
-    ASSERT_NE(sink, nullptr);
-
-    logger->add_sink(sink);
-    logger->info("Test Message 1");
+    logger_a->info("Test Message 1");
 
     // Verify it arrives eventually
-    ASSERT_TRUE(sink->wait_for(1));
-    ASSERT_EQ(sink->get(0), "Test Message 1");
+    ASSERT_TRUE(sink_a->wait_for(1));
+    ASSERT_EQ(sink_a->get(0), "Test Message 1");
 
     // Clear for reuse
-    sink->clear();
+    sink_a->clear();
 }
 
-TEST(AsyncLog, Ordering) 
+TEST_F(AsyncTest, Ordering) 
 {
     constexpr uint32_t message_count = 100;
     constexpr uint32_t wait_time = 100; // ms
 
-    std::shared_ptr<slog::tests::AsyncVectorSink> sink{nullptr};
-    std::shared_ptr<slog::Logger> logger = slog::Registry::instance().create_logger("async_a");
-    sink = get_or_create_sink(logger, "sink_a");
-
-    ASSERT_NE(logger, nullptr);
-    ASSERT_NE(sink, nullptr);
-
     // Log messages
     for (uint32_t i = 0; i < message_count; i++) {
-        logger->info("msg {}", i);
+        logger_a->info("msg {}", i);
     }
 
     // Wait for all to arrive
-    ASSERT_TRUE(sink->wait_for(wait_time));
+    ASSERT_TRUE(sink_a->wait_for(wait_time));
 
     // Verify order
     for (uint32_t i = 0; i < message_count; i++) {
-        EXPECT_EQ(sink->get(i), std::format("msg {}", i));
+        EXPECT_EQ(sink_a->get(i), std::format("msg {}", i));
     }
 
     // Clear for reuse
-    sink->clear();
+    sink_a->clear();
 }
 
-TEST(AsyncLog, Routing) 
+TEST_F(AsyncTest, Routing) 
 {
-    std::shared_ptr<slog::tests::AsyncVectorSink> sink_a{nullptr};
-    std::shared_ptr<slog::tests::AsyncVectorSink> sink_b{nullptr};
-    std::shared_ptr<slog::Logger> logger_a = slog::Registry::instance().create_logger("async_a");
-    std::shared_ptr<slog::Logger> logger_b = slog::Registry::instance().create_logger("async_b");
-    sink_a = get_or_create_sink(logger_a, "sink_a");
-    sink_b = get_or_create_sink(logger_b, "sink_b");
-
-    ASSERT_NE(logger_a, nullptr);
-    ASSERT_NE(logger_b, nullptr);
-    ASSERT_NE(sink_a, nullptr);
-    ASSERT_NE(sink_b, nullptr);
-
     logger_b->add_sink(sink_b);
     logger_a->info("Hello A");
     logger_b->info("Hello B");
@@ -103,22 +87,16 @@ TEST(AsyncLog, Routing)
     sink_b->clear();
 }
 
-TEST(AsyncLog, Concurrency) 
+TEST_F(AsyncTest, Concurrency) 
 {
     constexpr uint32_t NUM_THREADS = 4;
     constexpr uint32_t LOGS_PER_THREAD = 100;
 
-    std::shared_ptr<slog::Logger> logger = slog::Registry::instance().create_logger("async_a");
-    std::shared_ptr<slog::tests::AsyncVectorSink> sink = get_or_create_sink(logger, "sink_a");
-
-    ASSERT_NE(logger, nullptr);
-    ASSERT_NE(sink, nullptr);
-
     std::vector<std::thread> threads;
     for (uint32_t i = 0; i < NUM_THREADS; i++) {
-        threads.emplace_back([logger, i]() {
+        threads.emplace_back([this, i]() {
             for (uint32_t j = 0; j < LOGS_PER_THREAD; j++) {
-                logger->info("Thread {} Msg {}", i, j);
+                logger_a->info("Thread {} Msg {}", i, j);
             }
         });
     }
@@ -127,9 +105,9 @@ TEST(AsyncLog, Concurrency)
         t.join();
     }
 
-    ASSERT_TRUE(sink->wait_for(NUM_THREADS * LOGS_PER_THREAD));
-    EXPECT_EQ(sink->buffer_size(), NUM_THREADS * LOGS_PER_THREAD);
+    ASSERT_TRUE(sink_a->wait_for(NUM_THREADS * LOGS_PER_THREAD));
+    EXPECT_EQ(sink_a->buffer_size(), NUM_THREADS * LOGS_PER_THREAD);
 
     // Clear for reuse
-    sink->clear();
+    sink_a->clear();
 }

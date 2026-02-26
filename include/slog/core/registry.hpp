@@ -76,6 +76,8 @@ public:
 
     SLOG_ALWAYS_INLINE void set_log_level(const LogLevel level) noexcept { _log_level = level; }
 
+    SLOG_ALWAYS_INLINE void set_pattern(std::string_view pattern) noexcept { _format_pattern = pattern; }
+
     bool set_default_logger_name(std::string_view name);
 
 private:
@@ -107,6 +109,7 @@ private:
                                          std::shared_ptr<slog::async::Worker> worker);
 
     std::string _default_logger_name;
+    std::string_view _format_pattern;
     RegistryState _local_state;
     std::vector<std::shared_ptr<Logger>> _loggers;
     std::shared_ptr<slog::async::Worker> _worker{nullptr};

@@ -1,10 +1,10 @@
 #ifndef SLOG_SINKS_FILE_SINK_HPP
 #define SLOG_SINKS_FILE_SINK_HPP
 
-#include <cstdio>
 #include <exception>
 #include <iosfwd>
 
+#include <slog/details/filesystem.hpp>
 #include <slog/sinks/isink.hpp>
 
 namespace slog::sinks
@@ -19,7 +19,7 @@ public:
     {
         _file_name = file_name;
 
-        _stream = std::fopen(file_name.c_str(), mode.c_str());
+        _stream = slog::details::fopen(file_name.data(), mode.data());
         if (!_stream) {
             throw std::runtime_error("Failed to open log file.");
         }
@@ -43,9 +43,9 @@ public:
     [[nodiscard]] std::string get_file_name() const { return _file_name; }
 
 private:
-    void _write(const slog::LogRecord& record) override
+    void _write(std::string_view message) override
     {
-        slog::sinks::fwrite_file(record.string_buffer.data(), record.string_buffer.size(), _stream);
+        slog::details::fwrite_file(message.data(), message.size(), _stream);
     }
 
     std::FILE* _stream{nullptr};

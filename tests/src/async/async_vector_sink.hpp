@@ -46,12 +46,11 @@ public:
 
     void flush() override {}
     
-    
-    private:
-    void _write(const slog::LogRecord& record) override 
+private:
+    void _write(std::string_view message) override 
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        messages.push_back(record.string_buffer);
+        messages.push_back(std::string(message));
         _cv.notify_one();
     }
     

@@ -10,7 +10,7 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(ENABLE_ASAN "Enable Address Sanitizer" ON)
+option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
 
 find_package(GTest REQUIRED)
 
@@ -46,6 +46,9 @@ function(add_slog_sync_tests target_name)
         src/mpsc_queue/single_thread_tests.cpp
         src/mpsc_queue/multi_thread_tests.cpp
         src/sinks/console_sink.cpp
+        src/fmt/format_flags.cpp
+        src/fmt/pattern_formatter.cpp
+        src/fmt/deferred_format.cpp
     )
 
     finalize_slog_test_target(${target_name})

@@ -59,6 +59,7 @@
 #ifndef SLOG_TSAFE_DISABLED
     #include <mutex>
 
+    #define SLOG_TSAFE_ENABLED
     #define SLOG_MUTEX_MEMBER(name) mutable std::mutex name;
     #define SLOG_LOCK(name) std::lock_guard<std::mutex> lock(name);
 #else

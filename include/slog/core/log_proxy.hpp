@@ -1,7 +1,7 @@
 #ifndef SLOG_CORE_LOG_PROXY_HPP
 #define SLOG_CORE_LOG_PROXY_HPP
 
-#ifndef SLOG_STREAM_DISABLED
+#ifdef SLOG_STREAM_ENABLED
 
 #include <format>
 #include <iosfwd>
@@ -53,9 +53,13 @@ struct NullProxy
 class LogProxy
 {
 public:
+    LogProxy(Logger& logger, LogLevel level, bool is_active = true,
+            std::source_location loc = std::source_location::current());
+    LogProxy(Logger* logger, LogLevel level, bool is_active = true,
+            std::source_location loc = std::source_location::current());
     LogProxy(std::shared_ptr<Logger> logger, LogLevel level, bool is_active = true,
-             std::source_location loc = std::source_location::current());
-    LogProxy(const LogProxy&) = delete;
+            std::source_location loc = std::source_location::current());
+    LogProxy(LogProxy&) = delete;
     LogProxy(LogProxy&&) = delete;
 
     ~LogProxy();
@@ -72,11 +76,12 @@ public:
     LogProxy& operator<<(std::ios_base& (*manip)(std::ios_base&)) { return _stream_write(manip); }
 
     template<typename... Args>
-    void operator()(std::format_string<Args...> fmt, Args&&... args)
+    LogProxy& operator()(std::format_string<Args...> fmt, Args&&... args)
     {
         _record.format_str = fmt.get();
         _record.format_fn = &slog::fmt::format_deferred<std::decay_t<Args>...>;
         _record.stored_args.emplace<std::tuple<std::decay_t<Args>...>>(std::forward<Args>(args)...);
+        return *this;
     }
 
 private:
@@ -93,7 +98,7 @@ private:
     }
 
     LogRecord _record;
-    std::shared_ptr<Logger> _logger;
+    Logger* _logger;
     bool _is_active;
     std::unique_ptr<std::ostringstream> _stream_buffer;
 };
@@ -105,6 +110,6 @@ struct VodifyLogProxy
 
 } // namespace slog
 
-#endif // SLOG_STREAM_DISABLED
+#endif // SLOG_STREAM_ENABLED
 
 #endif // SLOG_CORE_LOG_PROXY_HPP

@@ -5,6 +5,7 @@
 #include <slog/core/log_proxy.hpp>
 #include <slog/core/logger.hpp>
 #include <slog/core/registry.hpp>
+#include <slog/details/deref.hpp>
 
 #ifdef SLOG_HEADER_ONLY
     #include <slog/impl/core/log_proxy.ipp>
@@ -13,8 +14,8 @@
 #endif
 
 #define SLOG_REGISTRY slog::Registry::instance()
-#define SLOG_DEFAULT_LOGGER SLOG_REGISTRY->get_default_logger()
-#define SLOG_GET_LOGGER(name) SLOG_REGISTRY->get_logger(name)
+#define SLOG_DEFAULT_LOGGER SLOG_REGISTRY.get_default_logger()
+#define SLOG_GET_LOGGER(name) SLOG_REGISTRY.get_logger(name)
 
 // ---------------------------------
 // Logging macros for Default Logger
@@ -55,17 +56,17 @@
 
 #ifdef SLOG_STREAM_ENABLED
     #define SLOG(lvl, logger)                                                                      \
-        ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || _SLOG_IS_OFF(lvl, logger))            \
+        ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || SLOG_IS_OFF(lvl, logger))            \
             ? (void)0                                                                              \
-            : slog::VodifyLogProxy() & slog::LogProxy(logger, lvl)
+            : slog::VodifyLogProxy() & slog::LogProxy(slog::details::deref(logger), lvl)
 #else
     #define SLOG(lvl, logger)                                                                      \
-        ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || _SLOG_IS_OFF(lvl, logger))            \
+        ((static_cast<uint8_t>(lvl) > SLOG_MAX_LOG_LEVEL) || SLOG_IS_OFF(lvl, logger))            \
             ? (void)0                                                                              \
-            : logger->log<lvl>
+            : slog::details::deref(logger).log<lvl>
 #endif
 
-#define _SLOG_IS_OFF(lvl, logger)                                                                  \
-    (lvl > SLOG_REGISTRY->get_log_level()) || (lvl > logger->get_log_level())
+#define SLOG_IS_OFF(lvl, logger)                                                                  \
+    (lvl > SLOG_REGISTRY.get_log_level()) || (lvl > slog::details::deref(logger).get_log_level())
 
 #endif // SLOG_HPP

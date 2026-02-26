@@ -29,9 +29,9 @@ SLOG_ALWAYS_INLINE void StreamSink::flush()
 // Private methods
 // ------------------------
 
-SLOG_ALWAYS_INLINE void StreamSink::_write(const slog::LogRecord& record)
+SLOG_ALWAYS_INLINE void StreamSink::_write(std::string_view message)
 {
-    _ostream << record.message << '\n';
+    _ostream << message << '\n';
 }
 
 } // namespace slog::sinks

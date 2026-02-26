@@ -5,6 +5,7 @@
 
 #include <slog/common.hpp>
 #include <slog/core/log_record.hpp>
+#include <slog/fmt/pattern_formatter.hpp>
 
 namespace slog::sinks
 {
@@ -27,19 +28,31 @@ public:
 
     [[nodiscard]] SLOG_ALWAYS_INLINE const std::string& get_name() const noexcept { return _name; }
 
-    SLOG_ALWAYS_INLINE void log(const slog::LogRecord& record)
+    SLOG_ALWAYS_INLINE void log(const slog::LogRecord& record, const std::string& sink_manager_pattern)
     {
+        _message.clear();
+
         SLOG_SINK_LOCK(_sink_mutex)
-        _write(record);
+        if (_formatter.get_pattern() != sink_manager_pattern) {
+            _formatter.format(record, _message);
+            _write(_message);
+        }
+        else {
+            _write(record.message);
+        }
     }
 
     SLOG_ALWAYS_INLINE void set_level(const slog::LogLevel level) noexcept { _level = level; }
 
+    SLOG_ALWAYS_INLINE void set_pattern(std::string_view pattern) { _formatter.set_pattern(pattern); }
+
 protected:
-    virtual void _write(const slog::LogRecord& record) = 0;
+    virtual void _write(std::string_view message) = 0;
 
 private:
+    slog::fmt::PatternFormatter _formatter;
     std::string _name;
+    std::string _message;
     slog::LogLevel _level{slog::LogLevel::TRACE};
     SLOG_SINK_MUTEX_MEMBER(_sink_mutex)
 };
