@@ -1,6 +1,6 @@
 # Compile-time Options
 
-Different compile-time options are available to configure the library. Following the C++ philosophy of **"pay for what you use"**
+Different compile-time options are available to configure the library. Following the C++ philosophy of **"pay for what you use"** it's possible to enable/disable most of the features.
 
 ## Table of Content
 
@@ -18,17 +18,16 @@ It **must** be explicitely defined which kind of library build type is required.
 |`SLOG_HEADER_ONLY`| `undefined` | Define header only mode | Necessary only if **not** using the project _CMakeLists.txt_  |
 |`SLOG_BUILD_TYPE`| `undefined` | Define build type for CMake project library | Values: `STATIC`, `SHARED`, `HEADER_ONLY` |
 |`SLOG_BUILD_TESTS`| `OFF` | Include building the tests | Values: `ON`, `OFF`. Only available when using the project _CMakeLists.txt_ |
-|`ENABLE_ASAN`| `ON` | Enable AddressSanitizer | Values: `ON`, `OFF`. Only available when using **Tests** and the project _CMakeLists.txt_ |
+|`ENABLE_ASAN`| `OFF` | Enable AddressSanitizer | Values: `ON`, `OFF`. Only available when using **Tests** and the project _CMakeLists.txt_ |
 
 ## General
 
 | Macro | Default value | Scope | Notes |
 |:------|:-------------:|:------|:------|
 |`SLOG_MAX_LOG_LEVEL`| `6` (`slog::core::LogLevel::TRACE`) | Define Max log level for compile time stripping | |
-|`SLOG_ASYNC_ENABLED`| `undefined` | Define async mode | The entire library does **not** use the `<mutex>` header |
+|`SLOG_ASYNC_ENABLED`| `undefined` | Define async mode | |
 |`SLOG_TSAFE_DISABLED`| `undefined` | Disable thread safety for sync mode | It removes locks and `<mutex>` header from all files |
-|`SLOG_STREAM_DISABLED`| `undefined` | Define stream logging syntax | It removes `LogProxy`, `NullProxy`, `VodifyLogProxy`, and everything related to streams except for `StreamSink` that have a dedicated macro [check below](#sinks) |
-|`SLOG_CACHELINE_SIZE`| `64` | Define the size of the cacheline | |
+|`SLOG_STREAM_ENABLED`| `undefined` | Define stream logging syntax | It enables stream logging syntax. **Note**: cause overall performance degradation |
 |`SLOG_MPSC_QUEUE_SIZE`| `8192` | Define the size of the MPSC queue | Must be power of 2 |
 
 ## Sinks
@@ -47,3 +46,5 @@ Each built-in **sink** is included by default but it can be omitted using the fo
 |:------|:-------------:|:------|:------|
 |`SLOG_FILE_FWRITE_UNLOCKED`| `undefined` | Enable lock-free `fwrite` for `FileSink`| |
 |`SLOG_CONSOLE_FWRITE_UNLOCKED`| `undefined` | Enable lock-free `fwrite` for `ConsoleSink`| ⚠️ **[WARNING]** Be cautious when using this macro, while **SLog** guarantee _thread safeness_ of sinks it **cannot** guarantee that console streams (passed as `std::FILE*`) like `stdout` and `stderr` are not used by others |
+|`SLOG_ASYNC_ENABLED`| `undefined` | Define async mode | |
+|`SLOG_CACHELINE_SIZE`| `64` | Define the size of the cacheline | |
