@@ -45,5 +45,27 @@
                 "CMAKE_BUILD_TYPE": "Release"
             }
         }
+    ],
+    "buildPresets": [
+        {
+            "name": "test",
+            "configurePreset": "test",
+            "configuration": "Release"
+        },
+        {
+            "name": "examples",
+            "configurePreset": "examples",
+            "configuration": "Release"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "test",
+            "configurePreset": "test",
+            "configuration": "Release",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
     ]
 }
