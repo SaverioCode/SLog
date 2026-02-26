@@ -12,6 +12,7 @@ set(TARGET_NAME slog)
 
 option(SLOG_BUILD_TESTS "Build with tests" OFF)
 option(SLOG_BUILD_EXAMPLES "Build examples" OFF)
+option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
 
 set(BUILD_OPTIONS "STATIC" "SHARED" "HEADER_ONLY")
 set(SLOG_BUILD_TYPE "STATIC" CACHE STRING "SLOG_BUILD_TYPE chosen by the user at CMake configure time")
@@ -59,6 +60,20 @@ if(MSVC)
     target_compile_options(${TARGET_NAME} ${OPTS_SCOPE} /W4 /WX)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${TARGET_NAME} ${OPTS_SCOPE} -Wall -Wextra -Werror)
+endif()
+
+#########################
+####  SANITIZERS     ####
+#########################
+
+if(ENABLE_ASAN)
+    if(MSVC)
+        target_compile_options(${TARGET_NAME} ${OPTS_SCOPE} /fsanitize=address /Zi)
+        target_link_options(${TARGET_NAME} ${OPTS_SCOPE} /INCREMENTAL:NO /DEBUG)
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(${TARGET_NAME} ${OPTS_SCOPE} -fsanitize=address -fno-omit-frame-pointer)
+        target_link_options(${TARGET_NAME} ${OPTS_SCOPE} -fsanitize=address)
+    endif()
 endif()
 
 ##################
