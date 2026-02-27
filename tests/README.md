@@ -4,24 +4,30 @@
 
 ## What is tested
 
-- Log levels
+- MPSC queue
+- Formatter
+- Sinks
+    - ConsoleSink
+- Async mode
 
 ## Run tests
+
+The suggested way it's run from root the _CMakePresets.json_ file.
 
 1. Create cmake config files
 
 ``` bash
-cmake -B build -DCMAKE_TOOLCHAIN_FILE=../conan/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=release
+cmake --preset test
 ```
 
 2. Build
 
 ``` bash
-cmake --build build
+cmake --build --preset test
 ```
 
 3. Execute
 
 ``` bash
-./build/slog_tests
+ctest --preset test
 ```
