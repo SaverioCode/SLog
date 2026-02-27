@@ -4,6 +4,7 @@
 [![Linux](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/linux.yml?branch=main&label=Linux&logo=linux&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/linux.yml)
 [![Windows](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/windows.yml?branch=main&label=Windows&logo=windows&logoColor=blue&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/windows.yml)
 [![MacOS](https://img.shields.io/github/actions/workflow/status/SaverioCode/SLog/macos.yml?branch=main&label=MacOS&logo=apple&style=flat-square)](https://github.com/SaverioCode/SLog/actions/workflows/macos.yml)
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C.svg?style=flat-square&logo=c%2B%2B&logoColor=white)](https://en.cppreference.com/w/cpp/20)
 
 **Simple, Reliable, Fast**.
 
@@ -25,9 +26,6 @@
 ## Description
 
 The main goal of this library is to provide a **reliable**, **safe to use**, general purpose logging system for C++ applications, that can be use in most scenarios avoiding to switch between different loggers or changing the code, but rather leveraging the library options. It's **simple** to start with and to integrate, it's **extensible**, still being very **fast** (~~benchmark~~). It's available as _header only_ or _static/shared_ library.
-
-> [!NOTE]  
-> The default settings are more preserving, ensuring no mistakes from the user, but it's possible to tune the library to your needs.
 
 ## Features
 
@@ -66,7 +64,7 @@ safety implementation)
 
 - **Linux**
 - **Windows**  
-- ~~**MacOS** (Todo: test)~~
+- **MacOS**
 
 ### Compilers
 
@@ -118,7 +116,7 @@ For more examples check [examples](examples) folder.
 For now the following docs pages are available:
 
 - [Compile-time options](docs/compile_time_options.md)
-- [Design Specefications](docs/design_specs.md)
+- [Design Specifications](docs/design_specs.md)
 - [Format Flags](docs/format_flags.md)
 
 ## Contribute
