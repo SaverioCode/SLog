@@ -18,6 +18,7 @@ It **must** be explicitely defined which kind of library build type is required.
 |`SLOG_HEADER_ONLY`| `undefined` | Define header only mode | Necessary only if **not** using the project _CMakeLists.txt_  |
 |`SLOG_BUILD_TYPE`| `undefined` | Define build type for CMake project library | Values: `STATIC`, `SHARED`, `HEADER_ONLY` |
 |`SLOG_BUILD_TESTS`| `OFF` | Include building the tests | Values: `ON`, `OFF`. Only available when using the project _CMakeLists.txt_ |
+|`SLOG_BUILD_EXAMPLES`| `OFF` | Include building the examples | Values: `ON`, `OFF`. Only available when using the project _CMakeLists.txt_ |
 |`ENABLE_ASAN`| `OFF` | Enable AddressSanitizer | Values: `ON`, `OFF`. Only available when using **Tests** and the project _CMakeLists.txt_ |
 
 ## General
