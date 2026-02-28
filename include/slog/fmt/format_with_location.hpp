@@ -1,5 +1,5 @@
-#ifndef SLOG_CORE_FORMAT_WITH_LOCATION_HPP
-#define SLOG_CORE_FORMAT_WITH_LOCATION_HPP
+#ifndef SLOG_FMT_FORMAT_WITH_LOCATION_HPP
+#define SLOG_FMT_FORMAT_WITH_LOCATION_HPP
 
 #include <format>
 #include <source_location>
@@ -22,4 +22,4 @@ struct FormatWithLocation
 
 } // namespace slog
 
-#endif // SLOG_CORE_FORMAT_WITH_LOCATION_HPP
+#endif // SLOG_FMT_FORMAT_WITH_LOCATION_HPP
