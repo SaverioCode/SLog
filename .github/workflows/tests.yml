@@ -19,6 +19,14 @@ jobs:
     runs-on: ${{ inputs.runner }}
     container: ${{ inputs.container || null }}
 
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [test-static-sync, test-static-async, test-shared-sync, test-shared-async, test-header]
+
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -70,37 +78,13 @@ jobs:
 
     # Tests
 
-    - name: Configure Tests
-      run: cmake --preset test
-
-    - name: Build Tests (Linux)
-      if: runner.os == 'Linux'
-      run: cmake --build --preset test -- -j$(nproc)
-
-    - name: Build Tests (Windows)
-      if: runner.os == 'Windows'
-      run: cmake --build --preset test -- /maxcpucount:$env:NUMBER_OF_PROCESSORS
-
-    - name: Build Tests (macOS)
-      if: runner.os == 'macOS'
-      run: cmake --build --preset test -- -j$(sysctl -n hw.logicalcpu)
-
-    - name: Run Tests
-      run: ctest --preset test
+    - name: Run Test Workflow (${{ matrix.preset }})
+      run: cmake --workflow --preset ${{ matrix.preset }}
 
     # Examples
 
-    - name: Configure Examples
-      run: cmake --preset examples
-
-    - name: Build Examples (Linux)
-      if: runner.os == 'Linux'
-      run: cmake --build --preset examples -- -j$(nproc)
-
-    - name: Build Examples (Windows)
-      if: runner.os == 'Windows'
-      run: cmake --build --preset examples -- /maxcpucount:$env:NUMBER_OF_PROCESSORS
-
-    - name: Build Examples (macOS)
-      if: runner.os == 'macOS'
-      run: cmake --build --preset examples -- -j$(sysctl -n hw.logicalcpu)
+    - name: Build Examples
+      if: matrix.preset == 'test-header'
+      run: |
+        cmake --preset examples
+        cmake --build --preset examples
