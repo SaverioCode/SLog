@@ -46,7 +46,7 @@ public:
         _compile(pattern);
     }
 
-    SLOG_ALWAYS_INLINE [[nodiscard]] const std::string& get_pattern() const noexcept
+    [[nodiscard]] SLOG_ALWAYS_INLINE const std::string& get_pattern() const noexcept
     {
         return _pattern;
     }
