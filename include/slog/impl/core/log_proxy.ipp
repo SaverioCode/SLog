@@ -17,7 +17,7 @@ namespace slog
 // PUBLIC
 // --------------
 
-SLOG_ALWAYS_INLINE LogProxy::LogProxy(Logger& logger, LogLevel level,
+SLOG_INLINE LogProxy::LogProxy(Logger& logger, LogLevel level,
                                       bool is_active, std::source_location loc)
     : _logger(&logger), _is_active(is_active)
 {
@@ -27,7 +27,7 @@ SLOG_ALWAYS_INLINE LogProxy::LogProxy(Logger& logger, LogLevel level,
     _record.thread_id = slog::details::current_thread_id();
 }
 
-SLOG_ALWAYS_INLINE LogProxy::LogProxy(Logger* logger, LogLevel level,
+SLOG_INLINE LogProxy::LogProxy(Logger* logger, LogLevel level,
                                       bool is_active, std::source_location loc)
     : _logger(logger), _is_active(is_active)
 {
@@ -37,7 +37,7 @@ SLOG_ALWAYS_INLINE LogProxy::LogProxy(Logger* logger, LogLevel level,
     _record.thread_id = slog::details::current_thread_id();
 }
 
-SLOG_ALWAYS_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel level,
+SLOG_INLINE LogProxy::LogProxy(std::shared_ptr<Logger> logger, LogLevel level,
                                       bool is_active, std::source_location loc)
     : _logger(logger.get()), _is_active(is_active)
 {
@@ -67,7 +67,7 @@ SLOG_INLINE LogProxy::~LogProxy()
 // PRIVATE
 // --------------
 
-SLOG_ALWAYS_INLINE void LogProxy::_ensure_stream()
+SLOG_INLINE void LogProxy::_ensure_stream()
 {
     if (!_stream_buffer) [[unlikely]] {
         _stream_buffer = std::make_unique<std::ostringstream>();

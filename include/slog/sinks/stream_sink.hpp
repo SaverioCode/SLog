@@ -3,12 +3,13 @@
 
 #include <iosfwd>
 
+#include <slog/details/macros.hpp>
 #include <slog/sinks/isink.hpp>
 
 namespace slog::sinks
 {
 
-class StreamSink : public ISink
+class SLOG_API StreamSink : public ISink
 {
 public:
     StreamSink() = delete;

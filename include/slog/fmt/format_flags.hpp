@@ -6,9 +6,9 @@
 #include <string>
 #include <string_view>
 
-#include <slog/common.hpp>
 #include <slog/core/log_level.hpp>
 #include <slog/core/log_record.hpp>
+#include <slog/details/macros.hpp>
 #include <slog/details/thread_id.hpp>
 #include <slog/details/filesystem.hpp>
 #include <slog/fmt/format_context.hpp>

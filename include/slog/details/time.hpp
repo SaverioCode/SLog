@@ -4,7 +4,7 @@
 #include <ctime>
 #include <chrono>
 
-#include <slog/common.hpp>
+#include <slog/details/macros.hpp>
 
 namespace slog::details
 {

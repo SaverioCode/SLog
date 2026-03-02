@@ -20,7 +20,7 @@ SLOG_INLINE StreamSink::~StreamSink()
     _ostream.flush();
 }
 
-SLOG_ALWAYS_INLINE void StreamSink::flush()
+SLOG_INLINE void StreamSink::flush()
 {
     _ostream.flush();
 }
@@ -29,7 +29,7 @@ SLOG_ALWAYS_INLINE void StreamSink::flush()
 // Private methods
 // ------------------------
 
-SLOG_ALWAYS_INLINE void StreamSink::_write(std::string_view message)
+SLOG_INLINE void StreamSink::_write(std::string_view message)
 {
     _ostream << message << '\n';
 }

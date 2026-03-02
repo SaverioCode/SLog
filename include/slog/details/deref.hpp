@@ -1,7 +1,7 @@
 #ifndef SLOG_DETAILS_DEREF_HPP
 #define SLOG_DETAILS_DEREF_HPP
 
-#include <slog/common.hpp>
+#include <slog/details/macros.hpp>
 
 // ------------------------
 // Forward declarations

@@ -6,13 +6,14 @@
 #include <source_location>
 
 #include <slog/async/worker.hpp>
-#include <slog/common.hpp>
-#include <slog/core/format_with_location.hpp>
+#include <slog/config_macros.hpp>
 #include <slog/core/log_level.hpp>
 #include <slog/core/log_proxy.hpp>
 #include <slog/core/log_record.hpp>
+#include <slog/details/macros.hpp>
 #include <slog/details/thread_id.hpp>
 #include <slog/fmt/deferred_format.hpp>
+#include <slog/fmt/format_with_location.hpp>
 #include <slog/sinks/isink.hpp>
 
 // ------------------------
@@ -32,7 +33,7 @@ class SinkManager;
 namespace slog
 {
 
-class Logger
+class SLOG_API Logger
 {
 public:
     ~Logger() = default;

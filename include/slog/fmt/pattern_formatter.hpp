@@ -7,6 +7,8 @@
 #include <string_view>
 #include <vector>
 
+#include <slog/config_macros.hpp>
+#include <slog/details/macros.hpp>
 #include <slog/fmt/format_context.hpp>
 #include <slog/fmt/format_flags.hpp>
 
@@ -44,7 +46,7 @@ public:
         _compile(pattern);
     }
 
-    [[nodiscard]] const std::string& get_pattern() const noexcept
+    SLOG_ALWAYS_INLINE [[nodiscard]] const std::string& get_pattern() const noexcept
     {
         return _pattern;
     }
@@ -63,7 +65,7 @@ public:
         }
     }
 
-    static void register_flag(char c, FormatFn fn)
+    SLOG_API static void register_flag(char c, FormatFn fn)
     {
         uint8_t idx = static_cast<uint8_t>(c);
 
@@ -117,7 +119,7 @@ private:
         _literal_flush(literal_accum);
     }
 
-    SLOG_ALWAYS_INLINE void _literal_flush(std::string& literal_accum)
+    void _literal_flush(std::string& literal_accum)
     {
         if (!literal_accum.empty()) {
             _steps.push_back(FormatStep{'\0', std::move(literal_accum)});
@@ -125,30 +127,7 @@ private:
         }
     }
 
-    static inline std::array<FormatFn, TABLE_SIZE> _dispatch_table = [] {
-        std::array<FormatFn, TABLE_SIZE> t{};
-
-        t.fill(nullptr);
-        t['v'] = fmt_message;
-        t['l'] = fmt_level;
-        t['L'] = fmt_level_short;
-        t['t'] = fmt_thread_id;
-        t['Y'] = fmt_year;
-        t['m'] = fmt_month;
-        t['d'] = fmt_day;
-        t['H'] = fmt_hour;
-        t['M'] = fmt_minute;
-        t['S'] = fmt_second;
-        t['e'] = fmt_millisecond;
-        t['f'] = fmt_microsecond;
-        t['s'] = fmt_source_file;
-        t['g'] = fmt_source_path;
-        t['#'] = fmt_source_line;
-        t['!'] = fmt_source_func;
-        t['n'] = fmt_logger_name;
-        return t;
-    }();
-
+    SLOG_API static std::array<FormatFn, TABLE_SIZE> _dispatch_table;
     std::vector<FormatStep> _steps;
     std::string _pattern;
 };

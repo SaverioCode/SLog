@@ -38,6 +38,12 @@ SLOG_INLINE void Registry::flush() const
     }
 }
 
+SLOG_INLINE Registry& Registry::instance()
+{
+    static Registry instance = Registry();
+    return instance;
+}
+
 SLOG_INLINE bool Registry::set_default_logger_name(std::string_view name)
 {
     SLOG_LOCK(_mutex);
@@ -65,16 +71,16 @@ SLOG_INLINE Registry::Registry()
 #endif
 
     if (_local_state == RegistryState::ACTIVE) {
-        _default_logger_name = _SLOG_DEFAULT_LOGGER_NAME;
+        _default_logger_name = SLOG_DEFAULT_LOGGER_NAME;
         logger = _make_logger(_default_logger_name, _worker);
         logger->add_sink(
-            std::make_shared<slog::sinks::ConsoleSink>(_SLOG_DEFAULT_SINK_NAME, stdout));
+            std::make_shared<slog::sinks::ConsoleSink>(SLOG_DEFAULT_SINK_NAME, stdout));
     }
     else if (_local_state == RegistryState::INACTIVE) {
-        _default_logger_name = _SLOG_INACTIVE_LOGGER_NAME;
+        _default_logger_name = SLOG_INACTIVE_LOGGER_NAME;
         logger = _make_logger(_default_logger_name, _worker);
         logger->add_sink(
-            std::make_shared<slog::sinks::ConsoleSink>(_SLOG_INACTIVE_SINK_NAME, stderr));
+            std::make_shared<slog::sinks::ConsoleSink>(SLOG_INACTIVE_SINK_NAME, stderr));
     }
     _loggers.push_back(logger);
 }
@@ -107,7 +113,7 @@ SLOG_INLINE std::shared_ptr<Logger> Registry::_get_logger_ptr(std::string_view n
     return nullptr;
 }
 
-SLOG_ALWAYS_INLINE std::shared_ptr<Logger>
+SLOG_INLINE std::shared_ptr<Logger>
 Registry::_make_logger(std::string_view name, std::shared_ptr<slog::async::Worker> worker)
 {
     struct TmpLogger : public Logger

@@ -2,8 +2,9 @@
 #define SLOG_CORE_REGISTRY_HPP
 
 #include <slog/async/worker.hpp>
-#include <slog/common.hpp>
+#include <slog/config_macros.hpp>
 #include <slog/core/log_level.hpp>
+#include <slog/details/macros.hpp>
 
 #include <atomic>
 
@@ -19,7 +20,7 @@ class Logger;
 namespace slog
 {
 
-class Registry
+class SLOG_API Registry
 {
 public:
     ~Registry()
@@ -32,11 +33,7 @@ public:
 
     [[nodiscard]] std::shared_ptr<Logger> create_logger(std::string_view name);
 
-    [[nodiscard]] static Registry& instance()
-    {
-        static Registry instance = Registry();
-        return instance;
-    }
+    [[nodiscard]] static Registry& instance();
 
     void flush() const;
 

@@ -1,11 +1,54 @@
 {
-    "version": 3,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 19,
+        "minor": 23,
         "patch": 0
     },
     "configurePresets": [
+        {
+            "name": "_base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "_static",
+            "hidden": true,
+            "cacheVariables": {
+                "SLOG_BUILD_TYPE": "STATIC"
+            }
+        },
+        {
+            "name": "_shared",
+            "hidden": true,
+            "cacheVariables": {
+                "SLOG_BUILD_TYPE": "SHARED"
+            }
+        },
+        {
+            "name": "_header_only",
+            "hidden": true,
+            "cacheVariables": {
+                "SLOG_BUILD_TYPE": "HEADER_ONLY"
+            }
+        },
+        {
+            "name": "_async",
+            "hidden": true,
+            "cacheVariables": {
+                "SLOG_ASYNC_ENABLED": "ON"
+            }
+        },
+        {
+            "name": "_sync",
+            "hidden": true,
+            "cacheVariables": {
+                "SLOG_ASYNC_ENABLED": "OFF"
+            }
+        },
         {
             "name": "default",
             "description": "Default build: static library, test off, Asan off",
@@ -19,22 +62,6 @@
             }
         },
         {
-            "name": "test",
-            "description": "Development build: header-only, test on, Asan on",
-            "generator": "",
-            "binaryDir": "${sourceDir}/build-test",
-            "cacheVariables": {
-                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/cmake/conan_provider.cmake",
-                "SLOG_BUILD_TYPE": "HEADER_ONLY",
-                "SLOG_BUILD_TESTS": "ON",
-                "ENABLE_ASAN": "ON",
-                "CMAKE_BUILD_TYPE": "Release"
-            },
-            "environment": {
-                "CXXFLAGS": "-DSLOG_STREAM_ENABLED"
-            }
-        },
-        {
             "name": "examples",
             "description": "Build all examples: header-only",
             "generator": "",
@@ -44,28 +71,219 @@
                 "SLOG_BUILD_EXAMPLES": "ON",
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "_base_test",
+            "hidden": true,
+            "inherits": "_base",
+            "description": "Base tests preset, Asan ON, Stream ON",
+            "generator": "",
+            "cacheVariables": {
+                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "${sourceDir}/cmake/conan_provider.cmake",
+                "SLOG_BUILD_TESTS": "ON",
+                "ENABLE_ASAN": "ON"
+            },
+            "environment": {
+                "CXXFLAGS": "-DSLOG_STREAM_ENABLED"
+            }
+        },
+        {
+            "name": "test-static-sync",
+            "inherits": [
+                "_base_test",
+                "_static",
+                "_sync"
+            ]
+        },
+        {
+            "name": "test-static-async",
+            "inherits": [
+                "_base_test",
+                "_static",
+                "_async"
+            ]
+        },
+        {
+            "name": "test-shared-sync",
+            "inherits": [
+                "_base_test",
+                "_shared",
+                "_sync"
+            ]
+        },
+        {
+            "name": "test-shared-async",
+            "inherits": [
+                "_base_test",
+                "_shared",
+                "_async"
+            ]
+        },
+        {
+            "name": "test-header",
+            "inherits": [
+                "_base_test",
+                "_header_only"
+            ]
         }
     ],
     "buildPresets": [
         {
-            "name": "test",
-            "configurePreset": "test",
+            "name": "examples",
+            "configurePreset": "examples",
             "configuration": "Release"
         },
         {
-            "name": "examples",
-            "configurePreset": "examples",
+            "name": "test-static-sync",
+            "configurePreset": "test-static-sync",
+            "configuration": "Release"
+        },
+        {
+            "name": "test-static-async",
+            "configurePreset": "test-static-async",
+            "configuration": "Release"
+        },
+        {
+            "name": "test-shared-sync",
+            "configurePreset": "test-shared-sync",
+            "configuration": "Release"
+        },
+        {
+            "name": "test-shared-async",
+            "configurePreset": "test-shared-async",
+            "configuration": "Release"
+        },
+        {
+            "name": "test-header",
+            "configurePreset": "test-header",
             "configuration": "Release"
         }
     ],
     "testPresets": [
         {
-            "name": "test",
-            "configurePreset": "test",
+            "name": "_base_test",
+            "hidden": true,
             "configuration": "Release",
             "output": {
                 "outputOnFailure": true
             }
+        },
+        {
+            "name": "test-static-sync",
+            "inherits": "_base_test",
+            "configurePreset": "test-static-sync"
+        },
+        {
+            "name": "test-static-async",
+            "inherits": "_base_test",
+            "configurePreset": "test-static-async"
+        },
+        {
+            "name": "test-shared-sync",
+            "inherits": "_base_test",
+            "configurePreset": "test-shared-sync"
+        },
+        {
+            "name": "test-shared-async",
+            "inherits": "_base_test",
+            "configurePreset": "test-shared-async"
+        },
+        {
+            "name": "test-header",
+            "inherits": "_base_test",
+            "configurePreset": "test-header"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "test-static-sync",
+            "description": "Configure, build, and test SLOG STATIC sync variation",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "test-static-sync"
+                },
+                {
+                    "type": "build",
+                    "name": "test-static-sync"
+                },
+                {
+                    "type": "test",
+                    "name": "test-static-sync"
+                }
+            ]
+        },
+        {
+            "name": "test-static-async",
+            "description": "Configure, build, and test SLOG STATIC async variation",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "test-static-async"
+                },
+                {
+                    "type": "build",
+                    "name": "test-static-async"
+                },
+                {
+                    "type": "test",
+                    "name": "test-static-async"
+                }
+            ]
+        },
+        {
+            "name": "test-shared-sync",
+            "description": "Configure, build, and test SLOG SHARED sync variation",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "test-shared-sync"
+                },
+                {
+                    "type": "build",
+                    "name": "test-shared-sync"
+                },
+                {
+                    "type": "test",
+                    "name": "test-shared-sync"
+                }
+            ]
+        },
+        {
+            "name": "test-shared-async",
+            "description": "Configure, build, and test SLOG SHARED async variation",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "test-shared-async"
+                },
+                {
+                    "type": "build",
+                    "name": "test-shared-async"
+                },
+                {
+                    "type": "test",
+                    "name": "test-shared-async"
+                }
+            ]
+        },
+        {
+            "name": "test-header",
+            "description": "Configure, build, and test SLOG HEADER-ONLY variation",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "test-header"
+                },
+                {
+                    "type": "build",
+                    "name": "test-header"
+                },
+                {
+                    "type": "test",
+                    "name": "test-header"
+                }
+            ]
         }
     ]
 }

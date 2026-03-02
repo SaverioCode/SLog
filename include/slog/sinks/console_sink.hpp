@@ -4,12 +4,13 @@
 #include <cstdio>
 
 #include <slog/details/filesystem.hpp>
+#include <slog/details/macros.hpp>
 #include <slog/sinks/isink.hpp>
 
 namespace slog::sinks
 {
 
-class ConsoleSink : public ISink
+class SLOG_API ConsoleSink : public ISink
 {
 public:
     ConsoleSink(const std::string_view name, std::FILE* stream) : ISink(name), _stream(stream) {}

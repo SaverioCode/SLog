@@ -10,7 +10,7 @@
 namespace slog::fmt
 {
 
-class FormatContext
+class SLOG_API FormatContext
 {
 public:
 

@@ -3,14 +3,22 @@
 
 #include <iosfwd>
 
-#include <slog/common.hpp>
+#include <slog/config_macros.hpp>
+#include <slog/core/log_level.hpp>
 #include <slog/core/log_record.hpp>
+#include <slog/details/macros.hpp>
 #include <slog/fmt/pattern_formatter.hpp>
 
 namespace slog::sinks
 {
 
-class ISink
+#ifdef SLOG_ASYNC_ENABLED
+    inline namespace async {
+#else
+    inline namespace sync {
+#endif
+
+class SLOG_API ISink
 {
 public:
     ISink() = delete;
@@ -57,6 +65,7 @@ private:
     SLOG_SINK_MUTEX_MEMBER(_sink_mutex)
 };
 
+}
 } // namespace slog::sinks
 
 #endif // SLOG_SINKS_ISINK_HPP

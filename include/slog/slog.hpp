@@ -1,7 +1,7 @@
 #ifndef SLOG_HPP
 #define SLOG_HPP
 
-#include <slog/common.hpp>
+#include <slog/config_macros.hpp>
 #include <slog/core/log_proxy.hpp>
 #include <slog/core/logger.hpp>
 #include <slog/core/registry.hpp>
@@ -11,6 +11,7 @@
     #include <slog/impl/core/log_proxy.ipp>
     #include <slog/impl/core/logger.ipp>
     #include <slog/impl/core/registry.ipp>
+    #include <slog/impl/fmt/pattern_formatter.ipp>
 #endif
 
 #define SLOG_REGISTRY slog::Registry::instance()

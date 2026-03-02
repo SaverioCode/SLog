@@ -4,13 +4,15 @@
 #include <exception>
 #include <iosfwd>
 
+#include <slog/config_macros.hpp>
 #include <slog/details/filesystem.hpp>
+#include <slog/details/macros.hpp>
 #include <slog/sinks/isink.hpp>
 
 namespace slog::sinks
 {
 
-class FileSink : public ISink
+class SLOG_API FileSink : public ISink
 {
 public:
     FileSink(const std::string_view sink_name, const std::string_view file_name,

@@ -9,9 +9,9 @@
 #include <source_location>
 #include <utility>
 
-#include <slog/common.hpp>
 #include <slog/core/log_level.hpp>
 #include <slog/core/log_record.hpp>
+#include <slog/details/macros.hpp>
 #include <slog/fmt/deferred_format.hpp>
 
 // ------------------------
@@ -50,7 +50,7 @@ struct NullProxy
     }
 };
 
-class LogProxy
+class SLOG_API LogProxy
 {
 public:
     LogProxy(Logger& logger, LogLevel level, bool is_active = true,
@@ -103,7 +103,7 @@ private:
     std::unique_ptr<std::ostringstream> _stream_buffer;
 };
 
-struct VodifyLogProxy
+struct SLOG_API VodifyLogProxy
 {
     void operator&(const LogProxy&) {}
 };

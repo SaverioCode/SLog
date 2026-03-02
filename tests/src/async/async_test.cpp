@@ -68,7 +68,6 @@ TEST_F(AsyncTest, Ordering)
 
 TEST_F(AsyncTest, Routing) 
 {
-    logger_b->add_sink(sink_b);
     logger_a->info("Hello A");
     logger_b->info("Hello B");
 

@@ -5,7 +5,8 @@
 #include <thread>
 
 #include <slog/async/common.hpp>
-#include <slog/common.hpp>
+#include <slog/config_macros.hpp>
+#include <slog/details/macros.hpp>
 
 namespace slog::async
 {
@@ -16,13 +17,13 @@ class MPSCQueue
     static_assert((Size != 0) && ((Size & (Size - 1)) == 0),
                   "MPSCQueue::Size must be a power of 2");
 
-    _SLOG_DISABLE_PADDING_WARNING
+    SLOG_DISABLE_PADDING_WARNING
     struct Node
     {
         T data;
         alignas(SLOG_CACHELINE_SIZE) std::atomic<size_t> seq;
     };
-    _SLOG_RESTORE_PADDING_WARNING
+    SLOG_RESTORE_PADDING_WARNING
 
 public:
     MPSCQueue() : _size(Size), _mask(Size - 1), _buffer(new Node[Size])
@@ -92,10 +93,10 @@ private:
     size_t _size;
     size_t _mask;
     Node* _buffer;
-    _SLOG_DISABLE_PADDING_WARNING
+    SLOG_DISABLE_PADDING_WARNING
     alignas(SLOG_CACHELINE_SIZE) std::atomic<size_t> _head{0};
     alignas(SLOG_CACHELINE_SIZE) std::atomic<size_t> _tail{0};
-    _SLOG_RESTORE_PADDING_WARNING
+    SLOG_RESTORE_PADDING_WARNING
 };
 
 } // namespace slog::async

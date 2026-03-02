@@ -1,5 +1,5 @@
-#ifndef SLOG_CONFIG_HPP
-#define SLOG_CONFIG_HPP
+#ifndef SLOG_CONFIG_MACROS_HPP
+#define SLOG_CONFIG_MACROS_HPP
 
 // ----------------------------------------
 // Compile-time Max log level
@@ -29,28 +29,10 @@
 // Default and Inactive loggers and sinks name
 // ----------------------------------------
 
-#define _SLOG_DEFAULT_LOGGER_NAME "default"
-#define _SLOG_INACTIVE_LOGGER_NAME "inactive"
-#define _SLOG_DEFAULT_SINK_NAME "console_out"
-#define _SLOG_INACTIVE_SINK_NAME "console_err"
-
-// ----------------------------------------
-// Inline and Always inline
-// ----------------------------------------
-
-#if !defined(SLOG_LIB_BUILD)
-    #if defined(_MSC_VER)
-        #define SLOG_ALWAYS_INLINE __forceinline
-    #elif defined(__GNUC__) || defined(__clang__)
-        #define SLOG_ALWAYS_INLINE inline __attribute__((always_inline))
-    #else
-        #define SLOG_ALWAYS_INLINE inline
-    #endif
-    #define SLOG_INLINE inline
-#else
-    #define SLOG_INLINE
-    #define SLOG_ALWAYS_INLINE
-#endif
+#define SLOG_DEFAULT_LOGGER_NAME "default"
+#define SLOG_INACTIVE_LOGGER_NAME "inactive"
+#define SLOG_DEFAULT_SINK_NAME "console_out"
+#define SLOG_INACTIVE_SINK_NAME "console_err"
 
 // ----------------------------------------
 // Thread safety
@@ -79,17 +61,5 @@
     #define SLOG_SINK_LOCK(name) SLOG_LOCK(name)
 #endif
 
-// ----------------------------------------
-// Temporary disable padding warning for MSVC
-// ----------------------------------------
 
-#ifdef _MSC_VER
-  #define _SLOG_DISABLE_PADDING_WARNING __pragma(warning(push)) __pragma(warning(disable: 4324))
-  #define _SLOG_RESTORE_PADDING_WARNING __pragma(warning(pop))
-#else
-  #define _SLOG_DISABLE_PADDING_WARNING
-  #define _SLOG_RESTORE_PADDING_WARNING
-#endif
-
-
-#endif // SLOG_CONFIG_HPP
+#endif // SLOG_CONFIG_MACROS_HPP

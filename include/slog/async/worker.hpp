@@ -10,7 +10,8 @@
     #include <slog/async/async_op.hpp>
     #include <slog/async/mpsc_queue.hpp>
     #include <slog/async/policies.hpp>
-    #include <slog/common.hpp>
+    #include <slog/config_macros.hpp>
+    #include <slog/details/macros.hpp>
     #include <slog/sinks/sink_manager.hpp>
 
 namespace slog::async
@@ -84,10 +85,10 @@ private:
     }
 
     MPSCQueue<AsyncOp, SLOG_MPSC_QUEUE_SIZE, BlockOnFull> _queue;
-    _SLOG_DISABLE_PADDING_WARNING
+    SLOG_DISABLE_PADDING_WARNING
     alignas(SLOG_CACHELINE_SIZE) std::atomic<bool> _running;
     alignas(SLOG_CACHELINE_SIZE) std::atomic<bool> _flag{true};
-    _SLOG_RESTORE_PADDING_WARNING
+    SLOG_RESTORE_PADDING_WARNING
     std::thread _worker_thread;
 };
 

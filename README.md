@@ -30,7 +30,7 @@ The main goal of this library is to provide a **reliable**, **safe to use**, gen
 ## Features
 
 - **Logger Registry** to ensure loggers/sinks/worker life cycle and address the _Static Destruction Order Fiasco_ without leakages
-- **Sync** (default/optional) if _thread safe_ is disabled, `<mutex>` and `<thread>` headers are not included
+- **Sync** (default/optional) ~~if _thread safe_ is disabled, `<mutex>` and `<thread>` headers are not included~~
 - **Async** (optional) ~~lock-free hot path with low latency on user application~~
 - **Unified Interface for Sync and Async**
 - **Thread Safe** (default/optional) _thread safe_ can be disable for _sync_ mode, for _async_ mode has no effects
@@ -127,13 +127,11 @@ Suggestion and contribution are welcome! Just contact me and I'll be glad to ans
 
 It's not ordered and it's more of a Todo list, but Roadmap sounds better.
 
-- [ ] Implement SLOG_API for windows static/shared library
 - [ ] Implement Worker Policies
 - [ ] Implement modules
 - [ ] Improve compilation time
 - [ ] Finilize EBR implementation for lock-free Registry
 - [ ] Implement multiprocess support
-- [ ] Unify .sh/.ps1 update_badge scripts to .py
 - [ ] Implement clang-format hook
 - [ ] Implement Signal Handler
 - [ ] Implement Log Rotation

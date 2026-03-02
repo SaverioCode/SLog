@@ -13,32 +13,32 @@ namespace slog
 // Public methods
 // ------------------------
 
-SLOG_ALWAYS_INLINE void Logger::flush() const
+SLOG_INLINE void Logger::flush() const
 {
     _sink_manager->flush();
 }
 
-SLOG_ALWAYS_INLINE void Logger::add_sink(std::shared_ptr<slog::sinks::ISink> sink)
+SLOG_INLINE void Logger::add_sink(std::shared_ptr<slog::sinks::ISink> sink)
 {
     _sink_manager->add_sink(sink);
 }
 
-SLOG_ALWAYS_INLINE void Logger::remove_sink(const std::string& name) noexcept
+SLOG_INLINE void Logger::remove_sink(const std::string& name) noexcept
 {
     _sink_manager->remove_sink(name);
 }
 
-[[nodiscard]] SLOG_ALWAYS_INLINE std::shared_ptr<slog::sinks::ISink> Logger::get_sink(const std::string& name) const
+[[nodiscard]] SLOG_INLINE std::shared_ptr<slog::sinks::ISink> Logger::get_sink(const std::string& name) const
 {
     return _sink_manager->get_sink(name);
 }
 
-[[nodiscard]] SLOG_ALWAYS_INLINE std::shared_ptr<std::vector<std::shared_ptr<slog::sinks::ISink>>> Logger::get_sinks() const
+[[nodiscard]] SLOG_INLINE std::shared_ptr<std::vector<std::shared_ptr<slog::sinks::ISink>>> Logger::get_sinks() const
 {
     return _sink_manager->get_sinks();
 }
 
-[[nodiscard]] SLOG_ALWAYS_INLINE bool Logger::has_sink(const std::string& name) const noexcept
+[[nodiscard]] SLOG_INLINE bool Logger::has_sink(const std::string& name) const noexcept
 {
     return _sink_manager->has_sink(name);
 }
@@ -68,12 +68,12 @@ SLOG_INLINE Logger::Logger(std::string_view name,
     _sink_manager = std::make_shared<slog::sinks::SinkManager>(sinks);
 }
 
-SLOG_ALWAYS_INLINE void Logger::set_pattern(std::string_view pattern)
+SLOG_INLINE void Logger::set_pattern(std::string_view pattern)
 {
     _sink_manager->set_pattern(pattern);
 }
 
-SLOG_ALWAYS_INLINE void Logger::_submit(LogRecord&& record)
+SLOG_INLINE void Logger::_submit(LogRecord&& record)
 {
 #ifdef SLOG_ASYNC_ENABLED
     _worker->push(slog::async::AsyncOp{std::move(record), _sink_manager});
